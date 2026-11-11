@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@magpie-community/opencode-cursor-auth": "0.2.44",
-    "dsh-cursor": "link:../dsh-cursor",
+    "dsh-cursor": "github:YanzuoLu/dsh-cursor#a5c5afb",
     "esbuild": "0.25.12"
   }
 }
