@@ -7628,6 +7628,13 @@ function canonical(value) {
   return value;
 }
 var sha256 = (data) => createHash6("sha256").update(data).digest("hex");
+function argumentsKey(args) {
+  try {
+    return JSON.stringify(canonical(JSON.parse(args)));
+  } catch {
+    return args;
+  }
+}
 function requestFingerprint(options) {
   const value = {
     system: options.system,
@@ -7636,7 +7643,7 @@ function requestFingerprint(options) {
         return {
           role: "assistant",
           text: message2.content.filter((block) => block.type === "text").map((block) => block.text).join("").trim(),
-          calls: message2.content.filter((block) => block.type === "tool-call").map(({ id, name, arguments: args }) => ({ id: String(id), name, args }))
+          calls: message2.content.filter((block) => block.type === "tool-call").map(({ id, name, arguments: args }) => ({ id: String(id), name, args: argumentsKey(args) }))
         };
       }
       return {
@@ -13511,7 +13518,7 @@ function createChat({ runtime, ready, route, maxRequired: maxRequired2, logger }
           continue;
         }
         if (emitted || attempt > 0 || !REBUILD.has(error?.code) || options.signal.aborted) throw error;
-        logger?.warn(`cursor: ${options.sessionId} rebuilding from history after ${error.code}`);
+        logger?.warn(`cursor: ${options.sessionId} rebuilding from history after ${error.code}: ${error.message}`);
         if (options.sessionId) await runtime.closeTurn(options.sessionId, error.message).catch(() => {
         });
       }

@@ -23,6 +23,15 @@ function canonical(value) {
 const sha256 = data => createHash('sha256').update(data).digest('hex')
 
 /**
+ * Tool-call arguments by what they say: a client may encode the same JSON
+ * again (magpie's Go encoder writes `>` as `\u003e` for a freeform tool's
+ * input).
+ */
+function argumentsKey(args) {
+  try { return JSON.stringify(canonical(JSON.parse(args))) } catch { return args }
+}
+
+/**
  * Hash only what the model sees and a client replays faithfully. Clients
  * do not all replay reasoning, and they join an assistant reply's text
  * blocks, so an assistant message counts as its joined text and its calls.
@@ -35,7 +44,7 @@ export function requestFingerprint(options) {
         return {
           role: 'assistant',
           text: message.content.filter(block => block.type === 'text').map(block => block.text).join('').trim(),
-          calls: message.content.filter(block => block.type === 'tool-call').map(({ id, name, arguments: args }) => ({ id: String(id), name, args })),
+          calls: message.content.filter(block => block.type === 'tool-call').map(({ id, name, arguments: args }) => ({ id: String(id), name, args: argumentsKey(args) })),
         }
       }
       return {

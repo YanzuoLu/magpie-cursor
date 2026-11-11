@@ -162,7 +162,7 @@ export function createChat({ runtime, ready, route, maxRequired, logger }) {
           continue
         }
         if (emitted || attempt > 0 || !REBUILD.has(error?.code) || options.signal.aborted) throw error
-        logger?.warn(`cursor: ${options.sessionId} rebuilding from history after ${error.code}`)
+        logger?.warn(`cursor: ${options.sessionId} rebuilding from history after ${error.code}: ${error.message}`)
         if (options.sessionId) await runtime.closeTurn(options.sessionId, error.message).catch(() => {})
       }
     }
