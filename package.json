@@ -14,11 +14,15 @@
   ],
   "license": "MIT",
   "author": "Yanzuo Lu",
-  "repository": { "type": "git", "url": "https://github.com/YanzuoLu/magpie-cursor.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YanzuoLu/magpie-cursor.git"
+  },
   "scripts": {
     "build": "node scripts/build.mjs"
   },
   "devDependencies": {
+    "@magpie-community/opencode-cursor-auth": "0.2.44",
     "dsh-cursor": "link:../dsh-cursor",
     "esbuild": "0.25.12"
   }

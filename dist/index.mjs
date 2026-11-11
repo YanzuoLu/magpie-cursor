@@ -1,9 +1,9 @@
-/* magpie-cursor: dsh-cursor (MIT, Yanzuo Lu) in magpie. Upstream notices in dsh-cursor UPSTREAM.md. */
+/* magpie-cursor: dsh-cursor (MIT, Yanzuo Lu) and @magpie-community/opencode-cursor-auth (MIT) in magpie. */
 
 // src/index.js
-import { appendFileSync, mkdirSync as mkdirSync2, renameSync as renameSync2, statSync } from "node:fs";
-import { homedir as homedir2 } from "node:os";
-import { join as join3 } from "node:path";
+import { appendFileSync, mkdirSync as mkdirSync3, renameSync as renameSync3, statSync } from "node:fs";
+import { homedir as homedir3 } from "node:os";
+import { join as join5 } from "node:path";
 
 // ../dsh-cursor/lib/runtime.js
 import { createHash as createHash7, randomUUID as randomUUID4 } from "node:crypto";
@@ -18,7 +18,6 @@ var LlmError = class extends Error {
     if (options?.offloadImages !== void 0) this.offloadImages = options.offloadImages;
   }
 };
-var ReasoningEffortId = (id) => id;
 var ToolCallId = (id) => id;
 var attributionHeaders = () => ({});
 function createAssistantMessage({ content, source }) {
@@ -130,8 +129,8 @@ function int64ToString(lo, hi) {
   if (negative) {
     bits = negate(bits.lo, bits.hi);
   }
-  const result = uInt64ToString(bits.lo, bits.hi);
-  return negative ? "-" + result : result;
+  const result2 = uInt64ToString(bits.lo, bits.hi);
+  return negative ? "-" + result2 : result2;
 }
 function uInt64ToString(lo, hi) {
   ({ lo, hi } = toUnsigned(lo, hi));
@@ -174,23 +173,23 @@ var decimalFrom1e7WithLeadingZeros = (digit1e7) => {
   const partial = String(digit1e7);
   return "0000000".slice(partial.length) + partial;
 };
-function varint32write(value, bytes) {
+function varint32write(value, bytes2) {
   if (value >>> 0 < 128) {
-    bytes.push(value);
+    bytes2.push(value);
     return;
   }
   if (value >= 0) {
     while (value > 127) {
-      bytes.push(value & 127 | 128);
+      bytes2.push(value & 127 | 128);
       value = value >>> 7;
     }
-    bytes.push(value);
+    bytes2.push(value);
   } else {
     for (let i = 0; i < 9; i++) {
-      bytes.push(value & 127 | 128);
+      bytes2.push(value & 127 | 128);
       value = value >> 7;
     }
-    bytes.push(1);
+    bytes2.push(1);
   }
 }
 function varint32read() {
@@ -199,33 +198,33 @@ function varint32read() {
     this.assertBounds();
     return b;
   }
-  let result = b & 127;
+  let result2 = b & 127;
   b = this.buf[this.pos++];
-  result |= (b & 127) << 7;
+  result2 |= (b & 127) << 7;
   if ((b & 128) === 0) {
     this.assertBounds();
-    return result;
+    return result2;
   }
   b = this.buf[this.pos++];
-  result |= (b & 127) << 14;
+  result2 |= (b & 127) << 14;
   if ((b & 128) === 0) {
     this.assertBounds();
-    return result;
+    return result2;
   }
   b = this.buf[this.pos++];
-  result |= (b & 127) << 21;
+  result2 |= (b & 127) << 21;
   if ((b & 128) === 0) {
     this.assertBounds();
-    return result;
+    return result2;
   }
   b = this.buf[this.pos++];
-  result |= (b & 15) << 28;
+  result2 |= (b & 15) << 28;
   for (let readBytes = 5; (b & 128) !== 0 && readBytes < 10; readBytes++)
     b = this.buf[this.pos++];
   if ((b & 128) !== 0)
     throw new Error("invalid varint");
   this.assertBounds();
-  return result >>> 0;
+  return result2 >>> 0;
 }
 
 // ../dsh-cursor/node_modules/.pnpm/@bufbuild+protobuf@2.14.1/node_modules/@bufbuild/protobuf/dist/esm/proto-int64.js
@@ -379,60 +378,60 @@ function unsafeOneofCase(target, oneof) {
   }
   return oneof.fields.find((f) => f.localName === c);
 }
-function unsafeIsSet(target, field2) {
-  const name = field2.localName;
-  if (field2.oneof) {
-    return target[field2.oneof.localName].case === name;
+function unsafeIsSet(target, field4) {
+  const name = field4.localName;
+  if (field4.oneof) {
+    return target[field4.oneof.localName].case === name;
   }
-  if (field2.presence != IMPLICIT) {
+  if (field4.presence != IMPLICIT) {
     return target[name] !== void 0 && Object.prototype.hasOwnProperty.call(target, name);
   }
-  switch (field2.fieldKind) {
+  switch (field4.fieldKind) {
     case "list":
       return target[name].length > 0;
     case "map":
       return Object.keys(target[name]).length > 0;
     case "scalar":
-      return !isScalarZeroValue(field2.scalar, target[name]);
+      return !isScalarZeroValue(field4.scalar, target[name]);
     case "enum":
-      return target[name] !== field2.enum.values[0].number;
+      return target[name] !== field4.enum.values[0].number;
   }
   throw new Error("message field with implicit presence");
 }
 function unsafeIsSetExplicit(target, localName) {
   return Object.prototype.hasOwnProperty.call(target, localName) && target[localName] !== void 0;
 }
-function unsafeGet(target, field2) {
-  if (field2.oneof) {
-    const oneof = target[field2.oneof.localName];
-    if (oneof.case === field2.localName) {
+function unsafeGet(target, field4) {
+  if (field4.oneof) {
+    const oneof = target[field4.oneof.localName];
+    if (oneof.case === field4.localName) {
       return oneof.value;
     }
     return void 0;
   }
-  return target[field2.localName];
+  return target[field4.localName];
 }
-function unsafeSet(target, field2, value) {
-  if (field2.oneof) {
-    target[field2.oneof.localName] = {
-      case: field2.localName,
+function unsafeSet(target, field4, value) {
+  if (field4.oneof) {
+    target[field4.oneof.localName] = {
+      case: field4.localName,
       value
     };
   } else {
-    target[field2.localName] = value;
+    target[field4.localName] = value;
   }
 }
-function unsafeClear(target, field2) {
-  const name = field2.localName;
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function unsafeClear(target, field4) {
+  const name = field4.localName;
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     if (target[oneofLocalName].case === name) {
       target[oneofLocalName] = { case: void 0 };
     }
-  } else if (field2.presence != IMPLICIT) {
+  } else if (field4.presence != IMPLICIT) {
     delete target[name];
   } else {
-    switch (field2.fieldKind) {
+    switch (field4.fieldKind) {
       case "map":
         target[name] = {};
         break;
@@ -440,10 +439,10 @@ function unsafeClear(target, field2) {
         target[name] = [];
         break;
       case "enum":
-        target[name] = field2.enum.values[0].number;
+        target[name] = field4.enum.values[0].number;
         break;
       case "scalar":
-        target[name] = scalarZeroValue(field2.scalar, field2.longAsString);
+        target[name] = scalarZeroValue(field4.scalar, field4.longAsString);
         break;
     }
   }
@@ -453,11 +452,11 @@ function unsafeClear(target, field2) {
 function isObject(arg) {
   return arg !== null && typeof arg == "object" && !Array.isArray(arg);
 }
-function isReflectList(arg, field2) {
+function isReflectList(arg, field4) {
   var _a, _b, _c, _d;
   if (isObject(arg) && unsafeLocal in arg && "add" in arg && "field" in arg && typeof arg.field == "function") {
-    if (field2 !== void 0) {
-      const a = field2;
+    if (field4 !== void 0) {
+      const a = field4;
       const b = arg.field();
       return a.listKind == b.listKind && a.scalar === b.scalar && ((_a = a.message) === null || _a === void 0 ? void 0 : _a.typeName) === ((_b = b.message) === null || _b === void 0 ? void 0 : _b.typeName) && ((_c = a.enum) === null || _c === void 0 ? void 0 : _c.typeName) === ((_d = b.enum) === null || _d === void 0 ? void 0 : _d.typeName);
     }
@@ -465,11 +464,11 @@ function isReflectList(arg, field2) {
   }
   return false;
 }
-function isReflectMap(arg, field2) {
+function isReflectMap(arg, field4) {
   var _a, _b, _c, _d;
   if (isObject(arg) && unsafeLocal in arg && "has" in arg && "field" in arg && typeof arg.field == "function") {
-    if (field2 !== void 0) {
-      const a = field2, b = arg.field();
+    if (field4 !== void 0) {
+      const a = field4, b = arg.field();
       return a.mapKey === b.mapKey && a.mapKind == b.mapKind && a.scalar === b.scalar && ((_a = a.message) === null || _a === void 0 ? void 0 : _a.typeName) === ((_b = b.message) === null || _b === void 0 ? void 0 : _b.typeName) && ((_c = a.enum) === null || _c === void 0 ? void 0 : _c.typeName) === ((_d = b.enum) === null || _d === void 0 ? void 0 : _d.typeName);
     }
     return true;
@@ -664,25 +663,25 @@ function compileInitMessage(desc) {
 }
 function compileConvertOneof(oneof) {
   const converters = /* @__PURE__ */ new Map();
-  for (const field2 of oneof.fields) {
+  for (const field4 of oneof.fields) {
     let convert;
-    if (field2.fieldKind == "message") {
-      convert = compileConvertMessage(field2);
-    } else if (field2.fieldKind == "scalar" && field2.scalar == ScalarType.BYTES) {
+    if (field4.fieldKind == "message") {
+      convert = compileConvertMessage(field4);
+    } else if (field4.fieldKind == "scalar" && field4.scalar == ScalarType.BYTES) {
       convert = toU8Arr;
     }
-    converters.set(field2.localName, convert !== null && convert !== void 0 ? convert : ((value) => value));
+    converters.set(field4.localName, convert !== null && convert !== void 0 ? convert : ((value) => value));
   }
   return converters;
 }
-function compileConvertMessage(field2) {
-  if (field2.fieldKind == "message" && !field2.oneof && isWrapperDesc(field2.message)) {
-    return field2.message.fields[0].scalar == ScalarType.BYTES ? toU8Arr : void 0;
+function compileConvertMessage(field4) {
+  if (field4.fieldKind == "message" && !field4.oneof && isWrapperDesc(field4.message)) {
+    return field4.message.fields[0].scalar == ScalarType.BYTES ? toU8Arr : void 0;
   }
-  if (field2.message.typeName == "google.protobuf.Struct" && field2.parent.typeName !== "google.protobuf.Value") {
+  if (field4.message.typeName == "google.protobuf.Struct" && field4.parent.typeName !== "google.protobuf.Value") {
     return void 0;
   }
-  const messageDesc2 = field2.message;
+  const messageDesc2 = field4.message;
   let compiled;
   return (value) => {
     if (!isObject(value) || isMessage(value, messageDesc2)) {
@@ -705,12 +704,12 @@ function needsPrototypeChain(desc) {
       return desc.fields.some((f) => f.presence != IMPLICIT2 && f.fieldKind != "message" && !f.oneof);
   }
 }
-function createZeroValue(field2) {
-  const defaultValue = field2.getDefaultValue();
+function createZeroValue(field4) {
+  const defaultValue = field4.getDefaultValue();
   if (defaultValue !== void 0) {
-    return field2.fieldKind == "scalar" && field2.longAsString ? defaultValue.toString() : defaultValue;
+    return field4.fieldKind == "scalar" && field4.longAsString ? defaultValue.toString() : defaultValue;
   }
-  return field2.fieldKind == "scalar" ? scalarZeroValue(field2.scalar, field2.longAsString) : field2.enum.values[0].number;
+  return field4.fieldKind == "scalar" ? scalarZeroValue(field4.scalar, field4.longAsString) : field4.enum.values[0].number;
 }
 
 // ../dsh-cursor/node_modules/.pnpm/@bufbuild+protobuf@2.14.1/node_modules/@bufbuild/protobuf/dist/esm/reflect/error.js
@@ -746,23 +745,23 @@ function getTextEncoding() {
     const textDecoder = new globals.TextDecoder();
     let textDecoderStrict;
     const config = {
-      encodeUtf8(text2) {
-        return textEncoder.encode(text2);
+      encodeUtf8(text) {
+        return textEncoder.encode(text);
       },
-      decodeUtf8(bytes, strict) {
+      decodeUtf8(bytes2, strict) {
         if (strict) {
           if (!textDecoderStrict) {
             textDecoderStrict = new globals.TextDecoder("utf-8", {
               fatal: true
             });
           }
-          return textDecoderStrict.decode(bytes);
+          return textDecoderStrict.decode(bytes2);
         }
-        return textDecoder.decode(bytes);
+        return textDecoder.decode(bytes2);
       },
-      checkUtf8(text2) {
+      checkUtf8(text) {
         try {
-          encodeURIComponent(text2);
+          encodeURIComponent(text);
           return true;
         } catch (_) {
           return false;
@@ -774,8 +773,8 @@ function getTextEncoding() {
     }
     const nativeStringIsWellFormed = String.prototype.isWellFormed;
     if (nativeStringIsWellFormed) {
-      config.checkUtf8 = (text2) => {
-        return nativeStringIsWellFormed.call(text2);
+      config.checkUtf8 = (text) => {
+        return nativeStringIsWellFormed.call(text);
       };
     }
     configureTextEncoding(config);
@@ -783,10 +782,10 @@ function getTextEncoding() {
   return te;
 }
 function emulateEncodeInto(encodeUtf8) {
-  return (text2, dest) => {
-    const bytes = encodeUtf8(text2);
-    dest.set(bytes);
-    return { written: bytes.byteLength };
+  return (text, dest) => {
+    const bytes2 = encodeUtf8(text);
+    dest.set(bytes2);
+    return { written: bytes2.byteLength };
   };
 }
 
@@ -830,11 +829,11 @@ var BinaryWriter = class {
    * was last used.
    */
   view() {
-    const bytes = this.buffer;
+    const bytes2 = this.buffer;
     const view = this.viewCache;
-    if (view.byteLength === bytes.byteLength)
+    if (view.byteLength === bytes2.byteLength)
       return view;
-    const newView = new DataView(bytes.buffer);
+    const newView = new DataView(bytes2.buffer);
     this.viewCache = newView;
     return newView;
   }
@@ -842,10 +841,10 @@ var BinaryWriter = class {
    * Return all bytes written and reset this writer.
    */
   finish() {
-    const result = this.buffer.slice(0, this.pos);
+    const result2 = this.buffer.slice(0, this.pos);
     this.pos = 0;
     this.stackPos = [];
-    return result;
+    return result2;
   }
   /**
    * Start a new fork for length-delimited data like a message
@@ -1315,20 +1314,20 @@ var BinaryReader = class {
    * `strict` is true, throw on invalid UTF-8 instead of substituting U+FFFD.
    */
   string(strict) {
-    const bytes = this.bytes();
-    const len = bytes.length;
+    const bytes2 = this.bytes();
+    const len = bytes2.length;
     if (len <= ASCII_MAX_LENGTH) {
       const codes = new Array(len);
       for (let i = 0; i < len; i++) {
-        const byte = bytes[i];
+        const byte = bytes2[i];
         if (byte > 127) {
-          return this.decodeUtf8(bytes, strict);
+          return this.decodeUtf8(bytes2, strict);
         }
         codes[i] = byte;
       }
       return String.fromCharCode.apply(String, codes);
     }
-    return this.decodeUtf8(bytes, strict);
+    return this.decodeUtf8(bytes2, strict);
   }
 };
 function assertInt32(arg) {
@@ -1364,54 +1363,54 @@ function assertFloat32(arg) {
 }
 
 // ../dsh-cursor/node_modules/.pnpm/@bufbuild+protobuf@2.14.1/node_modules/@bufbuild/protobuf/dist/esm/reflect/reflect-check.js
-function checkField(field2, value) {
-  const check = field2.fieldKind == "list" ? isReflectList(value, field2) : field2.fieldKind == "map" ? isReflectMap(value, field2) : checkSingular(field2, value);
+function checkField(field4, value) {
+  const check = field4.fieldKind == "list" ? isReflectList(value, field4) : field4.fieldKind == "map" ? isReflectMap(value, field4) : checkSingular(field4, value);
   if (check === true) {
     return void 0;
   }
   let reason;
-  switch (field2.fieldKind) {
+  switch (field4.fieldKind) {
     case "list":
-      reason = `expected ${formatReflectList(field2)}, got ${formatVal(value)}`;
+      reason = `expected ${formatReflectList(field4)}, got ${formatVal(value)}`;
       break;
     case "map":
-      reason = `expected ${formatReflectMap(field2)}, got ${formatVal(value)}`;
+      reason = `expected ${formatReflectMap(field4)}, got ${formatVal(value)}`;
       break;
     default: {
-      reason = reasonSingular(field2, value, check);
+      reason = reasonSingular(field4, value, check);
     }
   }
-  return new FieldError(field2, reason);
+  return new FieldError(field4, reason);
 }
-function checkListItem(field2, index, value) {
-  const check = checkSingular(field2, value);
+function checkListItem(field4, index, value) {
+  const check = checkSingular(field4, value);
   if (check !== true) {
-    return new FieldError(field2, `list item #${index + 1}: ${reasonSingular(field2, value, check)}`);
+    return new FieldError(field4, `list item #${index + 1}: ${reasonSingular(field4, value, check)}`);
   }
   return void 0;
 }
-function checkMapEntry(field2, key, value) {
-  const checkKey = checkScalarValue(field2.mapKey)(key);
+function checkMapEntry(field4, key, value) {
+  const checkKey = checkScalarValue(field4.mapKey)(key);
   if (checkKey !== true) {
-    return new FieldError(field2, `invalid map key: ${reasonSingular({ scalar: field2.mapKey }, key, checkKey)}`);
+    return new FieldError(field4, `invalid map key: ${reasonSingular({ scalar: field4.mapKey }, key, checkKey)}`);
   }
-  const checkVal = checkSingular(field2, value);
+  const checkVal = checkSingular(field4, value);
   if (checkVal !== true) {
-    return new FieldError(field2, `map entry ${formatVal(key)}: ${reasonSingular(field2, value, checkVal)}`);
+    return new FieldError(field4, `map entry ${formatVal(key)}: ${reasonSingular(field4, value, checkVal)}`);
   }
   return void 0;
 }
-function checkSingular(field2, value) {
-  if (field2.scalar !== void 0) {
-    return checkScalarValue(field2.scalar)(value);
+function checkSingular(field4, value) {
+  if (field4.scalar !== void 0) {
+    return checkScalarValue(field4.scalar)(value);
   }
-  if (field2.enum !== void 0) {
-    if (field2.enum.open) {
+  if (field4.enum !== void 0) {
+    if (field4.enum.open) {
       return checkScalarValue(ScalarType.INT32)(value);
     }
-    return field2.enum.values.some((v) => v.number === value);
+    return field4.enum.values.some((v) => v.number === value);
   }
-  return isReflectMessage(value, field2.message);
+  return isReflectMessage(value, field4.message);
 }
 function checkScalarValue(scalar) {
   switch (scalar) {
@@ -1493,15 +1492,15 @@ function checkScalarValue(scalar) {
       };
   }
 }
-function reasonSingular(field2, val, details) {
+function reasonSingular(field4, val, details) {
   details = typeof details == "string" ? `: ${details}` : `, got ${formatVal(val)}`;
-  if (field2.scalar !== void 0) {
-    return `expected ${scalarTypeDescription(field2.scalar)}` + details;
+  if (field4.scalar !== void 0) {
+    return `expected ${scalarTypeDescription(field4.scalar)}` + details;
   }
-  if (field2.enum !== void 0) {
-    return `expected ${field2.enum.toString()}` + details;
+  if (field4.enum !== void 0) {
+    return `expected ${field4.enum.toString()}` + details;
   }
-  return `expected ${formatReflectMessage(field2.message)}` + details;
+  return `expected ${formatReflectMessage(field4.message)}` + details;
 }
 function formatVal(val) {
   switch (typeof val) {
@@ -1543,24 +1542,24 @@ function formatVal(val) {
 function formatReflectMessage(desc) {
   return `ReflectMessage (${desc.typeName})`;
 }
-function formatReflectList(field2) {
-  switch (field2.listKind) {
+function formatReflectList(field4) {
+  switch (field4.listKind) {
     case "message":
-      return `ReflectList (${field2.message.toString()})`;
+      return `ReflectList (${field4.message.toString()})`;
     case "enum":
-      return `ReflectList (${field2.enum.toString()})`;
+      return `ReflectList (${field4.enum.toString()})`;
     case "scalar":
-      return `ReflectList (${ScalarType[field2.scalar]})`;
+      return `ReflectList (${ScalarType[field4.scalar]})`;
   }
 }
-function formatReflectMap(field2) {
-  switch (field2.mapKind) {
+function formatReflectMap(field4) {
+  switch (field4.mapKind) {
     case "message":
-      return `ReflectMap (${ScalarType[field2.mapKey]}, ${field2.message.toString()})`;
+      return `ReflectMap (${ScalarType[field4.mapKey]}, ${field4.message.toString()})`;
     case "enum":
-      return `ReflectMap (${ScalarType[field2.mapKey]}, ${field2.enum.toString()})`;
+      return `ReflectMap (${ScalarType[field4.mapKey]}, ${field4.enum.toString()})`;
     case "scalar":
-      return `ReflectMap (${ScalarType[field2.mapKey]}, ${ScalarType[field2.scalar]})`;
+      return `ReflectMap (${ScalarType[field4.mapKey]}, ${ScalarType[field4.scalar]})`;
   }
 }
 function scalarTypeDescription(scalar) {
@@ -1594,15 +1593,15 @@ function scalarTypeDescription(scalar) {
 
 // ../dsh-cursor/node_modules/.pnpm/@bufbuild+protobuf@2.14.1/node_modules/@bufbuild/protobuf/dist/esm/reflect/message.js
 var NULL_VALUE = 0;
-function localMessageMapper(field2) {
-  if (usesJsonRepresentation(field2)) {
+function localMessageMapper(field4) {
+  if (usesJsonRepresentation(field4)) {
     return {
       toMessage: (local) => wktStructToReflect(local),
       toLocal: (message2) => wktStructToLocal(message2)
     };
   }
-  if (field2.fieldKind == "message" && !field2.oneof && isWrapperDesc(field2.message)) {
-    const wrapperDesc = field2.message;
+  if (field4.fieldKind == "message" && !field4.oneof && isWrapperDesc(field4.message)) {
+    const wrapperDesc = field4.message;
     const valueLocalName = wrapperDesc.fields[0].localName;
     return {
       toMessage: (local) => {
@@ -1615,14 +1614,14 @@ function localMessageMapper(field2) {
       toLocal: (message2) => message2[valueLocalName]
     };
   }
-  const childDesc = field2.message;
+  const childDesc = field4.message;
   return {
     toMessage: (local) => local === void 0 ? create(childDesc) : local,
     toLocal: (message2) => message2
   };
 }
-function usesJsonRepresentation(field2) {
-  return field2.message.typeName == "google.protobuf.Struct" && field2.parent.typeName != "google.protobuf.Value";
+function usesJsonRepresentation(field4) {
+  return field4.message.typeName == "google.protobuf.Struct" && field4.parent.typeName != "google.protobuf.Value";
 }
 function wktStructToReflect(json) {
   const struct = {
@@ -1734,63 +1733,63 @@ var ReflectMessageImpl = class {
     assertOwn(this.message, oneof);
     return unsafeOneofCase(this.message, oneof);
   }
-  isSet(field2) {
-    assertOwn(this.message, field2);
-    return unsafeIsSet(this.message, field2);
+  isSet(field4) {
+    assertOwn(this.message, field4);
+    return unsafeIsSet(this.message, field4);
   }
-  clear(field2) {
-    assertOwn(this.message, field2);
-    unsafeClear(this.message, field2);
+  clear(field4) {
+    assertOwn(this.message, field4);
+    unsafeClear(this.message, field4);
   }
-  get(field2) {
-    assertOwn(this.message, field2);
-    const value = unsafeGet(this.message, field2);
-    switch (field2.fieldKind) {
+  get(field4) {
+    assertOwn(this.message, field4);
+    const value = unsafeGet(this.message, field4);
+    switch (field4.fieldKind) {
       case "list":
-        let list = this.lists.get(field2);
+        let list = this.lists.get(field4);
         if (!list || list[unsafeLocal] !== value) {
           this.lists.set(
-            field2,
+            field4,
             // biome-ignore lint/suspicious/noAssignInExpressions: no
-            list = new ReflectListImpl(field2, value, this.check)
+            list = new ReflectListImpl(field4, value, this.check)
           );
         }
         return list;
       case "map":
-        let map = this.maps.get(field2);
+        let map = this.maps.get(field4);
         if (!map || map[unsafeLocal] !== value) {
           this.maps.set(
-            field2,
+            field4,
             // biome-ignore lint/suspicious/noAssignInExpressions: no
-            map = new ReflectMapImpl(field2, value, this.check)
+            map = new ReflectMapImpl(field4, value, this.check)
           );
         }
         return map;
       case "message":
-        return messageToReflect(field2, value, this.check);
+        return messageToReflect(field4, value, this.check);
       case "scalar":
-        return value === void 0 ? scalarZeroValue(field2.scalar, false) : longToReflect(field2, value);
+        return value === void 0 ? scalarZeroValue(field4.scalar, false) : longToReflect(field4, value);
       case "enum":
-        return value !== null && value !== void 0 ? value : field2.enum.values[0].number;
+        return value !== null && value !== void 0 ? value : field4.enum.values[0].number;
     }
   }
-  set(field2, value) {
-    assertOwn(this.message, field2);
+  set(field4, value) {
+    assertOwn(this.message, field4);
     if (this.check) {
-      const err = checkField(field2, value);
+      const err = checkField(field4, value);
       if (err) {
         throw err;
       }
     }
     let local;
-    if (field2.fieldKind == "message") {
-      local = messageToLocal(field2, value);
+    if (field4.fieldKind == "message") {
+      local = messageToLocal(field4, value);
     } else if (isReflectMap(value) || isReflectList(value)) {
       local = value[unsafeLocal];
     } else {
-      local = longToLocal(field2, value);
+      local = longToLocal(field4, value);
     }
-    unsafeSet(this.message, field2, local);
+    unsafeSet(this.message, field4, local);
   }
   getUnknown() {
     return this.message.$unknown;
@@ -1811,8 +1810,8 @@ var ReflectListImpl = class {
   get size() {
     return this._arr.length;
   }
-  constructor(field2, unsafeInput, check) {
-    this._field = field2;
+  constructor(field4, unsafeInput, check) {
+    this._field = field4;
     this._arr = this[unsafeLocal] = unsafeInput;
     this.check = check;
   }
@@ -1863,10 +1862,10 @@ var ReflectListImpl = class {
   }
 };
 var ReflectMapImpl = class {
-  constructor(field2, unsafeInput, check = true) {
+  constructor(field4, unsafeInput, check = true) {
     this.obj = this[unsafeLocal] = unsafeInput !== null && unsafeInput !== void 0 ? unsafeInput : {};
     this.check = check;
-    this._field = field2;
+    this._field = field4;
   }
   field() {
     return this._field;
@@ -1934,52 +1933,52 @@ var ReflectMapImpl = class {
     }
   }
 };
-function messageToLocal(field2, value) {
+function messageToLocal(field4, value) {
   if (!isReflectMessage(value)) {
     return value;
   }
-  if (isWrapper(value.message) && !field2.oneof && field2.fieldKind == "message") {
+  if (isWrapper(value.message) && !field4.oneof && field4.fieldKind == "message") {
     return value.message.value;
   }
-  if (value.desc.typeName == "google.protobuf.Struct" && field2.parent.typeName != "google.protobuf.Value") {
+  if (value.desc.typeName == "google.protobuf.Struct" && field4.parent.typeName != "google.protobuf.Value") {
     return wktStructToLocal(value.message);
   }
   return value.message;
 }
-function messageToReflect(field2, value, check) {
+function messageToReflect(field4, value, check) {
   if (value !== void 0) {
-    if (isWrapperDesc(field2.message) && !field2.oneof && field2.fieldKind == "message") {
+    if (isWrapperDesc(field4.message) && !field4.oneof && field4.fieldKind == "message") {
       value = {
-        $typeName: field2.message.typeName,
-        value: longToReflect(field2.message.fields[0], value)
+        $typeName: field4.message.typeName,
+        value: longToReflect(field4.message.fields[0], value)
       };
-    } else if (field2.message.typeName == "google.protobuf.Struct" && field2.parent.typeName != "google.protobuf.Value" && isObject(value)) {
+    } else if (field4.message.typeName == "google.protobuf.Struct" && field4.parent.typeName != "google.protobuf.Value" && isObject(value)) {
       value = wktStructToReflect(value);
     }
   }
-  return new ReflectMessageImpl(field2.message, value, check);
+  return new ReflectMessageImpl(field4.message, value, check);
 }
-function listItemToLocal(field2, value) {
-  if (field2.listKind == "message") {
-    return messageToLocal(field2, value);
+function listItemToLocal(field4, value) {
+  if (field4.listKind == "message") {
+    return messageToLocal(field4, value);
   }
-  return longToLocal(field2, value);
+  return longToLocal(field4, value);
 }
-function listItemToReflect(field2, value, check) {
-  if (field2.listKind == "message") {
-    return messageToReflect(field2, value, check);
+function listItemToReflect(field4, value, check) {
+  if (field4.listKind == "message") {
+    return messageToReflect(field4, value, check);
   }
-  return longToReflect(field2, value);
+  return longToReflect(field4, value);
 }
-function mapValueToLocal(field2, value) {
-  if (field2.mapKind == "message") {
-    return messageToLocal(field2, value);
+function mapValueToLocal(field4, value) {
+  if (field4.mapKind == "message") {
+    return messageToLocal(field4, value);
   }
-  return longToLocal(field2, value);
+  return longToLocal(field4, value);
 }
-function mapValueToReflect(field2, value, check) {
-  if (field2.mapKind == "message") {
-    return messageToReflect(field2, value, check);
+function mapValueToReflect(field4, value, check) {
+  if (field4.mapKind == "message") {
+    return messageToReflect(field4, value, check);
   }
   return value;
 }
@@ -2025,30 +2024,30 @@ function mapKeyToReflect(key, type) {
   }
   return key;
 }
-function longToReflect(field2, value) {
-  switch (field2.scalar) {
+function longToReflect(field4, value) {
+  switch (field4.scalar) {
     case ScalarType.INT64:
     case ScalarType.SFIXED64:
     case ScalarType.SINT64:
-      if ("longAsString" in field2 && field2.longAsString && typeof value == "string") {
+      if ("longAsString" in field4 && field4.longAsString && typeof value == "string") {
         value = protoInt64.parse(value);
       }
       break;
     case ScalarType.FIXED64:
     case ScalarType.UINT64:
-      if ("longAsString" in field2 && field2.longAsString && typeof value == "string") {
+      if ("longAsString" in field4 && field4.longAsString && typeof value == "string") {
         value = protoInt64.uParse(value);
       }
       break;
   }
   return value;
 }
-function longToLocal(field2, value) {
-  switch (field2.scalar) {
+function longToLocal(field4, value) {
+  switch (field4.scalar) {
     case ScalarType.INT64:
     case ScalarType.SFIXED64:
     case ScalarType.SINT64:
-      if ("longAsString" in field2 && field2.longAsString) {
+      if ("longAsString" in field4 && field4.longAsString) {
         value = String(value);
       } else if (typeof value == "string" || typeof value == "number") {
         value = protoInt64.parse(value);
@@ -2056,7 +2055,7 @@ function longToLocal(field2, value) {
       break;
     case ScalarType.FIXED64:
     case ScalarType.UINT64:
-      if ("longAsString" in field2 && field2.longAsString) {
+      if ("longAsString" in field4 && field4.longAsString) {
         value = String(value);
       } else if (typeof value == "string" || typeof value == "number") {
         value = protoInt64.uParse(value);
@@ -2101,11 +2100,11 @@ function cloneReflect(i) {
   }
   return o;
 }
-function cloneSingular(field2, value) {
-  if (field2.message !== void 0 && isReflectMessage(value)) {
+function cloneSingular(field4, value) {
+  if (field4.message !== void 0 && isReflectMessage(value)) {
     return cloneReflect(value);
   }
-  if (field2.scalar == ScalarType.BYTES && value instanceof Uint8Array) {
+  if (field4.scalar == ScalarType.BYTES && value instanceof Uint8Array) {
     return value.slice();
   }
   return value;
@@ -2119,23 +2118,23 @@ function base64Decode(base64Str) {
   if ((len & 3) == 0 && base64Str[len - 1] == "=") {
     size -= base64Str[len - 2] == "=" ? 2 : 1;
   }
-  const bytes = new Uint8Array(size);
+  const bytes2 = new Uint8Array(size);
   let written = -1;
   if (nativeSetFromBase64) {
     try {
-      const result = nativeSetFromBase64.call(bytes, base64Str);
-      if (result.read == len) {
-        written = result.written;
+      const result2 = nativeSetFromBase64.call(bytes2, base64Str);
+      if (result2.read == len) {
+        written = result2.written;
       }
     } catch (_a) {
     }
   }
   if (written < 0) {
-    written = setFromBase64(bytes, base64Str);
+    written = setFromBase64(bytes2, base64Str);
   }
-  return written == size ? bytes : bytes.subarray(0, written);
+  return written == size ? bytes2 : bytes2.subarray(0, written);
 }
-function setFromBase64(bytes, base64Str) {
+function setFromBase64(bytes2, base64Str) {
   const table = getDecodeTable();
   let bytePos = 0, groupPos = 0, b, p = 0;
   for (let i = 0; i < base64Str.length; i++) {
@@ -2162,17 +2161,17 @@ function setFromBase64(bytes, base64Str) {
         groupPos = 1;
         break;
       case 1:
-        bytes[bytePos++] = p << 2 | (b & 48) >> 4;
+        bytes2[bytePos++] = p << 2 | (b & 48) >> 4;
         p = b;
         groupPos = 2;
         break;
       case 2:
-        bytes[bytePos++] = (p & 15) << 4 | (b & 60) >> 2;
+        bytes2[bytePos++] = (p & 15) << 4 | (b & 60) >> 2;
         p = b;
         groupPos = 3;
         break;
       case 3:
-        bytes[bytePos++] = (p & 3) << 6 | b;
+        bytes2[bytePos++] = (p & 3) << 6 | b;
         groupPos = 0;
         break;
     }
@@ -2187,15 +2186,15 @@ var toBase64OptionsMap = {
   std_raw: { alphabet: "base64", omitPadding: true },
   url: { alphabet: "base64url", omitPadding: true }
 };
-function base64Encode(bytes, encoding = "std") {
+function base64Encode(bytes2, encoding = "std") {
   if (nativeToBase64) {
-    return nativeToBase64.call(bytes, toBase64OptionsMap[encoding]);
+    return nativeToBase64.call(bytes2, toBase64OptionsMap[encoding]);
   }
   const table = getEncodeTable(encoding);
   const pad = encoding == "std";
   let base64 = "", groupPos = 0, b, p = 0;
-  for (let i = 0; i < bytes.length; i++) {
-    b = bytes[i];
+  for (let i = 0; i < bytes2.length; i++) {
+    b = bytes2[i];
     switch (groupPos) {
       case 0:
         base64 += table[b >> 2];
@@ -2309,11 +2308,11 @@ function restoreJsonNames(message2) {
 
 // ../dsh-cursor/node_modules/.pnpm/@bufbuild+protobuf@2.14.1/node_modules/@bufbuild/protobuf/dist/esm/wire/text-format.js
 function parseTextFormatEnumValue(descEnum, value) {
-  const enumValue2 = descEnum.values.find((v) => v.name === value);
-  if (!enumValue2) {
+  const enumValue = descEnum.values.find((v) => v.name === value);
+  if (!enumValue) {
     throw new Error(`cannot parse ${descEnum} default value: ${value}`);
   }
-  return enumValue2.number;
+  return enumValue.number;
 }
 function parseTextFormatScalarValue(type, value) {
   switch (type) {
@@ -2355,10 +2354,10 @@ function parseTextFormatScalarValue(type, value) {
       return parseInt(value, 10);
   }
 }
-function unescapeBytesDefaultValue(str) {
+function unescapeBytesDefaultValue(str2) {
   const b = [];
   const input = {
-    tail: str,
+    tail: str2,
     c: "",
     next() {
       if (this.tail.length == 0) {
@@ -2789,13 +2788,13 @@ function addFields(message2, reg, mapEntries) {
   const oneofsSeen = /* @__PURE__ */ new Set();
   for (const proto of message2.proto.field) {
     const oneof = findOneof(proto, allOneofs);
-    const field2 = newField(proto, message2, reg, oneof, mapEntries);
-    message2.fields.push(field2);
-    message2.field[field2.localName] = field2;
+    const field4 = newField(proto, message2, reg, oneof, mapEntries);
+    message2.fields.push(field4);
+    message2.field[field4.localName] = field4;
     if (oneof === void 0) {
-      message2.members.push(field2);
+      message2.members.push(field4);
     } else {
-      oneof.fields.push(field2);
+      oneof.fields.push(field4);
       if (!oneofsSeen.has(oneof)) {
         oneofsSeen.add(oneof);
         message2.members.push(oneof);
@@ -2957,7 +2956,7 @@ function newOneof(proto, parent) {
 function newField(proto, parentOrFile, reg, oneof, mapEntries) {
   var _a, _b, _c;
   const isExtension = mapEntries === void 0;
-  const field2 = {
+  const field4 = {
     kind: "field",
     proto,
     deprecated: (_b = (_a = proto.options) === null || _a === void 0 ? void 0 : _a.deprecated) !== null && _b !== void 0 ? _b : false,
@@ -2981,26 +2980,26 @@ function newField(proto, parentOrFile, reg, oneof, mapEntries) {
     const file = parentOrFile.kind == "file" ? parentOrFile : parentOrFile.file;
     const parent = parentOrFile.kind == "file" ? void 0 : parentOrFile;
     const typeName = makeTypeName(proto, parent, file);
-    field2.kind = "extension";
-    field2.file = file;
-    field2.parent = parent;
-    field2.oneof = void 0;
-    field2.typeName = typeName;
-    field2.jsonName = `[${typeName}]`;
+    field4.kind = "extension";
+    field4.file = file;
+    field4.parent = parent;
+    field4.oneof = void 0;
+    field4.typeName = typeName;
+    field4.jsonName = `[${typeName}]`;
     toStr = () => `extension ${typeName}`;
     const extendee = reg.getMessage(trimLeadingDot(proto.extendee));
     assert(extendee, `invalid FieldDescriptorProto: extendee ${proto.extendee} not found`);
-    field2.extendee = extendee;
+    field4.extendee = extendee;
   } else {
     const parent = parentOrFile;
     assert(parent.kind == "message");
-    field2.parent = parent;
-    field2.oneof = oneof;
-    field2.localName = oneof ? protoCamelCase(proto.name) : safeObjectProperty(protoCamelCase(proto.name));
-    field2.jsonName = proto.jsonName;
+    field4.parent = parent;
+    field4.oneof = oneof;
+    field4.localName = oneof ? protoCamelCase(proto.name) : safeObjectProperty(protoCamelCase(proto.name));
+    field4.jsonName = proto.jsonName;
     toStr = () => `field ${parent.typeName}.${proto.name}`;
   }
-  Object.defineProperty(field2, "toString", {
+  Object.defineProperty(field4, "toString", {
     value: toStr,
     writable: true,
     enumerable: true,
@@ -3012,69 +3011,69 @@ function newField(proto, parentOrFile, reg, oneof, mapEntries) {
   if (label === LABEL_REPEATED) {
     const mapEntry = type == TYPE_MESSAGE ? mapEntries === null || mapEntries === void 0 ? void 0 : mapEntries.get(trimLeadingDot(proto.typeName)) : void 0;
     if (mapEntry) {
-      field2.fieldKind = "map";
+      field4.fieldKind = "map";
       const { key, value } = findMapEntryFields(mapEntry);
-      field2.mapKey = key.scalar;
-      field2.mapKind = value.fieldKind;
-      field2.message = value.message;
-      field2.delimitedEncoding = false;
-      field2.enum = value.enum;
-      field2.scalar = value.scalar;
-      return field2;
+      field4.mapKey = key.scalar;
+      field4.mapKind = value.fieldKind;
+      field4.message = value.message;
+      field4.delimitedEncoding = false;
+      field4.enum = value.enum;
+      field4.scalar = value.scalar;
+      return field4;
     }
-    field2.fieldKind = "list";
+    field4.fieldKind = "list";
     switch (type) {
       case TYPE_MESSAGE:
       case TYPE_GROUP:
-        field2.listKind = "message";
-        field2.message = reg.getMessage(trimLeadingDot(proto.typeName));
-        assert(field2.message);
-        field2.delimitedEncoding = isDelimitedEncoding(proto, parentOrFile);
+        field4.listKind = "message";
+        field4.message = reg.getMessage(trimLeadingDot(proto.typeName));
+        assert(field4.message);
+        field4.delimitedEncoding = isDelimitedEncoding(proto, parentOrFile);
         break;
       case TYPE_ENUM:
-        field2.listKind = "enum";
-        field2.enum = reg.getEnum(trimLeadingDot(proto.typeName));
-        assert(field2.enum);
+        field4.listKind = "enum";
+        field4.enum = reg.getEnum(trimLeadingDot(proto.typeName));
+        assert(field4.enum);
         break;
       default:
-        field2.listKind = "scalar";
-        field2.scalar = type;
-        field2.longAsString = jstype == JS_STRING;
+        field4.listKind = "scalar";
+        field4.scalar = type;
+        field4.longAsString = jstype == JS_STRING;
         break;
     }
-    field2.packed = isPackedField(proto, parentOrFile);
-    return field2;
+    field4.packed = isPackedField(proto, parentOrFile);
+    return field4;
   }
   switch (type) {
     case TYPE_MESSAGE:
     case TYPE_GROUP:
-      field2.fieldKind = "message";
-      field2.message = reg.getMessage(trimLeadingDot(proto.typeName));
-      assert(field2.message, `invalid FieldDescriptorProto: type_name ${proto.typeName} not found`);
-      field2.delimitedEncoding = isDelimitedEncoding(proto, parentOrFile);
-      field2.getDefaultValue = () => void 0;
+      field4.fieldKind = "message";
+      field4.message = reg.getMessage(trimLeadingDot(proto.typeName));
+      assert(field4.message, `invalid FieldDescriptorProto: type_name ${proto.typeName} not found`);
+      field4.delimitedEncoding = isDelimitedEncoding(proto, parentOrFile);
+      field4.getDefaultValue = () => void 0;
       break;
     case TYPE_ENUM: {
       const enumeration = reg.getEnum(trimLeadingDot(proto.typeName));
       assert(enumeration !== void 0, `invalid FieldDescriptorProto: type_name ${proto.typeName} not found`);
-      field2.fieldKind = "enum";
-      field2.enum = reg.getEnum(trimLeadingDot(proto.typeName));
-      field2.getDefaultValue = () => {
+      field4.fieldKind = "enum";
+      field4.enum = reg.getEnum(trimLeadingDot(proto.typeName));
+      field4.getDefaultValue = () => {
         return unsafeIsSetExplicit(proto, "defaultValue") ? parseTextFormatEnumValue(enumeration, proto.defaultValue) : void 0;
       };
       break;
     }
     default: {
-      field2.fieldKind = "scalar";
-      field2.scalar = type;
-      field2.longAsString = jstype == JS_STRING;
-      field2.getDefaultValue = () => {
+      field4.fieldKind = "scalar";
+      field4.scalar = type;
+      field4.longAsString = jstype == JS_STRING;
+      field4.getDefaultValue = () => {
         return unsafeIsSetExplicit(proto, "defaultValue") ? parseTextFormatScalarValue(type, proto.defaultValue) : void 0;
       };
       break;
     }
   }
-  return field2;
+  return field4;
 }
 function getFileEdition(proto) {
   switch (proto.syntax) {
@@ -3484,9 +3483,9 @@ var SymbolVisibility;
 function makeReadContext(options) {
   return Object.assign(Object.assign({ readUnknownFields: true, recursionLimit: 100 }, options), { depth: 0 });
 }
-function fromBinary(schema, bytes, options) {
+function fromBinary(schema, bytes2, options) {
   const message2 = create(schema);
-  compiledReader(schema).read(message2, new BinaryReader(bytes), makeReadContext(options), bytes.byteLength);
+  compiledReader(schema).read(message2, new BinaryReader(bytes2), makeReadContext(options), bytes2.byteLength);
   return message2;
 }
 var compiledReaders = /* @__PURE__ */ new WeakMap();
@@ -3505,8 +3504,8 @@ function compileMessage(desc) {
     readGroup: compileGroupReader(descString, fieldReaders)
   };
   compiledReaders.set(desc, compiled);
-  for (const field2 of desc.fields) {
-    fieldReaders.set(field2.number, compileFieldReader(field2));
+  for (const field4 of desc.fields) {
+    fieldReaders.set(field4.number, compileFieldReader(field4));
   }
   return compiled;
 }
@@ -3569,28 +3568,28 @@ function compileGroupReader(descString, fieldReaders) {
     ctx.depth--;
   };
 }
-function readField(message2, reader, field2, wireType, ctx) {
-  compileFieldReader(field2)(message2[unsafeLocal], reader, ctx, wireType);
+function readField(message2, reader, field4, wireType, ctx) {
+  compileFieldReader(field4)(message2[unsafeLocal], reader, ctx, wireType);
 }
-function compileFieldReader(field2) {
-  switch (field2.fieldKind) {
+function compileFieldReader(field4) {
+  switch (field4.fieldKind) {
     case "scalar":
-      return compileScalarFieldReader(field2);
+      return compileScalarFieldReader(field4);
     case "enum":
-      return compileEnumFieldReader(field2);
+      return compileEnumFieldReader(field4);
     case "message":
-      return compileMessageFieldReader(field2);
+      return compileMessageFieldReader(field4);
     case "list":
-      return compileListFieldReader(field2);
+      return compileListFieldReader(field4);
     case "map":
-      return compileMapFieldReader(field2);
+      return compileMapFieldReader(field4);
   }
 }
-function compileScalarFieldReader(field2) {
-  const readScalar = compileScalarReader(field2.scalar, field2.utf8Validation, field2.longAsString);
-  const localName = field2.localName;
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileScalarFieldReader(field4) {
+  const readScalar = compileScalarReader(field4.scalar, field4.utf8Validation, field4.longAsString);
+  const localName = field4.localName;
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (message2, reader) => {
       message2[oneofLocalName] = {
         case: localName,
@@ -3602,11 +3601,11 @@ function compileScalarFieldReader(field2) {
     message2[localName] = readScalar(reader);
   };
 }
-function compileEnumFieldReader(field2) {
+function compileEnumFieldReader(field4) {
   var _a;
-  const localName = field2.localName;
-  const oneofLocalName = (_a = field2.oneof) === null || _a === void 0 ? void 0 : _a.localName;
-  if (field2.enum.open) {
+  const localName = field4.localName;
+  const oneofLocalName = (_a = field4.oneof) === null || _a === void 0 ? void 0 : _a.localName;
+  if (field4.enum.open) {
     if (oneofLocalName !== void 0) {
       return (message2, reader) => {
         message2[oneofLocalName] = { case: localName, value: reader.int32() };
@@ -3616,8 +3615,8 @@ function compileEnumFieldReader(field2) {
       message2[localName] = reader.int32();
     };
   }
-  const values = field2.enum.values;
-  const fieldNo = field2.number;
+  const values = field4.enum.values;
+  const fieldNo = field4.number;
   return (message2, reader, ctx, wireType) => {
     var _a2;
     const val = reader.int32();
@@ -3628,24 +3627,24 @@ function compileEnumFieldReader(field2) {
         message2[localName] = val;
       }
     } else if (ctx.readUnknownFields) {
-      const bytes = [];
-      varint32write(val, bytes);
+      const bytes2 = [];
+      varint32write(val, bytes2);
       const unknownFields = (_a2 = message2.$unknown) !== null && _a2 !== void 0 ? _a2 : [];
       unknownFields.push({
         no: fieldNo,
         wireType,
-        data: new Uint8Array(bytes)
+        data: new Uint8Array(bytes2)
       });
       message2.$unknown = unknownFields;
     }
   };
 }
-function compileMessageFieldReader(field2) {
-  const localName = field2.localName;
-  const { toMessage, toLocal } = localMessageMapper(field2);
-  const readChild = compileChildReader(field2);
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileMessageFieldReader(field4) {
+  const localName = field4.localName;
+  const { toMessage, toLocal } = localMessageMapper(field4);
+  const readChild = compileChildReader(field4);
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (message2, reader, ctx) => {
       const oneof = message2[oneofLocalName];
       const child = toMessage(oneof.case === localName ? oneof.value : void 0);
@@ -3659,28 +3658,28 @@ function compileMessageFieldReader(field2) {
     message2[localName] = toLocal(child);
   };
 }
-function compileChildReader(field2) {
-  const compiledChild = compiledReader(field2.message);
-  if (field2.delimitedEncoding) {
-    const fieldNo = field2.number;
+function compileChildReader(field4) {
+  const compiledChild = compiledReader(field4.message);
+  if (field4.delimitedEncoding) {
+    const fieldNo = field4.number;
     return (child, reader, ctx) => compiledChild.readGroup(child, reader, ctx, fieldNo);
   }
   return (child, reader, ctx) => compiledChild.read(child, reader, ctx, reader.uint32());
 }
-function compileListFieldReader(field2) {
-  const localName = field2.localName;
-  if (field2.listKind == "message") {
-    const { toMessage, toLocal } = localMessageMapper(field2);
-    const readChild = compileChildReader(field2);
+function compileListFieldReader(field4) {
+  const localName = field4.localName;
+  if (field4.listKind == "message") {
+    const { toMessage, toLocal } = localMessageMapper(field4);
+    const readChild = compileChildReader(field4);
     return (message2, reader, ctx) => {
       const child = toMessage(void 0);
       readChild(child, reader, ctx);
       message2[localName].push(toLocal(child));
     };
   }
-  const scalarType = field2.listKind == "enum" ? ScalarType.INT32 : field2.scalar;
-  const longAsString = field2.listKind == "scalar" ? field2.longAsString : false;
-  const readScalar = compileScalarReader(scalarType, field2.utf8Validation, longAsString);
+  const scalarType = field4.listKind == "enum" ? ScalarType.INT32 : field4.scalar;
+  const longAsString = field4.listKind == "scalar" ? field4.longAsString : false;
+  const readScalar = compileScalarReader(scalarType, field4.utf8Validation, longAsString);
   const packedPossible = scalarType != ScalarType.STRING && scalarType != ScalarType.BYTES;
   return (message2, reader, ctx, wireType) => {
     const items = message2[localName];
@@ -3694,16 +3693,16 @@ function compileListFieldReader(field2) {
     }
   };
 }
-function compileMapFieldReader(field2) {
-  const localName = field2.localName;
-  const readKey = compileScalarReader(field2.mapKey, field2.utf8Validation, false);
-  const keyZero = scalarZeroValue(field2.mapKey, false);
+function compileMapFieldReader(field4) {
+  const localName = field4.localName;
+  const readKey = compileScalarReader(field4.mapKey, field4.utf8Validation, false);
+  const keyZero = scalarZeroValue(field4.mapKey, false);
   let readValue;
   let valueDefault;
-  switch (field2.mapKind) {
+  switch (field4.mapKind) {
     case "scalar": {
-      const scalar = field2.scalar;
-      const readScalar = compileScalarReader(scalar, field2.utf8Validation, false);
+      const scalar = field4.scalar;
+      const readScalar = compileScalarReader(scalar, field4.utf8Validation, false);
       readValue = (reader) => readScalar(reader);
       if (scalar == ScalarType.BYTES) {
         valueDefault = () => new Uint8Array(0);
@@ -3714,14 +3713,14 @@ function compileMapFieldReader(field2) {
       break;
     }
     case "enum": {
-      const zero2 = field2.enum.values[0].number;
+      const zero2 = field4.enum.values[0].number;
       readValue = (reader) => reader.int32();
       valueDefault = () => zero2;
       break;
     }
     case "message": {
-      const { toMessage, toLocal } = localMessageMapper(field2);
-      const readChild = compiledReader(field2.message).read;
+      const { toMessage, toLocal } = localMessageMapper(field4);
+      const readChild = compiledReader(field4.message).read;
       readValue = (reader, ctx) => {
         const child = toMessage(void 0);
         readChild(child, reader, ctx, reader.uint32());
@@ -3864,28 +3863,28 @@ function compileMessage2(desc) {
     }
   };
   compiledWriters.set(desc, compiled);
-  for (const field2 of sortedFields) {
-    fieldWriters.push(compileField(field2));
+  for (const field4 of sortedFields) {
+    fieldWriters.push(compileField(field4));
   }
   return compiled;
 }
-function compileField(field2) {
-  switch (field2.fieldKind) {
+function compileField(field4) {
+  switch (field4.fieldKind) {
     case "message":
     case "scalar":
     case "enum":
-      return compileSingularField(field2);
+      return compileSingularField(field4);
     case "list":
-      return compileListField(field2);
+      return compileListField(field4);
     case "map":
-      return compileMapField(field2);
+      return compileMapField(field4);
   }
 }
-function compileSingularField(field2) {
-  const writeValue = compileSingularValue(field2);
-  const localName = field2.localName;
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileSingularField(field4) {
+  const writeValue = compileSingularValue(field4);
+  const localName = field4.localName;
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (writer, opts, message2) => {
       const oneof = message2[oneofLocalName];
       if (oneof.case === localName) {
@@ -3893,8 +3892,8 @@ function compileSingularField(field2) {
       }
     };
   }
-  if (field2.presence != IMPLICIT4) {
-    const requiredError = field2.presence == LEGACY_REQUIRED2 ? `cannot encode ${field2} to binary: required field not set` : void 0;
+  if (field4.presence != IMPLICIT4) {
+    const requiredError = field4.presence == LEGACY_REQUIRED2 ? `cannot encode ${field4} to binary: required field not set` : void 0;
     return (writer, opts, message2) => {
       const value = message2[localName];
       if (value !== void 0 && Object.prototype.hasOwnProperty.call(message2, localName)) {
@@ -3904,8 +3903,8 @@ function compileSingularField(field2) {
       }
     };
   }
-  if (field2.fieldKind == "enum") {
-    const zero2 = field2.enum.values[0].number;
+  if (field4.fieldKind == "enum") {
+    const zero2 = field4.enum.values[0].number;
     return (writer, opts, message2) => {
       const value = message2[localName];
       if (value !== zero2) {
@@ -3913,7 +3912,7 @@ function compileSingularField(field2) {
       }
     };
   }
-  switch (field2.scalar) {
+  switch (field4.scalar) {
     case ScalarType.BOOL:
       return (writer, opts, message2) => {
         const value = message2[localName];
@@ -3952,21 +3951,21 @@ function compileSingularField(field2) {
       };
   }
 }
-function compileSingularValue(field2) {
-  switch (field2.fieldKind) {
+function compileSingularValue(field4) {
+  switch (field4.fieldKind) {
     case "message": {
-      const { toMessage } = localMessageMapper(field2);
-      const writeChild = compileChildWriter(field2);
+      const { toMessage } = localMessageMapper(field4);
+      const writeChild = compileChildWriter(field4);
       return (writer, opts, value) => {
         writeChild(writer, opts, toMessage(value));
       };
     }
     case "scalar":
     case "enum": {
-      const scalarType = field2.fieldKind == "enum" ? ScalarType.INT32 : field2.scalar;
-      const fieldNo = field2.number;
+      const scalarType = field4.fieldKind == "enum" ? ScalarType.INT32 : field4.scalar;
+      const fieldNo = field4.number;
       const wireType = writeTypeOfScalar(scalarType);
-      const writeScalar = compileScalarValue(scalarType, field2.parent.typeName, field2.name);
+      const writeScalar = compileScalarValue(scalarType, field4.parent.typeName, field4.name);
       return (writer, opts, value) => {
         writer.tag(fieldNo, wireType);
         writeScalar(writer, value);
@@ -3974,13 +3973,13 @@ function compileSingularValue(field2) {
     }
   }
 }
-function compileListField(field2) {
-  const localName = field2.localName;
-  const fieldNo = field2.number;
-  switch (field2.listKind) {
+function compileListField(field4) {
+  const localName = field4.localName;
+  const fieldNo = field4.number;
+  switch (field4.listKind) {
     case "message": {
-      const { toMessage } = localMessageMapper(field2);
-      const writeChild = compileChildWriter(field2);
+      const { toMessage } = localMessageMapper(field4);
+      const writeChild = compileChildWriter(field4);
       return (writer, opts, message2) => {
         const items = message2[localName];
         for (let i = 0; i < items.length; i++) {
@@ -3990,9 +3989,9 @@ function compileListField(field2) {
     }
     case "scalar":
     case "enum": {
-      const scalarType = field2.listKind == "enum" ? ScalarType.INT32 : field2.scalar;
-      const writeScalar = compileScalarValue(scalarType, field2.parent.typeName, field2.name);
-      if (field2.packed) {
+      const scalarType = field4.listKind == "enum" ? ScalarType.INT32 : field4.scalar;
+      const writeScalar = compileScalarValue(scalarType, field4.parent.typeName, field4.name);
+      if (field4.packed) {
         return (writer, opts, message2) => {
           const items = message2[localName];
           if (items.length == 0) {
@@ -4016,13 +4015,13 @@ function compileListField(field2) {
     }
   }
 }
-function compileMapField(field2) {
-  const localName = field2.localName;
-  const fieldNo = field2.number;
-  const writeKey = compileMapKey(field2);
-  if (field2.mapKind == "message") {
-    const { toMessage } = localMessageMapper(field2);
-    const writeMessage = compiledWriter(field2.message);
+function compileMapField(field4) {
+  const localName = field4.localName;
+  const fieldNo = field4.number;
+  const writeKey = compileMapKey(field4);
+  if (field4.mapKind == "message") {
+    const { toMessage } = localMessageMapper(field4);
+    const writeMessage = compiledWriter(field4.message);
     return (writer, opts, message2) => {
       const record = message2[localName];
       const keys = Object.keys(record);
@@ -4037,9 +4036,9 @@ function compileMapField(field2) {
       }
     };
   }
-  const scalarType = field2.mapKind == "enum" ? ScalarType.INT32 : field2.scalar;
+  const scalarType = field4.mapKind == "enum" ? ScalarType.INT32 : field4.scalar;
   const valueWireType = writeTypeOfScalar(scalarType);
-  const writeScalar = compileScalarValue(scalarType, field2.parent.typeName, field2.name);
+  const writeScalar = compileScalarValue(scalarType, field4.parent.typeName, field4.name);
   return (writer, opts, message2) => {
     const record = message2[localName];
     const keys = Object.keys(record);
@@ -4053,10 +4052,10 @@ function compileMapField(field2) {
     }
   };
 }
-function compileMapKey(field2) {
-  const wireType = writeTypeOfScalar(field2.mapKey);
-  const writeScalar = compileScalarValue(field2.mapKey, field2.parent.typeName, field2.name);
-  const convertKey = compileMapKeyConverter(field2.mapKey);
+function compileMapKey(field4) {
+  const wireType = writeTypeOfScalar(field4.mapKey);
+  const writeScalar = compileScalarValue(field4.mapKey, field4.parent.typeName, field4.name);
+  const convertKey = compileMapKeyConverter(field4.mapKey);
   return (writer, key) => {
     writer.tag(1, wireType);
     writeScalar(writer, convertKey(key));
@@ -4141,13 +4140,13 @@ function compileScalarWrite(type) {
       return (writer, value) => writer.sint32(value);
   }
 }
-function writeField(writer, opts, msg, field2) {
-  compileField(field2)(writer, opts, msg[unsafeLocal]);
+function writeField(writer, opts, msg, field4) {
+  compileField(field4)(writer, opts, msg[unsafeLocal]);
 }
-function compileChildWriter(field2) {
-  const fieldNo = field2.number;
-  const writeMessage = compiledWriter(field2.message);
-  if (field2.delimitedEncoding) {
+function compileChildWriter(field4) {
+  const fieldNo = field4.number;
+  const writeMessage = compiledWriter(field4.message);
+  if (field4.delimitedEncoding) {
     return (writer, opts, child) => {
       writer.tag(fieldNo, WireType.StartGroup);
       writeMessage(writer, opts, child);
@@ -4233,10 +4232,10 @@ var NullValue;
 function getExtension(message2, extension, options) {
   assertExtendee(extension, message2);
   const ufs = filterUnknownFields(message2.$unknown, extension);
-  const [container, field2, get] = createExtensionContainer(extension);
+  const [container, field4, get] = createExtensionContainer(extension);
   const ctx = makeReadContext(options);
   for (const uf of ufs) {
-    readField(container, new BinaryReader(uf.data), field2, uf.wireType, ctx);
+    readField(container, new BinaryReader(uf.data), field4, uf.wireType, ctx);
   }
   return get();
 }
@@ -4244,9 +4243,9 @@ function setExtension(message2, extension, value) {
   var _a;
   assertExtendee(extension, message2);
   const ufs = ((_a = message2.$unknown) !== null && _a !== void 0 ? _a : []).filter((uf) => uf.no !== extension.number);
-  const [container, field2] = createExtensionContainer(extension, value);
+  const [container, field4] = createExtensionContainer(extension, value);
   const writer = new BinaryWriter();
-  writeField(writer, { writeUnknownFields: true }, container, field2);
+  writeField(writer, { writeUnknownFields: true }, container, field4);
   const reader = new BinaryReader(writer.finish());
   while (reader.pos < reader.len) {
     const [no, wireType] = reader.tag();
@@ -4270,12 +4269,12 @@ function filterUnknownFields(unknownFields, extension) {
 }
 function createExtensionContainer(extension, value) {
   const localName = extension.typeName;
-  const field2 = Object.assign(Object.assign({}, extension), { kind: "field", parent: extension.extendee, localName });
-  const desc = Object.assign(Object.assign({}, extension.extendee), { fields: [field2], members: [field2], oneofs: [] });
+  const field4 = Object.assign(Object.assign({}, extension), { kind: "field", parent: extension.extendee, localName });
+  const desc = Object.assign(Object.assign({}, extension.extendee), { fields: [field4], members: [field4], oneofs: [] });
   const container = create(desc, value !== void 0 ? { [localName]: value } : void 0);
   return [
     reflect(desc, container),
-    field2,
+    field4,
     () => {
       const value2 = container[localName];
       if (value2 === void 0) {
@@ -4354,8 +4353,8 @@ function compileMessage3(desc) {
     return json;
   };
   compiledWriters2.set(desc, compiledWriter3);
-  for (const field2 of sortedFields) {
-    fieldWriters.push(compileField2(field2));
+  for (const field4 of sortedFields) {
+    fieldWriters.push(compileField2(field4));
   }
   return compiledWriter3;
 }
@@ -4392,18 +4391,18 @@ function compileWkt(desc) {
       return void 0;
   }
 }
-function compileField2(field2) {
-  switch (field2.fieldKind) {
+function compileField2(field4) {
+  switch (field4.fieldKind) {
     case "scalar":
     case "enum":
     case "message":
-      return compileSingularField2(field2);
+      return compileSingularField2(field4);
     case "list":
     case "map": {
-      const writeValue = field2.fieldKind == "list" ? compileListValue(field2) : compileMapValue(field2);
-      const protoName = field2.name;
-      const jsonKey = field2.jsonName;
-      const localName = field2.localName;
+      const writeValue = field4.fieldKind == "list" ? compileListValue(field4) : compileMapValue(field4);
+      const protoName = field4.name;
+      const jsonKey = field4.jsonName;
+      const localName = field4.localName;
       return (opts, message2, json) => {
         const value = writeValue(opts, message2[localName]);
         if (value !== void 0) {
@@ -4413,13 +4412,13 @@ function compileField2(field2) {
     }
   }
 }
-function compileSingularField2(field2) {
-  const writeValue = compileSingularValue2(field2);
-  const protoName = field2.name;
-  const jsonKey = field2.jsonName;
-  const localName = field2.localName;
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileSingularField2(field4) {
+  const writeValue = compileSingularValue2(field4);
+  const protoName = field4.name;
+  const jsonKey = field4.jsonName;
+  const localName = field4.localName;
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (opts, message2, json) => {
       const oneof = message2[oneofLocalName];
       if (oneof.case === localName) {
@@ -4427,8 +4426,8 @@ function compileSingularField2(field2) {
       }
     };
   }
-  if (field2.presence != IMPLICIT5) {
-    const requiredError = field2.presence == LEGACY_REQUIRED3 ? `cannot encode ${field2} to JSON: required field not set` : void 0;
+  if (field4.presence != IMPLICIT5) {
+    const requiredError = field4.presence == LEGACY_REQUIRED3 ? `cannot encode ${field4} to JSON: required field not set` : void 0;
     return (opts, message2, json) => {
       const value = message2[localName];
       if (value !== void 0 && Object.prototype.hasOwnProperty.call(message2, localName)) {
@@ -4438,8 +4437,8 @@ function compileSingularField2(field2) {
       }
     };
   }
-  if (field2.fieldKind == "enum") {
-    const zero2 = field2.enum.values[0].number;
+  if (field4.fieldKind == "enum") {
+    const zero2 = field4.enum.values[0].number;
     return (opts, message2, json) => {
       const value = message2[localName];
       if (value !== zero2 || opts.alwaysEmitImplicit) {
@@ -4447,7 +4446,7 @@ function compileSingularField2(field2) {
       }
     };
   }
-  switch (field2.scalar) {
+  switch (field4.scalar) {
     case ScalarType.BOOL:
       return (opts, message2, json) => {
         const value = message2[localName];
@@ -4486,35 +4485,35 @@ function compileSingularField2(field2) {
       };
   }
 }
-function compileFieldValue(field2) {
-  switch (field2.fieldKind) {
+function compileFieldValue(field4) {
+  switch (field4.fieldKind) {
     case "scalar":
     case "enum":
     case "message":
-      return compileSingularValue2(field2);
+      return compileSingularValue2(field4);
     case "list":
-      return compileListValue(field2);
+      return compileListValue(field4);
     case "map":
-      return compileMapValue(field2);
+      return compileMapValue(field4);
   }
 }
-function compileSingularValue2(field2) {
-  switch (field2.fieldKind) {
+function compileSingularValue2(field4) {
+  switch (field4.fieldKind) {
     case "scalar":
-      return compileScalarValue2(field2);
+      return compileScalarValue2(field4);
     case "enum":
-      return compileEnumValue(field2);
+      return compileEnumValue(field4);
     case "message":
-      return compileMessageValue(field2);
+      return compileMessageValue(field4);
   }
 }
-function compileMessageValue(field2) {
-  const { toMessage } = localMessageMapper(field2);
-  const writeMessage = compiledWriter2(field2.message);
+function compileMessageValue(field4) {
+  const { toMessage } = localMessageMapper(field4);
+  const writeMessage = compiledWriter2(field4.message);
   return (opts, value) => writeMessage(opts, toMessage(value));
 }
-function compileListValue(field2) {
-  const writeItem = compileListItemValue(field2);
+function compileListValue(field4) {
+  const writeItem = compileListItemValue(field4);
   return (opts, value) => {
     const items = value;
     if (items.length == 0 && !opts.alwaysEmitImplicit) {
@@ -4527,18 +4526,18 @@ function compileListValue(field2) {
     return jsonArray;
   };
 }
-function compileListItemValue(field2) {
-  switch (field2.listKind) {
+function compileListItemValue(field4) {
+  switch (field4.listKind) {
     case "scalar":
-      return compileScalarValue2(field2);
+      return compileScalarValue2(field4);
     case "enum":
-      return compileEnumValue(field2);
+      return compileEnumValue(field4);
     case "message":
-      return compileMessageValue(field2);
+      return compileMessageValue(field4);
   }
 }
-function compileMapValue(field2) {
-  const writeMapValue = compileMapEntryValue(field2);
+function compileMapValue(field4) {
+  const writeMapValue = compileMapEntryValue(field4);
   return (opts, value) => {
     const record = value;
     const keys = Object.keys(record);
@@ -4553,18 +4552,18 @@ function compileMapValue(field2) {
     return jsonObject;
   };
 }
-function compileMapEntryValue(field2) {
-  switch (field2.mapKind) {
+function compileMapEntryValue(field4) {
+  switch (field4.mapKind) {
     case "scalar":
-      return compileScalarValue2(field2);
+      return compileScalarValue2(field4);
     case "enum":
-      return compileEnumValue(field2);
+      return compileEnumValue(field4);
     case "message":
-      return compileMessageValue(field2);
+      return compileMessageValue(field4);
   }
 }
-function compileEnumValue(field2) {
-  const desc = field2.enum;
+function compileEnumValue(field4) {
+  const desc = field4.enum;
   if (desc.typeName == "google.protobuf.NullValue") {
     return (opts, value) => {
       if (typeof value != "number") {
@@ -4587,8 +4586,8 @@ function compileEnumValue(field2) {
 function errorEnumValue(desc, value) {
   return new Error(`cannot encode ${desc} to JSON: expected number, got ${formatVal(value)}`);
 }
-function compileScalarValue2(field2) {
-  switch (field2.scalar) {
+function compileScalarValue2(field4) {
+  switch (field4.scalar) {
     // int32, fixed32, uint32: JSON value will be a decimal number. Either numbers or strings are accepted.
     case ScalarType.INT32:
     case ScalarType.SFIXED32:
@@ -4597,7 +4596,7 @@ function compileScalarValue2(field2) {
     case ScalarType.UINT32:
       return (opts, value) => {
         if (typeof value != "number") {
-          throw errorScalarValue(field2, value);
+          throw errorScalarValue(field4, value);
         }
         return value;
       };
@@ -4607,7 +4606,7 @@ function compileScalarValue2(field2) {
     case ScalarType.DOUBLE:
       return (opts, value) => {
         if (typeof value != "number") {
-          throw errorScalarValue(field2, value);
+          throw errorScalarValue(field4, value);
         }
         if (Number.isNaN(value))
           return "NaN";
@@ -4621,7 +4620,7 @@ function compileScalarValue2(field2) {
     case ScalarType.STRING:
       return (opts, value) => {
         if (typeof value != "string") {
-          throw errorScalarValue(field2, value);
+          throw errorScalarValue(field4, value);
         }
         return value;
       };
@@ -4629,7 +4628,7 @@ function compileScalarValue2(field2) {
     case ScalarType.BOOL:
       return (opts, value) => {
         if (typeof value != "boolean") {
-          throw errorScalarValue(field2, value);
+          throw errorScalarValue(field4, value);
         }
         return value;
       };
@@ -4643,7 +4642,7 @@ function compileScalarValue2(field2) {
         if (typeof value == "bigint" || typeof value == "string" || typeof value == "number" && Number.isInteger(value)) {
           return value.toString();
         }
-        throw errorScalarValue(field2, value);
+        throw errorScalarValue(field4, value);
       };
     // bytes: JSON value will be the data encoded as a string using standard base64 encoding with paddings.
     // Either standard or URL-safe base64 encoding with/without paddings are accepted.
@@ -4652,13 +4651,13 @@ function compileScalarValue2(field2) {
         if (value instanceof Uint8Array) {
           return base64Encode(value);
         }
-        throw errorScalarValue(field2, value);
+        throw errorScalarValue(field4, value);
       };
   }
 }
-function errorScalarValue(field2, value) {
+function errorScalarValue(field4, value) {
   var _a;
-  return new Error(`cannot encode ${field2} to JSON: ${(_a = checkField(field2, value)) === null || _a === void 0 ? void 0 : _a.message}`);
+  return new Error(`cannot encode ${field4} to JSON: ${(_a = checkField(field4, value)) === null || _a === void 0 ? void 0 : _a.message}`);
 }
 function writeExtensions(json, opts, registry2, message2, desc) {
   const unknown = message2.$unknown;
@@ -4675,9 +4674,9 @@ function writeExtensions(json, opts, registry2, message2, desc) {
         continue;
       }
       const value = getExtension(message2, extension);
-      const [container, field2] = createExtensionContainer(extension, value);
+      const [container, field4] = createExtensionContainer(extension, value);
       const local = container[unsafeLocal];
-      const jsonValue = compileFieldValue(field2)(opts, local[field2.localName]);
+      const jsonValue = compileFieldValue(field4)(opts, local[field4.localName]);
       if (jsonValue !== void 0) {
         json[extension.jsonName] = jsonValue;
       }
@@ -4715,7 +4714,7 @@ function durationToJson(val) {
   if (seconds > 0 && nanos < 0 || seconds < 0 && nanos > 0) {
     throw new Error(`cannot encode message ${val.$typeName} to JSON: nanos sign must match seconds sign`);
   }
-  let text2 = val.seconds.toString();
+  let text = val.seconds.toString();
   if (nanos !== 0) {
     let nanosStr = Math.abs(nanos).toString();
     nanosStr = "0".repeat(9 - nanosStr.length) + nanosStr;
@@ -4724,12 +4723,12 @@ function durationToJson(val) {
     } else if (nanosStr.substring(6) === "000") {
       nanosStr = nanosStr.substring(0, 6);
     }
-    text2 += "." + nanosStr;
+    text += "." + nanosStr;
     if (nanos < 0 && seconds == 0) {
-      text2 = "-" + text2;
+      text = "-" + text;
     }
   }
-  return text2 + "s";
+  return text + "s";
 }
 function fieldMaskToJson(val) {
   return val.paths.map((p) => {
@@ -4859,27 +4858,27 @@ function compileMessage4(desc) {
       const jsonValue = json[jsonKey];
       const entry = fieldsByJsonKey.get(jsonKey);
       if (entry !== void 0) {
-        const field2 = entry.field;
-        if (fieldSeen.has(field2)) {
-          throw new FieldError(field2, "set multiple times");
+        const field4 = entry.field;
+        if (fieldSeen.has(field4)) {
+          throw new FieldError(field4, "set multiple times");
         }
-        fieldSeen.add(field2);
+        fieldSeen.add(field4);
         if (entry.oneofScalarNullSkip && jsonValue === null) {
           continue;
         }
         if (entry.oneof) {
           const seen = oneofSeen.get(entry.oneof);
           if (seen !== void 0) {
-            throw new FieldError(entry.oneof, `oneof set multiple times by ${seen.name} and ${field2.name}`);
+            throw new FieldError(entry.oneof, `oneof set multiple times by ${seen.name} and ${field4.name}`);
           }
-          oneofSeen.set(entry.oneof, field2);
+          oneofSeen.set(entry.oneof, field4);
         }
         entry.read(message2, jsonValue, ctx);
       } else {
         const extension = jsonKey.startsWith("[") && jsonKey.endsWith("]") ? (_a = ctx.registry) === null || _a === void 0 ? void 0 : _a.getExtension(jsonKey.substring(1, jsonKey.length - 1)) : void 0;
         if ((extension === null || extension === void 0 ? void 0 : extension.extendee.typeName) == typeName) {
-          const [container, field2, get] = createExtensionContainer(extension);
-          compileFieldReader2(field2)(container[unsafeLocal], jsonValue, ctx);
+          const [container, field4, get] = createExtensionContainer(extension);
+          compileFieldReader2(field4)(container[unsafeLocal], jsonValue, ctx);
           setExtension(message2, extension, get());
         }
         if (extension === void 0 && !ctx.ignoreUnknownFields) {
@@ -4890,14 +4889,14 @@ function compileMessage4(desc) {
     ctx.depth--;
   };
   compiledReaders2.set(desc, compiled);
-  for (const field2 of desc.fields) {
+  for (const field4 of desc.fields) {
     const entry = {
-      read: compileFieldReader2(field2),
-      field: field2,
-      oneof: field2.oneof,
-      oneofScalarNullSkip: field2.oneof !== void 0 && field2.fieldKind == "scalar"
+      read: compileFieldReader2(field4),
+      field: field4,
+      oneof: field4.oneof,
+      oneofScalarNullSkip: field4.oneof !== void 0 && field4.fieldKind == "scalar"
     };
-    fieldsByJsonKey.set(field2.name, entry).set(field2.jsonName, entry);
+    fieldsByJsonKey.set(field4.name, entry).set(field4.jsonName, entry);
   }
   return compiled;
 }
@@ -4938,25 +4937,25 @@ function compileWkt2(desc) {
       return void 0;
   }
 }
-function compileFieldReader2(field2) {
-  switch (field2.fieldKind) {
+function compileFieldReader2(field4) {
+  switch (field4.fieldKind) {
     case "scalar":
-      return compileScalarFieldReader2(field2);
+      return compileScalarFieldReader2(field4);
     case "enum":
-      return compileEnumFieldReader2(field2);
+      return compileEnumFieldReader2(field4);
     case "message":
-      return compileMessageFieldReader2(field2);
+      return compileMessageFieldReader2(field4);
     case "list":
-      return compileListFieldReader2(field2);
+      return compileListFieldReader2(field4);
     case "map":
-      return compileMapFieldReader2(field2);
+      return compileMapFieldReader2(field4);
   }
 }
-function compileScalarFieldReader2(field2) {
-  const readScalar = compileScalarConverter(field2);
-  const localName = field2.localName;
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileScalarFieldReader2(field4) {
+  const readScalar = compileScalarConverter(field4);
+  const localName = field4.localName;
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (message2, json) => {
       message2[oneofLocalName] = {
         case: localName,
@@ -4964,7 +4963,7 @@ function compileScalarFieldReader2(field2) {
       };
     };
   }
-  const clear = compileClear(field2);
+  const clear = compileClear(field4);
   return (message2, json) => {
     if (json === null) {
       clear(message2);
@@ -4973,32 +4972,32 @@ function compileScalarFieldReader2(field2) {
     }
   };
 }
-function compileClear(field2) {
-  const localName = field2.localName;
-  if (field2.presence != IMPLICIT6) {
+function compileClear(field4) {
+  const localName = field4.localName;
+  if (field4.presence != IMPLICIT6) {
     return (message2) => {
       delete message2[localName];
     };
   }
-  if (field2.fieldKind == "enum") {
-    const zero2 = field2.enum.values[0].number;
+  if (field4.fieldKind == "enum") {
+    const zero2 = field4.enum.values[0].number;
     return (message2) => {
       message2[localName] = zero2;
     };
   }
-  const scalar = field2.scalar;
-  const longAsString = field2.longAsString;
+  const scalar = field4.scalar;
+  const longAsString = field4.longAsString;
   return (message2) => {
     message2[localName] = scalarZeroValue(scalar, longAsString);
   };
 }
-function compileEnumFieldReader2(field2) {
-  const readEnumValue = compileEnumConverter(field2.enum);
-  const checkEnum = compileEnumCheck(field2.enum);
-  const localName = field2.localName;
-  const nullResets = field2.enum.typeName != "google.protobuf.NullValue";
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileEnumFieldReader2(field4) {
+  const readEnumValue = compileEnumConverter(field4.enum);
+  const checkEnum = compileEnumCheck(field4.enum);
+  const localName = field4.localName;
+  const nullResets = field4.enum.typeName != "google.protobuf.NullValue";
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (message2, json, ctx) => {
       if (json === null && nullResets) {
         const oneof = message2[oneofLocalName];
@@ -5013,12 +5012,12 @@ function compileEnumFieldReader2(field2) {
       }
       const check = checkEnum(value);
       if (check !== true) {
-        throw new FieldError(field2, reasonSingular(field2, value, check));
+        throw new FieldError(field4, reasonSingular(field4, value, check));
       }
       message2[oneofLocalName] = { case: localName, value };
     };
   }
-  const clear = compileClear(field2);
+  const clear = compileClear(field4);
   return (message2, json, ctx) => {
     if (json === null && nullResets) {
       clear(message2);
@@ -5030,18 +5029,18 @@ function compileEnumFieldReader2(field2) {
     }
     const check = checkEnum(value);
     if (check !== true) {
-      throw new FieldError(field2, reasonSingular(field2, value, check));
+      throw new FieldError(field4, reasonSingular(field4, value, check));
     }
     message2[localName] = value;
   };
 }
-function compileMessageFieldReader2(field2) {
-  const localName = field2.localName;
-  const { toMessage, toLocal } = localMessageMapper(field2);
-  const readChild = compiledReader2(field2.message);
-  const nullResets = field2.message.typeName != "google.protobuf.Value";
-  if (field2.oneof) {
-    const oneofLocalName = field2.oneof.localName;
+function compileMessageFieldReader2(field4) {
+  const localName = field4.localName;
+  const { toMessage, toLocal } = localMessageMapper(field4);
+  const readChild = compiledReader2(field4.message);
+  const nullResets = field4.message.typeName != "google.protobuf.Value";
+  if (field4.oneof) {
+    const oneofLocalName = field4.oneof.localName;
     return (message2, json, ctx) => {
       const oneof = message2[oneofLocalName];
       if (json === null && nullResets) {
@@ -5065,15 +5064,15 @@ function compileMessageFieldReader2(field2) {
     message2[localName] = toLocal(child);
   };
 }
-function compileListFieldReader2(field2) {
-  const localName = field2.localName;
-  const readItem = compileListItemReader(field2);
+function compileListFieldReader2(field4) {
+  const localName = field4.localName;
+  const readItem = compileListItemReader(field4);
   return (message2, json, ctx) => {
     if (json === null) {
       return;
     }
     if (!Array.isArray(json)) {
-      throw new FieldError(field2, "expected Array, got " + formatVal(json));
+      throw new FieldError(field4, "expected Array, got " + formatVal(json));
     }
     const items = message2[localName];
     for (let i = 0; i < json.length; i++) {
@@ -5084,31 +5083,31 @@ function compileListFieldReader2(field2) {
     }
   };
 }
-function compileListItemReader(field2) {
-  switch (field2.listKind) {
+function compileListItemReader(field4) {
+  switch (field4.listKind) {
     case "scalar": {
-      const parseScalar = compileScalarParse(field2);
-      const checkValue = checkScalarValue(field2.scalar);
-      const toLocal = compileScalarToLocal(field2);
+      const parseScalar = compileScalarParse(field4);
+      const checkValue = checkScalarValue(field4.scalar);
+      const toLocal = compileScalarToLocal(field4);
       return (json, ctx, index) => {
         if (json === null) {
-          throw new FieldError(field2, "list item must not be null");
+          throw new FieldError(field4, "list item must not be null");
         }
         const value = parseScalar(json);
         const check = checkValue(value);
         if (check !== true) {
-          throw new FieldError(field2, `list item #${index + 1}: ${reasonSingular(field2, value, check)}`);
+          throw new FieldError(field4, `list item #${index + 1}: ${reasonSingular(field4, value, check)}`);
         }
         return toLocal(value);
       };
     }
     case "enum": {
-      const readEnumValue = compileEnumConverter(field2.enum);
-      const checkEnum = compileEnumCheck(field2.enum);
-      const nullResets = field2.enum.typeName != "google.protobuf.NullValue";
+      const readEnumValue = compileEnumConverter(field4.enum);
+      const checkEnum = compileEnumCheck(field4.enum);
+      const nullResets = field4.enum.typeName != "google.protobuf.NullValue";
       return (json, ctx, index) => {
         if (json === null && nullResets) {
-          throw new FieldError(field2, "list item must not be null");
+          throw new FieldError(field4, "list item must not be null");
         }
         const value = readEnumValue(json, ctx.ignoreUnknownFields);
         if (value === tokenIgnoredUnknownEnum) {
@@ -5116,18 +5115,18 @@ function compileListItemReader(field2) {
         }
         const check = checkEnum(value);
         if (check !== true) {
-          throw new FieldError(field2, `list item #${index + 1}: ${reasonSingular(field2, value, check)}`);
+          throw new FieldError(field4, `list item #${index + 1}: ${reasonSingular(field4, value, check)}`);
         }
         return value;
       };
     }
     case "message": {
-      const { toMessage, toLocal } = localMessageMapper(field2);
-      const readChild = compiledReader2(field2.message);
-      const nullResets = field2.message.typeName != "google.protobuf.Value";
+      const { toMessage, toLocal } = localMessageMapper(field4);
+      const readChild = compiledReader2(field4.message);
+      const nullResets = field4.message.typeName != "google.protobuf.Value";
       return (json, ctx) => {
         if (json === null && nullResets) {
-          throw new FieldError(field2, "list item must not be null");
+          throw new FieldError(field4, "list item must not be null");
         }
         const child = toMessage(void 0);
         readChild(child, json, ctx);
@@ -5136,33 +5135,33 @@ function compileListItemReader(field2) {
     }
   }
 }
-function compileMapFieldReader2(field2) {
-  const localName = field2.localName;
-  const mapKey = field2.mapKey;
+function compileMapFieldReader2(field4) {
+  const localName = field4.localName;
+  const mapKey = field4.mapKey;
   const parseMapKey = compileMapKeyParse(mapKey);
   const checkMapKey = checkScalarValue(mapKey);
   let parseValue;
   let checkValue;
   let toLocalValue = (value) => value;
   let nullResets = true;
-  switch (field2.mapKind) {
+  switch (field4.mapKind) {
     case "scalar": {
-      parseValue = compileScalarParse(field2);
-      checkValue = checkScalarValue(field2.scalar);
-      toLocalValue = compileScalarToLocal(field2);
+      parseValue = compileScalarParse(field4);
+      checkValue = checkScalarValue(field4.scalar);
+      toLocalValue = compileScalarToLocal(field4);
       break;
     }
     case "enum": {
-      const readEnumValue = compileEnumConverter(field2.enum);
+      const readEnumValue = compileEnumConverter(field4.enum);
       parseValue = (json, ctx) => readEnumValue(json, ctx.ignoreUnknownFields);
-      checkValue = compileEnumCheck(field2.enum);
-      nullResets = field2.enum.typeName != "google.protobuf.NullValue";
+      checkValue = compileEnumCheck(field4.enum);
+      nullResets = field4.enum.typeName != "google.protobuf.NullValue";
       break;
     }
     case "message": {
-      const { toMessage, toLocal } = localMessageMapper(field2);
-      const readChild = compiledReader2(field2.message);
-      nullResets = field2.message.typeName != "google.protobuf.Value";
+      const { toMessage, toLocal } = localMessageMapper(field4);
+      const readChild = compiledReader2(field4.message);
+      nullResets = field4.message.typeName != "google.protobuf.Value";
       parseValue = (json, ctx) => {
         const child = toMessage(void 0);
         readChild(child, json, ctx);
@@ -5176,7 +5175,7 @@ function compileMapFieldReader2(field2) {
       return;
     }
     if (typeof json != "object" || Array.isArray(json)) {
-      throw new FieldError(field2, "expected object, got " + formatVal(json));
+      throw new FieldError(field4, "expected object, got " + formatVal(json));
     }
     const record = message2[localName];
     const seen = /* @__PURE__ */ new Set();
@@ -5186,11 +5185,11 @@ function compileMapFieldReader2(field2) {
       const jsonMapValue = json[jsonMapKey];
       const key = parseMapKey(jsonMapKey);
       if (seen.has(key)) {
-        throw new FieldError(field2, `duplicate map key "${jsonMapKey}"`);
+        throw new FieldError(field4, `duplicate map key "${jsonMapKey}"`);
       }
       seen.add(key);
       if (jsonMapValue === null && nullResets) {
-        throw new FieldError(field2, "map value must not be null");
+        throw new FieldError(field4, "map value must not be null");
       }
       const value = parseValue(jsonMapValue, ctx);
       if (value === tokenIgnoredUnknownEnum) {
@@ -5198,12 +5197,12 @@ function compileMapFieldReader2(field2) {
       }
       const checkKey = checkMapKey(key);
       if (checkKey !== true) {
-        throw new FieldError(field2, `invalid map key: ${reasonSingular({ scalar: mapKey }, key, checkKey)}`);
+        throw new FieldError(field4, `invalid map key: ${reasonSingular({ scalar: mapKey }, key, checkKey)}`);
       }
       if (checkValue !== void 0) {
         const check = checkValue(value);
         if (check !== true) {
-          throw new FieldError(field2, `map entry ${formatVal(key)}: ${reasonSingular(field2, value, check)}`);
+          throw new FieldError(field4, `map entry ${formatVal(key)}: ${reasonSingular(field4, value, check)}`);
         }
       }
       record[key] = toLocalValue(value);
@@ -5245,21 +5244,21 @@ function compileEnumCheck(desc) {
   const values = desc.values;
   return (value) => values.some((v) => v.number === value);
 }
-function compileScalarConverter(field2) {
-  const parseScalar = compileScalarParse(field2);
-  const checkValue = checkScalarValue(field2.scalar);
-  const toLocal = compileScalarToLocal(field2);
+function compileScalarConverter(field4) {
+  const parseScalar = compileScalarParse(field4);
+  const checkValue = checkScalarValue(field4.scalar);
+  const toLocal = compileScalarToLocal(field4);
   return (json) => {
     const value = parseScalar(json);
     const check = checkValue(value);
     if (check !== true) {
-      throw new FieldError(field2, reasonSingular(field2, value, check));
+      throw new FieldError(field4, reasonSingular(field4, value, check));
     }
     return toLocal(value);
   };
 }
-function compileScalarParse(field2) {
-  switch (field2.scalar) {
+function compileScalarParse(field4) {
+  switch (field4.scalar) {
     // float, double: JSON value will be a number or one of the special string values "NaN", "Infinity", and "-Infinity".
     // Either numbers or strings are accepted. Exponent notation is also accepted.
     case ScalarType.DOUBLE:
@@ -5273,10 +5272,10 @@ function compileScalarParse(field2) {
           return Number.NEGATIVE_INFINITY;
         if (typeof json == "number") {
           if (Number.isNaN(json)) {
-            throw new FieldError(field2, "unexpected NaN number");
+            throw new FieldError(field4, "unexpected NaN number");
           }
           if (!Number.isFinite(json)) {
-            throw new FieldError(field2, "unexpected infinite number");
+            throw new FieldError(field4, "unexpected infinite number");
           }
           return json;
         }
@@ -5314,7 +5313,7 @@ function compileScalarParse(field2) {
             return base64Decode(json);
           } catch (e) {
             const message2 = e instanceof Error ? e.message : String(e);
-            throw new FieldError(field2, message2);
+            throw new FieldError(field4, message2);
           }
         }
         return json;
@@ -5325,9 +5324,9 @@ function compileScalarParse(field2) {
       return (json) => json;
   }
 }
-function compileScalarToLocal(field2) {
-  const longAsString = field2.fieldKind !== "map" && field2.longAsString;
-  switch (field2.scalar) {
+function compileScalarToLocal(field4) {
+  const longAsString = field4.fieldKind !== "map" && field4.longAsString;
+  switch (field4.scalar) {
     case ScalarType.INT64:
     case ScalarType.SFIXED64:
     case ScalarType.SINT64:
@@ -5381,11 +5380,11 @@ function int32FromJson(json) {
     if (json.trim().length !== json.length) {
       return json;
     }
-    const num = Number(json);
-    if (Number.isNaN(num)) {
+    const num2 = Number(json);
+    if (Number.isNaN(num2)) {
       return json;
     }
-    return num;
+    return num2;
   }
   return json;
 }
@@ -5566,9 +5565,9 @@ function httpError(status) {
   const code = status === 401 || status === 403 ? "AUTH" : status === 429 ? "RATE_LIMIT" : status >= 500 ? "SERVER" : "INVALID_REQUEST";
   return new CursorProtocolError(code, `Cursor request returned HTTP ${status}`, status);
 }
-function serverDetail(text2) {
-  if (typeof text2 !== "string" || !text2.trim()) return "";
-  return text2.replace(/bearer\s+\S+/giu, "[redacted]").replace(/[A-Za-z0-9_\-.]{32,}/gu, "[redacted]").replace(/\s+/gu, " ").trim().slice(0, 300);
+function serverDetail(text) {
+  if (typeof text !== "string" || !text.trim()) return "";
+  return text.replace(/bearer\s+\S+/giu, "[redacted]").replace(/[A-Za-z0-9_\-.]{32,}/gu, "[redacted]").replace(/\s+/gu, " ").trim().slice(0, 300);
 }
 function statusError(code, message2) {
   const known = {
@@ -5586,10 +5585,10 @@ function statusError(code, message2) {
     invalid_argument: "INVALID_REQUEST",
     "3": "INVALID_REQUEST"
   };
-  const detail = serverDetail(message2);
+  const detail2 = serverDetail(message2);
   return new CursorProtocolError(
     known[code] ?? "SERVER",
-    `Cursor returned ${code || "an unknown"} error${detail ? `: ${detail}` : ""}`
+    `Cursor returned ${code || "an unknown"} error${detail2 ? `: ${detail2}` : ""}`
   );
 }
 var LIMITS = Object.freeze({
@@ -5635,10 +5634,10 @@ var BlobStore = class {
     if (id.byteLength > 128) throw limitError();
     const key = Buffer.from(id).toString("hex");
     const previous = this.#items.get(key);
-    const bytes = this.#bytes - (previous?.byteLength ?? 0) + data.byteLength;
-    if (!previous && this.#items.size >= LIMITS.blobCount || bytes > LIMITS.blobBytes) throw limitError();
+    const bytes2 = this.#bytes - (previous?.byteLength ?? 0) + data.byteLength;
+    if (!previous && this.#items.size >= LIMITS.blobCount || bytes2 > LIMITS.blobBytes) throw limitError();
     this.#items.set(key, Uint8Array.from(data));
-    this.#bytes = bytes;
+    this.#bytes = bytes2;
   }
   entries() {
     return [...this.#items].map(([id, data]) => [new Uint8Array(Buffer.from(id, "hex")), data]);
@@ -5663,8 +5662,8 @@ function protocolHeaders(options) {
     "x-dsh-plugin": "dsh-cursor/0.1.0"
   };
   for (const [name, value] of Object.entries(options.headers ?? {})) {
-    const field2 = name.toLowerCase();
-    if (!field2.startsWith(":") && !FORBIDDEN.has(field2)) headers2[field2] = value;
+    const field22 = name.toLowerCase();
+    if (!field22.startsWith(":") && !FORBIDDEN.has(field22)) headers2[field22] = value;
   }
   for (const [name, value] of Object.entries(attributionHeaders())) headers2[name.toLowerCase()] = value;
   headers2.authorization = `Bearer ${options.accessToken}`;
@@ -5690,11 +5689,11 @@ function nodeCode(error) {
 }
 function frameMessage(payload, flags = 0) {
   if (payload.byteLength > LIMITS.frameBytes) throw limitError();
-  const frame = Buffer.allocUnsafe(payload.byteLength + 5);
-  frame[0] = flags;
-  frame.writeUInt32BE(payload.byteLength, 1);
-  frame.set(payload, 5);
-  return frame;
+  const frame2 = Buffer.allocUnsafe(payload.byteLength + 5);
+  frame2[0] = flags;
+  frame2.writeUInt32BE(payload.byteLength, 1);
+  frame2.set(payload, 5);
+  return frame2;
 }
 var FrameDecoder = class {
   #header = Buffer.alloc(5);
@@ -5703,7 +5702,7 @@ var FrameDecoder = class {
   #payloadUsed = 0;
   #flags = 0;
   push(chunk) {
-    const frames = [];
+    const frames2 = [];
     let offset = 0;
     while (offset < chunk.byteLength) {
       if (!this.#payload) {
@@ -5724,27 +5723,27 @@ var FrameDecoder = class {
       this.#payloadUsed += count;
       offset += count;
       if (this.#payloadUsed === this.#payload.length) {
-        frames.push({ flags: this.#flags, payload: this.#payload });
+        frames2.push({ flags: this.#flags, payload: this.#payload });
         this.#payload = void 0;
         this.#headerUsed = 0;
       }
     }
-    return frames;
+    return frames2;
   }
   finish() {
     if (this.#headerUsed !== 0 || this.#payload) throw new CursorProtocolError("INVALID_RESPONSE", "Cursor sent an incomplete frame");
   }
 };
 function terminalError(payload) {
-  let result;
+  let result2;
   try {
-    result = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(payload));
+    result2 = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(payload));
   } catch {
     throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor end-stream envelope");
   }
-  if (!result || typeof result !== "object" || Array.isArray(result)) throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor end-stream envelope");
-  if ("error" in result && result.error !== void 0) {
-    const error = result.error;
+  if (!result2 || typeof result2 !== "object" || Array.isArray(result2)) throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor end-stream envelope");
+  if ("error" in result2 && result2.error !== void 0) {
+    const error = result2.error;
     const code = error && typeof error === "object" && "code" in error && typeof error.code === "string" ? error.code : "";
     const message2 = error && typeof error === "object" && "message" in error ? error.message : void 0;
     throw statusError(code, message2);
@@ -5842,11 +5841,11 @@ var H2Channel = class {
     }
     this.#writes++;
     this.#writeBytes += data.byteLength;
-    const bytes = Buffer.from(data);
+    const bytes2 = Buffer.from(data);
     const written = this.#writeTail.then(async () => {
       if (this.#closed) throw this.#failure ?? new CursorProtocolError("CLOSED", "Cursor connection is closed");
       const started = Date.now();
-      const frame = this.#streaming && bytes[0] === 0 && bytes.length - 5 >= COMPRESS_MIN_BYTES ? frameMessage(await compress(bytes.subarray(5)), 1) : bytes;
+      const frame2 = this.#streaming && bytes2[0] === 0 && bytes2.length - 5 >= COMPRESS_MIN_BYTES ? frameMessage(await compress(bytes2.subarray(5)), 1) : bytes2;
       return new Promise((resolve, reject) => {
         if (this.#closed) {
           reject(this.#failure ?? new CursorProtocolError("CLOSED", "Cursor connection is closed"));
@@ -5861,7 +5860,7 @@ var H2Channel = class {
         const finish = () => {
           if (callbackDone && drained) {
             cleanup();
-            this.#trace?.("upload", { bytes: bytes.length, wireBytes: frame.length, elapsedMs: Date.now() - started });
+            this.#trace?.("upload", { bytes: bytes2.length, wireBytes: frame2.length, elapsedMs: Date.now() - started });
             resolve();
           }
         };
@@ -5875,7 +5874,7 @@ var H2Channel = class {
         };
         this.stream.once("close", onClose);
         try {
-          const accepted = this.stream.write(frame, (error) => {
+          const accepted = this.stream.write(frame2, (error) => {
             if (error) {
               cleanup();
               reject(safeError(error));
@@ -5893,7 +5892,7 @@ var H2Channel = class {
       });
     }).finally(() => {
       this.#writes--;
-      this.#writeBytes -= bytes.length;
+      this.#writeBytes -= bytes2.length;
     });
     this.#writeTail = written.catch((error) => {
       this.close(safeError(error));
@@ -5907,21 +5906,21 @@ var H2Channel = class {
       await this.ready;
       for await (const chunk of this.stream) {
         if (this.#failure) throw this.#failure;
-        for (const frame of decoder.push(chunk)) {
+        for (const frame2 of decoder.push(chunk)) {
           if (ended) throw new CursorProtocolError("INVALID_RESPONSE", "Cursor sent data after end-stream");
-          if ((frame.flags & 1) !== 0) {
+          if ((frame2.flags & 1) !== 0) {
             if (this.#responseHeaders["connect-content-encoding"] !== "gzip") throw new CursorProtocolError("INVALID_RESPONSE", "Unsupported Cursor frame compression");
             try {
-              frame.payload = gunzipSync(frame.payload, { maxOutputLength: LIMITS.inflatedBytes });
+              frame2.payload = gunzipSync(frame2.payload, { maxOutputLength: LIMITS.inflatedBytes });
             } catch {
               throw new CursorProtocolError("LIMIT_EXCEEDED", "Invalid or oversized Cursor compressed frame");
             }
           }
-          if ((frame.flags & 2) !== 0) {
-            terminalError(frame.payload);
+          if ((frame2.flags & 2) !== 0) {
+            terminalError(frame2.payload);
             ended = true;
           }
-          yield frame;
+          yield frame2;
         }
       }
       decoder.finish();
@@ -5942,100 +5941,18 @@ var H2Channel = class {
   end() {
     if (!this.stream.writableEnded && !this.#closed) this.stream.end();
   }
-  close(failure2) {
+  close(failure3) {
     if (this.#closed) return;
     this.#closed = true;
-    this.#failure = failure2;
+    this.#failure = failure3;
     this.#signal?.removeEventListener("abort", this.#onAbort);
-    this.#settleReady(failure2 ?? new CursorProtocolError("CLOSED", "Cursor connection is closed"));
+    this.#settleReady(failure3 ?? new CursorProtocolError("CLOSED", "Cursor connection is closed"));
     clearTimeout(this.#handshake);
     if (!this.stream.closed && !this.stream.destroyed) this.stream.close(constants.NGHTTP2_CANCEL);
     this.stream.destroy();
     this.session.destroy();
   }
 };
-async function requestUnary(path, body, options) {
-  if (options.unaryTransport === "http2") return requestUnaryHttp2(path, body, options);
-  const origin = validateTransport(options);
-  if (!path.startsWith("/") || path.startsWith("//") || path.includes("://")) throw new CursorProtocolError("INVALID_REQUEST", "Invalid Cursor RPC path");
-  if (body.byteLength > LIMITS.frameBytes) throw limitError();
-  const timeout = AbortSignal.timeout(LIMITS.unaryMs);
-  const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout;
-  let reader;
-  let response2;
-  const abort = () => {
-    void reader?.cancel().catch(() => {
-    });
-  };
-  try {
-    response2 = await globalThis.fetch(`${origin}${path}`, {
-      method: "POST",
-      redirect: "error",
-      signal,
-      headers: { ...protocolHeaders(options), "content-type": "application/proto", "connect-protocol-version": "1" },
-      body: Buffer.from(body)
-    });
-    signal.throwIfAborted();
-    if (!response2.ok) {
-      void response2.body?.cancel().catch(() => {
-      });
-      throw httpError(response2.status);
-    }
-    if (!response2.body) throw new CursorProtocolError("INVALID_RESPONSE", "Cursor metadata response has no body");
-    reader = response2.body.getReader();
-    signal.addEventListener("abort", abort, { once: true });
-    const chunks = [];
-    let length = 0;
-    while (true) {
-      signal.throwIfAborted();
-      const item = await reader.read();
-      signal.throwIfAborted();
-      if (item.done) break;
-      length += item.value.byteLength;
-      if (length > LIMITS.frameBytes) {
-        await reader.cancel();
-        throw limitError();
-      }
-      chunks.push(item.value);
-    }
-    return new Uint8Array(Buffer.concat(chunks, length));
-  } catch (error) {
-    if (options.signal?.aborted) throw new CursorProtocolError("ABORTED", "Cursor metadata request was aborted");
-    if (timeout.aborted) throw new CursorProtocolError("TIMEOUT", "Cursor metadata request timed out");
-    throw safeError(error, "Cursor metadata transport failed");
-  } finally {
-    signal.removeEventListener("abort", abort);
-    if (!reader && signal.aborted) void response2?.body?.cancel().catch(() => {
-    });
-    reader?.releaseLock();
-  }
-}
-async function requestUnaryHttp2(path, body, options) {
-  validateTransport(options);
-  if (body.byteLength > LIMITS.frameBytes) throw limitError();
-  const channel = new H2Channel(path, options, false);
-  const timer = setTimeout(() => channel.close(new CursorProtocolError("TIMEOUT", "Cursor unary request timeout")), LIMITS.unaryMs);
-  timer.unref();
-  try {
-    await channel.write(body);
-    channel.end();
-    await channel.ready;
-    const chunks = [];
-    let length = 0;
-    for await (const chunk of channel.stream) {
-      length += chunk.length;
-      if (length > LIMITS.frameBytes) throw limitError();
-      chunks.push(chunk);
-    }
-    channel.checkTrailers();
-    return new Uint8Array(Buffer.concat(chunks, length));
-  } catch (error) {
-    throw channel.failure ?? safeError(error);
-  } finally {
-    clearTimeout(timer);
-    channel.close();
-  }
-}
 var resolved = /* @__PURE__ */ new Map();
 async function cursorRunEndpoint(options) {
   if (options.endpoint !== void 0) return options.endpoint;
@@ -6044,9 +5961,9 @@ async function cursorRunEndpoint(options) {
   if (known) return known;
   const timeout = AbortSignal.timeout(15e3);
   const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout;
-  let response2;
+  let response;
   try {
-    response2 = await fetch(`${DEFAULT_ENDPOINT}/aiserver.v1.ServerConfigService/GetServerConfig`, {
+    response = await fetch(`${DEFAULT_ENDPOINT}/aiserver.v1.ServerConfigService/GetServerConfig`, {
       method: "POST",
       signal,
       headers: { ...protocolHeaders(options), "content-type": "application/json", accept: "application/json" },
@@ -6057,10 +5974,10 @@ async function cursorRunEndpoint(options) {
     if (timeout.aborted) throw new CursorProtocolError("TIMEOUT", "Cursor routing request timed out");
     throw safeError(error, "Cursor routing request failed");
   }
-  if (!response2.ok) throw httpError(response2.status);
+  if (!response.ok) throw httpError(response.status);
   let raw;
   try {
-    const body = await response2.json();
+    const body = await response.json();
     raw = body.agentUrlConfig?.agentnUrl || body.agentUrlConfig?.agentUrl;
   } catch {
     throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor routing response");
@@ -6092,7 +6009,6 @@ var ThinkingMessageSchema = /* @__PURE__ */ messageDesc(file_agent, 65);
 var ConversationTurnStructureSchema = /* @__PURE__ */ messageDesc(file_agent, 70);
 var AgentConversationTurnStructureSchema = /* @__PURE__ */ messageDesc(file_agent, 72);
 var ConversationStateStructureSchema = /* @__PURE__ */ messageDesc(file_agent, 83);
-var ThinkingDetailsSchema = /* @__PURE__ */ messageDesc(file_agent, 84);
 var ModelDetailsSchema = /* @__PURE__ */ messageDesc(file_agent, 88);
 var RequestedModelSchema = /* @__PURE__ */ messageDesc(file_agent, 89);
 var RequestedModel_ModelParameterbytesSchema = /* @__PURE__ */ messageDesc(file_agent, 90);
@@ -6100,8 +6016,6 @@ var AgentRunRequestSchema = /* @__PURE__ */ messageDesc(file_agent, 91);
 var InteractionResponseSchema = /* @__PURE__ */ messageDesc(file_agent, 111);
 var ClientHeartbeatSchema = /* @__PURE__ */ messageDesc(file_agent, 114);
 var AgentClientMessageSchema = /* @__PURE__ */ messageDesc(file_agent, 118);
-var GetUsableModelsRequestSchema = /* @__PURE__ */ messageDesc(file_agent, 122);
-var GetUsableModelsResponseSchema = /* @__PURE__ */ messageDesc(file_agent, 123);
 var CursorRuleTypeGlobalSchema = /* @__PURE__ */ messageDesc(file_agent, 180);
 var CursorRuleTypeSchema = /* @__PURE__ */ messageDesc(file_agent, 184);
 var CursorRuleSchema = /* @__PURE__ */ messageDesc(file_agent, 185);
@@ -6163,10 +6077,10 @@ function decodeArguments(args) {
 function textOf(content) {
   return content.filter((item) => item.type === "text").map((item) => item.text).join("\n");
 }
-function mcpContent(result) {
+function mcpContent(result2) {
   return create(McpSuccessSchema, {
-    isError: result.isError === true,
-    content: result.content.map((item) => {
+    isError: result2.isError === true,
+    content: result2.content.map((item) => {
       if (item.type === "image") return create(McpToolResultContentItemSchema, {
         content: { case: "image", value: create(McpImageContentSchema, { data: item.data, mimeType: item.mediaType }) }
       });
@@ -6179,10 +6093,10 @@ function mcpContent(result) {
 }
 var MCP_PROVIDER = "dsh";
 function uuid(seed) {
-  const bytes = createHash3("sha256").update(seed).digest().subarray(0, 16);
-  bytes[6] = bytes[6] & 15 | 64;
-  bytes[8] = bytes[8] & 63 | 128;
-  const hex = bytes.toString("hex");
+  const bytes2 = createHash3("sha256").update(seed).digest().subarray(0, 16);
+  bytes2[6] = bytes2[6] & 15 | 64;
+  bytes2[8] = bytes2[8] & 63 | 128;
+  const hex = bytes2.toString("hex");
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 function wireCallId(id) {
@@ -6239,10 +6153,10 @@ function sameHead(previous, head) {
 function systemPrompts(messages) {
   return messages.filter((message2) => message2.role === "system" || message2.role === "developer").map((message2) => textOf(message2.content).trim()).filter(Boolean);
 }
-function buildRunRequest(request, blobs, cached) {
-  const active = activeIndex(request.messages);
-  const historyEnd = active < 0 ? request.messages.length : active;
-  const prompts = systemPrompts(request.messages);
+function buildRunRequest(request2, blobs, cached) {
+  const active = activeIndex(request2.messages);
+  const historyEnd = active < 0 ? request2.messages.length : active;
+  const prompts = systemPrompts(request2.messages);
   const systemIds = (prompts.length ? prompts : ["You are a helpful assistant."]).map((content) => blobs.put(new TextEncoder().encode(JSON.stringify({ role: "system", content }))));
   const roots = [];
   const pushRoot = (value) => {
@@ -6251,7 +6165,7 @@ function buildRunRequest(request, blobs, cached) {
   const results = /* @__PURE__ */ new Map();
   const calls = /* @__PURE__ */ new Set();
   for (let index = 0; index < historyEnd; index++) {
-    const message2 = request.messages[index];
+    const message2 = request2.messages[index];
     if (message2.role === "tool") {
       if (!message2.toolCallId) throw new CursorProtocolError("INVALID_REQUEST", "Cursor history tool results require toolCallId");
       results.set(message2.toolCallId, message2);
@@ -6269,7 +6183,7 @@ function buildRunRequest(request, blobs, cached) {
     toolImages = [];
   };
   for (let index = 0; index < historyEnd; index++) {
-    const message2 = request.messages[index];
+    const message2 = request2.messages[index];
     if (message2.role === "system" || message2.role === "developer") continue;
     if (message2.role !== "tool") flushToolImages();
     if (message2.role === "tool") {
@@ -6307,21 +6221,21 @@ ${prompts.join("\n\n")}
     current?.steps.push(blobs.put(toBinary(ConversationStepSchema, step)));
   };
   for (let index = 0; index < historyEnd; index++) {
-    const message2 = request.messages[index];
+    const message2 = request2.messages[index];
     if (message2.role === "user") {
       flushTurn();
-      current = { user: blobs.put(toBinary(UserMessageSchema, userMessage([message2], blobs, `${request.conversationId}:user:${index}`))), steps: [] };
+      current = { user: blobs.put(toBinary(UserMessageSchema, userMessage([message2], blobs, `${request2.conversationId}:user:${index}`))), steps: [] };
     } else if (message2.role === "assistant") {
       for (const item of message2.content) {
         if (item.type === "text") pushStep(create(ConversationStepSchema, { message: { case: "assistantMessage", value: create(AssistantMessageSchema, { text: item.text }) } }));
         if (item.type === "reasoning") pushStep(create(ConversationStepSchema, { message: { case: "thinkingMessage", value: create(ThinkingMessageSchema, { text: item.text }) } }));
         if (item.type === "tool-call") {
-          const result = results.get(item.id);
+          const result2 = results.get(item.id);
           pushStep(create(ConversationStepSchema, { message: { case: "toolCall", value: create(ToolCallSchema, {
             toolCallId: wireCallId(item.id),
             tool: { case: "mcpToolCall", value: create(McpToolCallSchema, {
               args: create(McpArgsSchema, { name: item.name, toolName: item.name, providerIdentifier: MCP_PROVIDER, toolCallId: wireCallId(item.id), args: encodeArguments(item.arguments) }),
-              ...result ? { result: create(McpToolResultSchema, { result: { case: "success", value: mcpContent(result) } }) } : {}
+              ...result2 ? { result: create(McpToolResultSchema, { result: { case: "success", value: mcpContent(result2) } }) } : {}
             }) }
           }) } }));
         }
@@ -6330,51 +6244,51 @@ ${prompts.join("\n\n")}
   }
   flushTurn();
   const action = active < 0 ? create(ConversationActionSchema, { action: { case: "resumeAction", value: create(ResumeActionSchema) } }) : create(ConversationActionSchema, { action: { case: "userMessageAction", value: create(UserMessageActionSchema, {
-    userMessage: userMessage(request.messages.slice(active), blobs, `${request.conversationId}:active:${active}`)
+    userMessage: userMessage(request2.messages.slice(active), blobs, `${request2.conversationId}:active:${active}`)
   }) } });
   const conversationState = cached && sameHead(cached.rootPromptMessagesJson, systemIds) ? clone(ConversationStateStructureSchema, cached) : create(ConversationStateStructureSchema);
   conversationState.rootPromptMessagesJson = roots;
   conversationState.turns = turns;
   conversationState.pendingToolCalls = [];
   return create(AgentRunRequestSchema, {
-    conversationId: request.conversationId,
+    conversationId: request2.conversationId,
     conversationState,
     action,
-    ...modelFields(request)
+    ...modelFields(request2)
   });
 }
-function modelFields(request) {
+function modelFields(request2) {
   return {
-    modelDetails: create(ModelDetailsSchema, { modelId: request.selection.wireModelId, maxMode: request.selection.maxMode }),
+    modelDetails: create(ModelDetailsSchema, { modelId: request2.selection.wireModelId, maxMode: request2.selection.maxMode }),
     requestedModel: create(RequestedModelSchema, {
-      modelId: request.selection.requestedModelId ?? request.selection.wireModelId,
-      maxMode: request.selection.maxMode === true,
-      parameters: (request.selection.parameters ?? []).map((parameter) => create(RequestedModel_ModelParameterbytesSchema, { id: parameter.key, value: parameter.value }))
+      modelId: request2.selection.requestedModelId ?? request2.selection.wireModelId,
+      maxMode: request2.selection.maxMode === true,
+      parameters: (request2.selection.parameters ?? []).map((parameter) => create(RequestedModel_ModelParameterbytesSchema, { id: parameter.key, value: parameter.value }))
     })
   };
 }
 function messagesDigest(messages) {
-  const hash = createHash3("sha256");
+  const hash2 = createHash3("sha256");
   for (const message2 of messages) {
-    hash.update(JSON.stringify([message2.role, message2.toolCallId ?? null, message2.isError === true]));
+    hash2.update(JSON.stringify([message2.role, message2.toolCallId ?? null, message2.isError === true]));
     for (const item of message2.content) {
-      hash.update(item.type === "image" ? `image:${createHash3("sha256").update(item.data).digest("hex")}` : JSON.stringify(item));
+      hash2.update(item.type === "image" ? `image:${createHash3("sha256").update(item.data).digest("hex")}` : JSON.stringify(item));
     }
-    hash.update("\0");
+    hash2.update("\0");
   }
-  return hash.digest("hex");
+  return hash2.digest("hex");
 }
 function activeUserIndex(messages) {
   return activeIndex(messages);
 }
-function buildResumeRequest(request, blobs, checkpoint, active) {
+function buildResumeRequest(request2, blobs, checkpoint, active) {
   return create(AgentRunRequestSchema, {
-    conversationId: request.conversationId,
+    conversationId: request2.conversationId,
     conversationState: checkpoint,
     action: active < 0 ? create(ConversationActionSchema, { action: { case: "resumeAction", value: create(ResumeActionSchema) } }) : create(ConversationActionSchema, { action: { case: "userMessageAction", value: create(UserMessageActionSchema, {
-      userMessage: userMessage(request.messages.slice(active), blobs, `${request.conversationId}:active:${request.messages.length}:${active}`)
+      userMessage: userMessage(request2.messages.slice(active), blobs, `${request2.conversationId}:active:${request2.messages.length}:${active}`)
     }) } }),
-    ...modelFields(request)
+    ...modelFields(request2)
   });
 }
 var descriptor = clone(FileDescriptorProtoSchema, file_agent.proto);
@@ -6467,6 +6381,7 @@ var message = (name) => descriptor.messageType.find((item) => item.name === name
 message("ConversationAction").field.push(field("inject_context_action", "injectContextAction", 19, MESSAGE, ".agent.v1.InjectContextAction", 0));
 message("InteractionUpdate").field.push(field("context_injection_state", "contextInjectionState", 23, MESSAGE, ".agent.v1.ContextInjectionStateUpdate", 0));
 message("AgentRunRequest").field.push(field("run_id", "runId", 25, STRING));
+message("AgentRunRequest").field.push(field("emit_model_call_usage", "emitModelCallUsage", 37, FieldDescriptorProto_Type.BOOL));
 descriptor.messageType.push(create(DescriptorProtoSchema, {
   name: "McpMetaToolOptions",
   field: [
@@ -6525,15 +6440,15 @@ var DENIALS = {
   readMcpResourceExecArgs: "readMcpResourceExecResult"
 };
 var REASON = "Native execution is not supported by this client. Tools are owned by DeepSeek Harness.";
-function execResponse(exec, message2) {
+function execResponse(exec2, message2) {
   return create(AgentClientMessageSchema, {
-    message: { case: "execClientMessage", value: create(ExecClientMessageSchema, { id: exec.id, execId: exec.execId, message: message2 }) }
+    message: { case: "execClientMessage", value: create(ExecClientMessageSchema, { id: exec2.id, execId: exec2.execId, message: message2 }) }
   });
 }
 function toolDefinitions(tools) {
   if (tools.length > LIMITS.toolCount) throw limitError();
   const seen = /* @__PURE__ */ new Set();
-  let bytes = 0;
+  let bytes2 = 0;
   return tools.map((tool) => {
     if (!tool.name || seen.has(tool.name)) throw new CursorProtocolError("INVALID_REQUEST", "Cursor tool names must be unique and nonempty");
     seen.add(tool.name);
@@ -6544,8 +6459,8 @@ function toolDefinitions(tools) {
       providerIdentifier: MCP_PROVIDER,
       inputSchema: toBinary(ValueSchema, fromJson(ValueSchema, tool.parameters))
     });
-    bytes += toBinary(McpToolDefinitionSchema, definition).byteLength;
-    if (bytes > LIMITS.toolBytes) throw limitError();
+    bytes2 += toBinary(McpToolDefinitionSchema, definition).byteLength;
+    if (bytes2 > LIMITS.toolBytes) throw limitError();
     return definition;
   });
 }
@@ -6556,8 +6471,8 @@ function advertisedName(args, names) {
   if (!names.has(name)) return void 0;
   return name;
 }
-function contextResponse(exec, definitions, cwd, instructions) {
-  return execResponse(exec, { case: "requestContextResult", value: create(RequestContextResultSchema, {
+function contextResponse(exec2, definitions, cwd, instructions) {
+  return execResponse(exec2, { case: "requestContextResult", value: create(RequestContextResultSchema, {
     result: { case: "success", value: create(RequestContextSuccessSchema, {
       requestContext: create(WireRequestContextSchema, {
         mcpInfoComplete: true,
@@ -6581,71 +6496,71 @@ function contextResponse(exec, definitions, cwd, instructions) {
     }) }
   }) });
 }
-function mcpStateResponse(exec, definitions) {
-  if (exec.message.case !== "mcpStateExecArgs") throw new Error("Expected MCP state request");
-  const requested = exec.message.value.serverIdentifiers;
-  return execResponse(exec, { case: "mcpStateExecResult", value: create(McpStateExecResultSchema, {
+function mcpStateResponse(exec2, definitions) {
+  if (exec2.message.case !== "mcpStateExecArgs") throw new Error("Expected MCP state request");
+  const requested = exec2.message.value.serverIdentifiers;
+  return execResponse(exec2, { case: "mcpStateExecResult", value: create(McpStateExecResultSchema, {
     result: { case: "success", value: create(McpStateSuccessSchema, {
       servers: requested.length === 0 || requested.includes(MCP_PROVIDER) ? [create(McpStateServerSchema, { serverName: MCP_PROVIDER, serverIdentifier: MCP_PROVIDER, tools: definitions })] : []
     }) }
   }) });
 }
 function kvResponse(message2, blobs) {
-  let response2;
+  let response;
   if (message2.message.case === "getBlobArgs") {
     const data = blobs.get(message2.message.value.blobId);
-    response2 = { case: "getBlobResult", value: create(GetBlobResultSchema, data === void 0 ? {} : { blobData: data }) };
+    response = { case: "getBlobResult", value: create(GetBlobResultSchema, data === void 0 ? {} : { blobData: data }) };
   } else if (message2.message.case === "setBlobArgs") {
     blobs.set(message2.message.value.blobId, message2.message.value.blobData);
-    response2 = { case: "setBlobResult", value: create(SetBlobResultSchema) };
+    response = { case: "setBlobResult", value: create(SetBlobResultSchema) };
   } else throw new CursorProtocolError("UNSUPPORTED_CONTROL", "Unsupported Cursor key-value request");
-  return create(AgentClientMessageSchema, { message: { case: "kvClientMessage", value: create(KvClientMessageSchema, { id: message2.id, message: response2 }) } });
+  return create(AgentClientMessageSchema, { message: { case: "kvClientMessage", value: create(KvClientMessageSchema, { id: message2.id, message: response }) } });
 }
-function rejectNative(exec) {
-  if (exec.message.case === "forceBackgroundShellArgs") return execResponse(exec, {
+function rejectNative(exec2) {
+  if (exec2.message.case === "forceBackgroundShellArgs") return execResponse(exec2, {
     case: "forceBackgroundShellResult",
     value: create(ForceBackgroundShellResultSchema, {
       status: 2
       /* NOT_FOUND */
     })
   });
-  if (exec.message.case === "forceBackgroundSubagentArgs") return execResponse(exec, {
+  if (exec2.message.case === "forceBackgroundSubagentArgs") return execResponse(exec2, {
     case: "forceBackgroundSubagentResult",
     value: create(ForceBackgroundSubagentResultSchema, {
       status: 2
       /* NOT_FOUND */
     })
   });
-  const responseCase = exec.message.case ? DENIALS[exec.message.case] : void 0;
-  const result = ExecClientMessageSchema.fields.find((field2) => field2.localName === responseCase);
-  if (result?.fieldKind === "message") {
+  const responseCase = exec2.message.case ? DENIALS[exec2.message.case] : void 0;
+  const result2 = ExecClientMessageSchema.fields.find((field22) => field22.localName === responseCase);
+  if (result2?.fieldKind === "message") {
     for (const denial of ["rejected", "error", "failure"]) {
-      const field2 = result.message.fields.find((candidate) => candidate.localName === denial && candidate.oneof !== void 0);
-      if (field2?.fieldKind !== "message") continue;
-      const reason = field2.message.fields.find((candidate) => ["reason", "error", "errorMessage", "message"].includes(candidate.localName) && candidate.fieldKind === "scalar" && candidate.scalar === 9);
+      const field22 = result2.message.fields.find((candidate) => candidate.localName === denial && candidate.oneof !== void 0);
+      if (field22?.fieldKind !== "message") continue;
+      const reason = field22.message.fields.find((candidate) => ["reason", "error", "errorMessage", "message"].includes(candidate.localName) && candidate.fieldKind === "scalar" && candidate.scalar === 9);
       if (!reason) continue;
-      const response2 = fromJson(ExecClientMessageSchema, {
-        id: exec.id,
-        execId: exec.execId,
-        [result.jsonName]: { [field2.jsonName]: { [reason.jsonName]: REASON } }
+      const response = fromJson(ExecClientMessageSchema, {
+        id: exec2.id,
+        execId: exec2.execId,
+        [result2.jsonName]: { [field22.jsonName]: { [reason.jsonName]: REASON } }
       });
-      return create(AgentClientMessageSchema, { message: { case: "execClientMessage", value: response2 } });
+      return create(AgentClientMessageSchema, { message: { case: "execClientMessage", value: response } });
     }
   }
   throw new CursorProtocolError("UNSUPPORTED_EXEC", "Unsupported Cursor execution request has no safe denial schema");
 }
 function rejectInteraction(query) {
-  let response2;
+  let response;
   if (query.query.case === "askQuestionInteractionQuery") {
-    response2 = { id: query.id, askQuestionInteractionResponse: { result: { rejected: { reason: REASON } } } };
+    response = { id: query.id, askQuestionInteractionResponse: { result: { rejected: { reason: REASON } } } };
   } else if (query.query.case === "switchModeRequestQuery") {
-    response2 = { id: query.id, switchModeRequestResponse: { rejected: { reason: REASON } } };
+    response = { id: query.id, switchModeRequestResponse: { rejected: { reason: REASON } } };
   } else if (query.query.case === "createPlanRequestQuery") {
-    response2 = { id: query.id, createPlanRequestResponse: { result: { error: { error: REASON } } } };
+    response = { id: query.id, createPlanRequestResponse: { result: { error: { error: REASON } } } };
   } else {
     throw new CursorProtocolError("UNSUPPORTED_INTERACTION", "Unsupported Cursor interaction query has no safe denial schema");
   }
-  return create(AgentClientMessageSchema, { message: { case: "interactionResponse", value: fromJson(InteractionResponseSchema, response2) } });
+  return create(AgentClientMessageSchema, { message: { case: "interactionResponse", value: fromJson(InteractionResponseSchema, response) } });
 }
 var RunEvents = class {
   #queue = [];
@@ -6656,30 +6571,30 @@ var RunEvents = class {
   #waiting;
   push(event) {
     if (this.#ended) return;
-    const bytes = Buffer.byteLength(JSON.stringify(event));
-    if (bytes > LIMITS.eventBytes) throw limitError();
+    const bytes2 = Buffer.byteLength(JSON.stringify(event));
+    if (bytes2 > LIMITS.eventBytes) throw limitError();
     if (this.#waiting) {
       const waiting = this.#waiting;
       this.#waiting = void 0;
       waiting.resolve({ done: false, value: event });
       return;
     }
-    if (this.#queue.length >= LIMITS.eventCount || this.#bytes + bytes > LIMITS.eventBytes) throw limitError();
-    this.#queue.push({ event, bytes });
-    this.#bytes += bytes;
+    if (this.#queue.length >= LIMITS.eventCount || this.#bytes + bytes2 > LIMITS.eventBytes) throw limitError();
+    this.#queue.push({ event, bytes: bytes2 });
+    this.#bytes += bytes2;
   }
-  finish(failure2) {
+  finish(failure3) {
     if (this.#ended) return;
     this.#ended = true;
-    this.#failure = failure2;
-    if (failure2) {
+    this.#failure = failure3;
+    if (failure3) {
       this.#queue.length = 0;
       this.#bytes = 0;
     }
     const waiting = this.#waiting;
     this.#waiting = void 0;
     if (waiting) {
-      if (failure2) waiting.reject(failure2);
+      if (failure3) waiting.reject(failure3);
       else waiting.resolve({ done: true, value: void 0 });
     }
   }
@@ -6731,16 +6646,16 @@ var SPLIT_LIMITS = Object.freeze({ parallel: 16, sequenceWindow: 64, replyBytes:
 var RUN_STREAM_PATH = "/agent.v1.AgentService/RunSSE";
 var APPEND_PATH = "/aiserver.v1.BidiService/BidiAppend";
 function varint(value) {
-  const bytes = [];
+  const bytes2 = [];
   do {
     const low = value % 128;
     value = Math.floor(value / 128);
-    bytes.push(low | (value ? 128 : 0));
+    bytes2.push(low | (value ? 128 : 0));
   } while (value);
-  return Buffer.from(bytes);
+  return Buffer.from(bytes2);
 }
-function bytesField(field2, bytes) {
-  return Buffer.concat([varint(field2 * 8 + 2), varint(bytes.length), bytes]);
+function bytesField(field22, bytes2) {
+  return Buffer.concat([varint(field22 * 8 + 2), varint(bytes2.length), bytes2]);
 }
 function encodeRequestId(id) {
   return bytesField(1, Buffer.from(id));
@@ -6824,9 +6739,9 @@ var SplitChannel = class {
     if (error) this.#rejectReady(error);
     else this.#resolveReady();
   }
-  #track(request) {
-    this.#requests.add(request);
-    request.once("close", () => this.#requests.delete(request));
+  #track(request2) {
+    this.#requests.add(request2);
+    request2.once("close", () => this.#requests.delete(request2));
   }
   #open() {
     const body = frameMessage(encodeRequestId(this.#id));
@@ -6839,19 +6754,19 @@ var SplitChannel = class {
         "connect-accept-encoding": "gzip",
         "content-length": String(body.length)
       }
-    }, (response2) => {
+    }, (response) => {
       this.#clear(timer);
-      this.#response = response2;
-      response2.on("error", () => this.close(new CursorProtocolError("TRANSPORT", "Cursor split response failed")));
+      this.#response = response;
+      response.on("error", () => this.close(new CursorProtocolError("TRANSPORT", "Cursor split response failed")));
       if (this.#closed) {
-        response2.destroy();
+        response.destroy();
         return;
       }
-      if (response2.statusCode !== 200) {
-        this.close(httpError(response2.statusCode ?? 0));
+      if (response.statusCode !== 200) {
+        this.close(httpError(response.statusCode ?? 0));
         return;
       }
-      if (!["application/connect+proto", "text/event-stream"].includes(String(response2.headers["content-type"]).split(";")[0])) {
+      if (!["application/connect+proto", "text/event-stream"].includes(String(response.headers["content-type"]).split(";")[0])) {
         this.close(new CursorProtocolError("INVALID_RESPONSE", "Unexpected Cursor split response content type"));
         return;
       }
@@ -6867,19 +6782,19 @@ var SplitChannel = class {
     req.end(body);
   }
   /** KV data can pipeline. Tools/actions await their individual delivery acknowledgement. */
-  write(frame, buffered = false) {
+  write(frame2, buffered = false) {
     if (this.#closed) return Promise.reject(this.#failure);
-    if (frame.length < 5 || frame[0] !== 0 || Buffer.from(frame).readUInt32BE(1) !== frame.length - 5) {
+    if (frame2.length < 5 || frame2[0] !== 0 || Buffer.from(frame2).readUInt32BE(1) !== frame2.length - 5) {
       throw new Error("SplitChannel requires one uncompressed Connect message");
     }
-    if (frame.length - 5 > LIMITS.frameBytes || this.#writes >= LIMITS.queuedWrites || this.#bytes + frame.length > LIMITS.queuedWriteBytes) {
+    if (frame2.length - 5 > LIMITS.frameBytes || this.#writes >= LIMITS.queuedWrites || this.#bytes + frame2.length > LIMITS.queuedWriteBytes) {
       const error = limitError();
       this.close(error);
       return Promise.reject(error);
     }
-    const payload = Buffer.from(frame.subarray(5));
+    const payload = Buffer.from(frame2.subarray(5));
     this.#writes++;
-    this.#bytes += frame.length;
+    this.#bytes += frame2.length;
     let delivered;
     const admitted = this.#admission.then(async () => {
       while (!this.#closed && (this.#pending.size >= SPLIT_LIMITS.parallel || this.#nextSequence - this.#acknowledgedThrough >= SPLIT_LIMITS.sequenceWindow)) {
@@ -6891,14 +6806,14 @@ var SplitChannel = class {
         this.#acknowledged.add(sequence);
         while (this.#acknowledged.delete(this.#acknowledgedThrough)) this.#acknowledgedThrough++;
       }).catch((error) => {
-        const failure2 = this.#failure ?? safeError(error, "Cursor append delivery failed");
-        this.close(failure2);
-        throw failure2;
+        const failure3 = this.#failure ?? safeError(error, "Cursor append delivery failed");
+        this.close(failure3);
+        throw failure3;
       });
       delivered = sent.finally(() => {
         this.#pending.delete(delivered);
         this.#writes--;
-        this.#bytes -= frame.length;
+        this.#bytes -= frame2.length;
         this.#wake();
       });
       this.#pending.add(delivered);
@@ -6907,7 +6822,7 @@ var SplitChannel = class {
     }).catch((error) => {
       if (!delivered) {
         this.#writes--;
-        this.#bytes -= frame.length;
+        this.#bytes -= frame2.length;
       }
       throw error;
     });
@@ -6933,10 +6848,10 @@ var SplitChannel = class {
           "connect-timeout-ms": String(timeoutMs),
           ...compressed ? { "content-encoding": "gzip" } : {}
         }
-      }, (response2) => {
+      }, (response) => {
         const chunks = [];
         let length = 0;
-        response2.on("data", (chunk) => {
+        response.on("data", (chunk) => {
           length += chunk.length;
           if (length > SPLIT_LIMITS.replyBytes) {
             this.close(limitError());
@@ -6944,24 +6859,24 @@ var SplitChannel = class {
           }
           chunks.push(chunk);
         });
-        response2.on("error", () => reject(this.#failure ?? new CursorProtocolError("TRANSPORT", "Cursor append response failed")));
-        response2.on("end", () => {
+        response.on("error", () => reject(this.#failure ?? new CursorProtocolError("TRANSPORT", "Cursor append response failed")));
+        response.on("end", () => {
           this.#clear(timer);
           if (this.#closed) {
             reject(this.#failure);
             return;
           }
-          if (response2.statusCode !== 200) {
-            let error = httpError(response2.statusCode ?? 0);
+          if (response.statusCode !== 200) {
+            let error = httpError(response.statusCode ?? 0);
             try {
-              const detail = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-              if (typeof detail.code === "string") error = statusError(detail.code, detail.message);
+              const detail2 = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+              if (typeof detail2.code === "string") error = statusError(detail2.code, detail2.message);
             } catch {
             }
             reject(error);
             return;
           }
-          if (String(response2.headers["content-type"]).split(";")[0] !== "application/proto" || length !== 0) {
+          if (String(response.headers["content-type"]).split(";")[0] !== "application/proto" || length !== 0) {
             reject(new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor append acknowledgement"));
             return;
           }
@@ -6990,21 +6905,21 @@ var SplitChannel = class {
       await this.ready;
       for await (const chunk of this.#response) {
         if (this.#failure) throw this.#failure;
-        for (const frame of decoder.push(chunk)) {
+        for (const frame2 of decoder.push(chunk)) {
           if (ended) throw new CursorProtocolError("INVALID_RESPONSE", "Cursor sent data after end-stream");
-          if (frame.flags & 1) {
+          if (frame2.flags & 1) {
             if (this.#response.headers["connect-content-encoding"] !== "gzip") throw new CursorProtocolError("INVALID_RESPONSE", "Unsupported Cursor frame compression");
             try {
-              frame.payload = gunzipSync2(frame.payload, { maxOutputLength: LIMITS.inflatedBytes });
+              frame2.payload = gunzipSync2(frame2.payload, { maxOutputLength: LIMITS.inflatedBytes });
             } catch {
               throw limitError();
             }
           }
-          if (frame.flags & 2) {
-            terminalError(frame.payload);
+          if (frame2.flags & 2) {
+            terminalError(frame2.payload);
             ended = true;
           }
-          yield frame;
+          yield frame2;
         }
       }
       decoder.finish();
@@ -7037,17 +6952,17 @@ var SplitChannel = class {
   }
 };
 function tokenCounters(counters) {
-  const usage = {};
+  const usage2 = {};
   for (const name of ["inputTokens", "outputTokens", "cacheReadTokens", "cacheWriteTokens", "reasoningTokens"]) {
     const value = counters[name];
     if (value === void 0) continue;
     if (value < 0n || value > BigInt(Number.MAX_SAFE_INTEGER)) throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor token count");
-    usage[name] = Number(value);
+    usage2[name] = Number(value);
   }
-  if (usage.inputTokens !== void 0) {
-    usage.inputTokens = Math.max(0, usage.inputTokens - (usage.cacheReadTokens ?? 0) - (usage.cacheWriteTokens ?? 0));
+  if (usage2.inputTokens !== void 0) {
+    usage2.inputTokens = Math.max(0, usage2.inputTokens - (usage2.cacheReadTokens ?? 0) - (usage2.cacheWriteTokens ?? 0));
   }
-  return usage;
+  return usage2;
 }
 var CursorConnection = class {
   events = new RunEvents();
@@ -7084,18 +6999,18 @@ var CursorConnection = class {
   #outputBytes = 0;
   /** Exact host request whose uncommitted output this Run may recover. */
   requestKey = "";
-  constructor(request, options, blobs, definitions) {
+  constructor(request2, options, blobs, definitions) {
     this.#blobs = blobs;
-    const conversation = request.conversation;
-    const context = conversation?.contextTokens ?? conversation?.state?.tokenDetails?.usedTokens;
+    const conversation2 = request2.conversation;
+    const context = conversation2?.contextTokens ?? conversation2?.state?.tokenDetails?.usedTokens;
     if (context !== void 0 && context > 0) this.#usage.contextTokens = context;
     this.#definitions = definitions;
-    this.#names = new Set(request.tools.map((tool) => tool.name));
-    this.#cwd = request.cwd;
-    this.#instructions = request.messages.filter((message2) => message2.role === "system" || message2.role === "developer").map((message2) => message2.content.filter((item) => item.type === "text").map((item) => item.text).join("\n")).filter(Boolean).join("\n\n");
+    this.#names = new Set(request2.tools.map((tool) => tool.name));
+    this.#cwd = request2.cwd;
+    this.#instructions = request2.messages.filter((message2) => message2.role === "system" || message2.role === "developer").map((message2) => message2.content.filter((item) => item.type === "text").map((item) => item.text).join("\n")).filter(Boolean).join("\n\n");
     this.#signal = options.signal;
     this.#trace = options.trace;
-    this.#save = request.onCheckpoint;
+    this.#save = request2.onCheckpoint;
     this.#onAbort = () => this.#fail(new CursorProtocolError("ABORTED", "Cursor Run was aborted"));
     const transport = { ...options, signal: this.#lifetime.signal };
     this.#channel = options.runTransport === "split" ? new SplitChannel(transport) : new H2Channel(RUN_PATH, transport, true);
@@ -7116,14 +7031,14 @@ var CursorConnection = class {
   runId = randomUUID3();
   #persist() {
     if (!this.conversation || !this.#save) return this.#persistence;
-    const save = this.#save, conversation = this.conversation;
-    this.#persistence = this.#persistence.then(() => save(conversation));
+    const save = this.#save, conversation2 = this.conversation;
+    this.#persistence = this.#persistence.then(() => save(conversation2));
     void this.#persistence.catch(() => {
     });
     return this.#persistence;
   }
-  #rememberOutput(type, text2) {
-    this.#outputBytes += Buffer.byteLength(text2);
+  #rememberOutput(type, text) {
+    this.#outputBytes += Buffer.byteLength(text);
     if (this.#outputBytes > LIMITS.eventBytes) {
       this.#recoveryBarrier = true;
       if (this.conversation) this.conversation.recovery = void 0;
@@ -7131,8 +7046,8 @@ var CursorConnection = class {
       return;
     }
     const last = this.#stepOutput.at(-1);
-    if (last?.type === type) last.text += text2;
-    else this.#stepOutput.push({ type, text: text2 });
+    if (last?.type === type) last.text += text;
+    else this.#stepOutput.push({ type, text });
   }
   replayOutput(output) {
     for (const event of output) {
@@ -7141,14 +7056,13 @@ var CursorConnection = class {
       this.events.push({ ...event });
     }
   }
-  async start(request) {
-    ;
-    request.runId = this.runId;
+  async start(request2) {
+    Object.assign(request2, { runId: this.runId, emitModelCallUsage: true });
     this.#pump = this.#read().catch((error) => {
       if (!this.#closed) this.#fail(safeError(error, "Invalid Cursor Run response"));
     });
     try {
-      await this.#write(create(AgentClientMessageSchema, { message: { case: "runRequest", value: request } }));
+      await this.#write(create(AgentClientMessageSchema, { message: { case: "runRequest", value: request2 } }));
       this.#trace?.("opening-sent");
       await this.#channel.ready;
       this.#trace?.("headers");
@@ -7159,10 +7073,10 @@ var CursorConnection = class {
         }, LIMITS.heartbeatMs);
         this.#heartbeat.unref();
         this.#execHeartbeat = setInterval(() => {
-          for (const { exec } of this.#pending.values()) {
+          for (const { exec: exec2 } of this.#pending.values()) {
             void this.#write(create(AgentClientMessageSchema, {
               message: { case: "execClientControlMessage", value: create(ExecClientControlMessageSchema, {
-                message: { case: "heartbeat", value: create(ExecClientHeartbeatSchema, { id: exec.id }) }
+                message: { case: "heartbeat", value: create(ExecClientHeartbeatSchema, { id: exec2.id }) }
               }) }
             })).catch((error) => this.#fail(safeError(error)));
           }
@@ -7171,9 +7085,9 @@ var CursorConnection = class {
         this.#armIdle();
       }
     } catch (error) {
-      const failure2 = this.#failure ?? safeError(error);
-      this.#fail(failure2);
-      throw failure2;
+      const failure3 = this.#failure ?? safeError(error);
+      this.#fail(failure3);
+      throw failure3;
     }
   }
   async #write(message2) {
@@ -7226,12 +7140,12 @@ var CursorConnection = class {
   }
   async #read() {
     try {
-      for await (const frame of this.#channel.frames()) {
+      for await (const frame2 of this.#channel.frames()) {
         if (this.#closed) return;
-        if ((frame.flags & 2) !== 0) break;
+        if ((frame2.flags & 2) !== 0) break;
         let message2;
         try {
-          message2 = fromBinary(WireAgentServerMessageSchema, frame.payload);
+          message2 = fromBinary(WireAgentServerMessageSchema, frame2.payload);
         } catch {
           throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor protobuf response");
         }
@@ -7324,49 +7238,49 @@ var CursorConnection = class {
         throw new CursorProtocolError("UNSUPPORTED_CONTROL", "Unsupported Cursor server message");
     }
   }
-  async #exec(exec) {
-    switch (exec.message.case) {
+  async #exec(exec2) {
+    switch (exec2.message.case) {
       case "requestContextArgs":
         this.#trace?.("request-context", { kvGets: this.#kvGets });
-        await this.#write(contextResponse(exec, this.#definitions, this.#cwd, this.#instructions));
+        await this.#write(contextResponse(exec2, this.#definitions, this.#cwd, this.#instructions));
         return;
       case "mcpStateExecArgs":
-        await this.#write(mcpStateResponse(exec, this.#definitions));
+        await this.#write(mcpStateResponse(exec2, this.#definitions));
         return;
       case "mcpAllowlistPrecheckArgs":
-        await this.#write(execResponse(exec, { case: "mcpAllowlistPrecheckResult", value: create(McpAllowlistPrecheckResultSchema, { allowlisted: false }) }));
+        await this.#write(execResponse(exec2, { case: "mcpAllowlistPrecheckResult", value: create(McpAllowlistPrecheckResultSchema, { allowlisted: false }) }));
         return;
       case "shellAllowlistPrecheckArgs":
-        await this.#write(execResponse(exec, { case: "shellAllowlistPrecheckResult", value: create(ShellAllowlistPrecheckResultSchema, { allowlisted: false }) }));
+        await this.#write(execResponse(exec2, { case: "shellAllowlistPrecheckResult", value: create(ShellAllowlistPrecheckResultSchema, { allowlisted: false }) }));
         return;
       case "webFetchAllowlistPrecheckArgs":
-        await this.#write(execResponse(exec, { case: "webFetchAllowlistPrecheckResult", value: create(WebFetchAllowlistPrecheckResultSchema, { allowlisted: false }) }));
+        await this.#write(execResponse(exec2, { case: "webFetchAllowlistPrecheckResult", value: create(WebFetchAllowlistPrecheckResultSchema, { allowlisted: false }) }));
         return;
       case "mcpArgs": {
         if (this.#ended) throw new CursorProtocolError("INVALID_RESPONSE", "Cursor requested a tool after turnEnded");
-        const args = exec.message.value;
+        const args = exec2.message.value;
         const name = advertisedName(args, this.#names);
         if (args.smartModeApprovalOnly) {
-          await this.#write(execResponse(exec, { case: "mcpResult", value: create(McpResultSchema, {
+          await this.#write(execResponse(exec2, { case: "mcpResult", value: create(McpResultSchema, {
             result: name ? { case: "approved", value: create(McpApprovedSchema) } : { case: "rejected", value: create(McpRejectedSchema, { reason: "The requested tool is not advertised by DeepSeek Harness." }) }
           }) }));
           return;
         }
         if (!name) {
-          await this.#write(execResponse(exec, { case: "mcpResult", value: create(McpResultSchema, {
+          await this.#write(execResponse(exec2, { case: "mcpResult", value: create(McpResultSchema, {
             result: { case: "toolNotFound", value: create(McpToolNotFoundSchema, { availableTools: [...this.#names] }) }
           }) }));
           return;
         }
-        const identity = createHash4("sha256").update(JSON.stringify([exec.id, exec.execId])).digest("hex");
+        const identity = createHash4("sha256").update(JSON.stringify([exec2.id, exec2.execId])).digest("hex");
         if (this.#seen.has(identity)) throw new CursorProtocolError("INVALID_RESPONSE", "Cursor repeated an MCP execution envelope");
-        const bytes = toBinary(ExecServerMessageSchema, exec).byteLength;
-        if (this.#pending.size >= LIMITS.pendingCalls || this.#seen.size >= LIMITS.seenCalls || this.#pendingBytes + bytes > LIMITS.pendingBytes) throw limitError();
+        const bytes2 = toBinary(ExecServerMessageSchema, exec2).byteLength;
+        if (this.#pending.size >= LIMITS.pendingCalls || this.#seen.size >= LIMITS.seenCalls || this.#pendingBytes + bytes2 > LIMITS.pendingBytes) throw limitError();
         const argumentsJSON = decodeArguments(args.args);
         const callKey = randomUUID3();
         this.#seen.add(identity);
-        this.#pending.set(callKey, { exec, bytes });
-        this.#pendingBytes += bytes;
+        this.#pending.set(callKey, { exec: exec2, bytes: bytes2 });
+        this.#pendingBytes += bytes2;
         this.#armIdle();
         this.#checkpointCurrent = false;
         this.#recoveryBarrier = true;
@@ -7376,7 +7290,7 @@ var CursorConnection = class {
         return;
       }
       default:
-        await this.#write(rejectNative(exec));
+        await this.#write(rejectNative(exec2));
     }
   }
   async #interaction(update) {
@@ -7447,23 +7361,23 @@ var CursorConnection = class {
     if (Object.keys(counters).length) this.#haveUsage = true;
     Object.assign(this.#usage, counters);
   }
-  async reply(callKey, result) {
+  async reply(callKey, result2) {
     if (this.#closed) throw this.#failure ?? new CursorProtocolError("CLOSED", "Cursor Run is closed");
     const pending = this.#pending.get(callKey);
     if (!pending) throw new CursorProtocolError("INVALID_CALL_KEY", "Unknown or already answered Cursor tool call");
     this.#stepText = [];
-    const response2 = execResponse(pending.exec, { case: "mcpResult", value: create(McpResultSchema, {
-      result: { case: "success", value: mcpContent(result) }
+    const response = execResponse(pending.exec, { case: "mcpResult", value: create(McpResultSchema, {
+      result: { case: "success", value: mcpContent(result2) }
     }) });
     this.#pending.delete(callKey);
     this.#pendingBytes -= pending.bytes;
     this.#armIdle();
     try {
-      await this.#write(response2);
+      await this.#write(response);
     } catch (error) {
-      const failure2 = this.#failure ?? safeError(error);
-      this.#fail(failure2);
-      throw failure2;
+      const failure3 = this.#failure ?? safeError(error);
+      this.#fail(failure3);
+      throw failure3;
     }
   }
   async inject(content) {
@@ -7487,9 +7401,9 @@ var CursorConnection = class {
     try {
       await this.#write(message2);
     } catch (error) {
-      const failure2 = this.#failure ?? safeError(error);
-      this.#fail(failure2);
-      throw failure2;
+      const failure3 = this.#failure ?? safeError(error);
+      this.#fail(failure3);
+      throw failure3;
     }
   }
   async cancel(_reason) {
@@ -7508,11 +7422,11 @@ function anchorOf(messages) {
   const first2 = messages.find((message2) => message2.role !== "system" && message2.role !== "developer");
   return first2 ? messagesDigest([first2]) : "";
 }
-function resumePlan(conversation, messages) {
+function resumePlan(conversation2, messages) {
   const rebuild = (reason) => ({ active: -1, reason });
-  if (!conversation) return rebuild("ephemeral");
-  if (!conversation.state) return rebuild("no-checkpoint");
-  const resume = conversation.resume;
+  if (!conversation2) return rebuild("ephemeral");
+  if (!conversation2.state) return rebuild("no-checkpoint");
+  const resume = conversation2.resume;
   if (!resume) return rebuild("unfinished-turn");
   const active = activeUserIndex(messages);
   if (active < 0) return rebuild("tool-result-tail");
@@ -7525,40 +7439,40 @@ function resumePlan(conversation, messages) {
   return { active, reason: "terminal-checkpoint" };
 }
 function resetCursorConversation(value) {
-  const conversation = value;
-  Object.assign(conversation, { blobs: new BlobStore(), state: void 0, contextTokens: void 0, hostHistory: void 0, resume: void 0, recovery: void 0, notes: [] });
+  const conversation2 = value;
+  Object.assign(conversation2, { blobs: new BlobStore(), state: void 0, contextTokens: void 0, hostHistory: void 0, resume: void 0, recovery: void 0, notes: [] });
 }
 function createCursorConversation() {
   const store = { kind: "cursor-conversation", id: randomUUID3(), blobEncryptionKey: randomBytes(32).toString("hex"), blobs: new BlobStore(), notes: [] };
   return store;
 }
-async function openCursorRun(request, options) {
+async function openCursorRun(request2, options) {
   validateTransport(options);
-  const conversation = request.conversation;
-  const definitions = toolDefinitions(request.tools);
-  const requestKey = createHash4("sha256").update(JSON.stringify([messagesDigest(request.messages), request.selection, request.tools, request.cwd ?? null])).digest("hex");
-  const recovery = conversation?.state && conversation.recovery?.requestKey === requestKey ? conversation.recovery : void 0;
+  const conversation2 = request2.conversation;
+  const definitions = toolDefinitions(request2.tools);
+  const requestKey = createHash4("sha256").update(JSON.stringify([messagesDigest(request2.messages), request2.selection, request2.tools, request2.cwd ?? null])).digest("hex");
+  const recovery = conversation2?.state && conversation2.recovery?.requestKey === requestKey ? conversation2.recovery : void 0;
   if (recovery && recovery.attempts >= 2) throw new CursorProtocolError("CURSOR_RECOVERY_STALLED", "Cursor checkpoint recovery made no progress");
-  const { active, reason } = recovery ? { active: -1, reason: "interrupted-checkpoint" } : resumePlan(conversation, request.messages);
+  const { active, reason } = recovery ? { active: -1, reason: "interrupted-checkpoint" } : resumePlan(conversation2, request2.messages);
   const blobs = new BlobStore();
   let built;
-  if (conversation && recovery) {
+  if (conversation2 && recovery) {
     recovery.attempts++;
-    built = buildResumeRequest({ ...request, conversationId: conversation.id }, conversation.blobs, conversation.state, -1);
-  } else if (conversation && active >= 0) {
-    const notes = conversation.notes.splice(0);
-    const messages = notes.length ? [...request.messages.slice(0, active), ...notes.map((content) => ({ role: "user", content })), ...request.messages.slice(active)] : request.messages;
-    built = buildResumeRequest({ ...request, messages, conversationId: conversation.id }, conversation.blobs, conversation.state, active);
+    built = buildResumeRequest({ ...request2, conversationId: conversation2.id }, conversation2.blobs, conversation2.state, -1);
+  } else if (conversation2 && active >= 0) {
+    const notes = conversation2.notes.splice(0);
+    const messages = notes.length ? [...request2.messages.slice(0, active), ...notes.map((content) => ({ role: "user", content })), ...request2.messages.slice(active)] : request2.messages;
+    built = buildResumeRequest({ ...request2, messages, conversationId: conversation2.id }, conversation2.blobs, conversation2.state, active);
   } else {
-    if (conversation && (conversation.state || conversation.blobs.bytes > LIMITS.conversationBytes)) {
-      resetCursorConversation(conversation);
+    if (conversation2 && (conversation2.state || conversation2.blobs.bytes > LIMITS.conversationBytes)) {
+      resetCursorConversation(conversation2);
     }
-    built = buildRunRequest(conversation ? { ...request, conversationId: conversation.id } : request, conversation?.blobs ?? blobs);
+    built = buildRunRequest(conversation2 ? { ...request2, conversationId: conversation2.id } : request2, conversation2?.blobs ?? blobs);
   }
-  const store = conversation?.blobs ?? blobs;
+  const store = conversation2?.blobs ?? blobs;
   const historyBytes = built.conversationState.rootPromptMessagesJson.reduce((total, id) => total + (store.get(id)?.byteLength ?? 0), 0);
   const transport = options.runTransport && options.runTransport !== "auto" ? options.runTransport : historyBytes >= 4 * 1024 * 1024 ? "split" : "http2";
-  const blobEncryptionKey = conversation?.blobEncryptionKey ?? randomBytes(32).toString("hex");
+  const blobEncryptionKey = conversation2?.blobEncryptionKey ?? randomBytes(32).toString("hex");
   const headers2 = Object.fromEntries(Object.entries(options.headers ?? {}).filter(([name]) => name.toLowerCase() !== "x-blob-encryption-key"));
   options = {
     ...options,
@@ -7566,70 +7480,55 @@ async function openCursorRun(request, options) {
     runTransport: transport,
     endpoint: transport === "split" ? options.endpoint ?? DEFAULT_ENDPOINT : await cursorRunEndpoint(options)
   };
-  options.trace?.(recovery ? "recover-checkpoint" : active >= 0 ? "resume-checkpoint" : "rebuild-history", { messages: request.messages.length, reason, transport, historyBytes });
-  if (conversation) {
-    conversation.resume = void 0;
-    if (!recovery) conversation.recovery = void 0;
-    await request.onCheckpoint?.(conversation);
+  options.trace?.(recovery ? "recover-checkpoint" : active >= 0 ? "resume-checkpoint" : "rebuild-history", { messages: request2.messages.length, reason, transport, historyBytes });
+  if (conversation2) {
+    conversation2.resume = void 0;
+    if (!recovery) conversation2.recovery = void 0;
+    await request2.onCheckpoint?.(conversation2);
   }
   if (options.signal?.aborted) throw new CursorProtocolError("ABORTED", "Cursor Run was aborted");
-  const connection = new CursorConnection(request, options, conversation?.blobs ?? blobs, definitions);
-  connection.conversation = conversation;
-  connection.anchor = anchorOf(request.messages);
+  const connection = new CursorConnection(request2, options, conversation2?.blobs ?? blobs, definitions);
+  connection.conversation = conversation2;
+  connection.anchor = anchorOf(request2.messages);
   connection.requestKey = requestKey;
   if (recovery) connection.replayOutput(recovery.output);
   await connection.start(built);
   return connection;
 }
-async function fetchCursorUsableModels(options) {
-  const bytes = await requestUnary("/agent.v1.AgentService/GetUsableModels", toBinary(GetUsableModelsRequestSchema, create(GetUsableModelsRequestSchema)), options);
-  try {
-    return fromBinary(GetUsableModelsResponseSchema, bytes).models.map((model) => ({
-      modelId: model.modelId,
-      displayName: model.displayName,
-      ...model.displayModelId ? { displayModelId: model.displayModelId } : {},
-      ...model.displayNameShort ? { displayNameShort: model.displayNameShort } : {},
-      ...model.maxMode !== void 0 ? { maxMode: model.maxMode } : {},
-      ...model.thinkingDetails ? { thinkingDetails: toJson(ThinkingDetailsSchema, model.thinkingDetails) } : {}
-    }));
-  } catch {
-    throw new CursorProtocolError("INVALID_RESPONSE", "Invalid Cursor model catalog protobuf");
-  }
-}
 var compress3 = promisify3(gzip3);
 var decompress = promisify3(gunzip);
 var blobHashes = /* @__PURE__ */ new WeakMap();
 function blobHash(data) {
-  let hash = blobHashes.get(data);
-  if (!hash) {
-    hash = createHash5("sha256").update(data).digest("hex");
-    blobHashes.set(data, hash);
+  let hash2 = blobHashes.get(data);
+  if (!hash2) {
+    hash2 = createHash5("sha256").update(data).digest("hex");
+    blobHashes.set(data, hash2);
   }
-  return hash;
+  return hash2;
 }
 function packHash(entries) {
   return createHash5("sha256").update(JSON.stringify(entries.map(([id, data]) => [Buffer.from(id).toString("base64"), blobHash(data)]))).digest("hex");
 }
 function blobPacks(entries) {
   const packs = [];
-  let pack = [], bytes = 0;
+  let pack = [], bytes2 = 0;
   for (const entry of entries) {
     if (entry[1].byteLength >= 64 * 1024) {
       if (pack.length) {
         packs.push(pack);
         pack = [];
-        bytes = 0;
+        bytes2 = 0;
       }
       packs.push([entry]);
       continue;
     }
-    if (pack.length && (pack.length >= 64 || bytes + entry[1].byteLength > 1024 * 1024)) {
+    if (pack.length && (pack.length >= 64 || bytes2 + entry[1].byteLength > 1024 * 1024)) {
       packs.push(pack);
       pack = [];
-      bytes = 0;
+      bytes2 = 0;
     }
     pack.push(entry);
-    bytes += entry[1].byteLength;
+    bytes2 += entry[1].byteLength;
   }
   if (pack.length) packs.push(pack);
   return packs;
@@ -7653,20 +7552,20 @@ async function snapshotCursorConversation(value, external) {
   if (external) {
     references = [];
     for (const pack of blobPacks(snapshot.blobs)) {
-      const hash = packHash(pack);
-      if (!external.has(hash)) {
+      const hash2 = packHash(pack);
+      if (!external.has(hash2)) {
         const json2 = JSON.stringify(pack.map(([id, data]) => [Buffer.from(id).toString("base64"), Buffer.from(data).toString("base64")]));
-        await external.put(hash, (await compress3(json2)).toString("base64"));
+        await external.put(hash2, (await compress3(json2)).toString("base64"));
       }
-      references.push(hash);
+      references.push(hash2);
     }
   }
   const json = JSON.stringify({ ...snapshot, ...references ? { blobs: references } : {} }, (_key, item) => item instanceof Uint8Array ? { cursorBytes: Buffer.from(item).toString("base64") } : item);
   return (await compress3(json)).toString("base64");
 }
 async function restoreCursorConversation(snapshot, external) {
-  const bytes = await decompress(Buffer.from(snapshot, "base64"), { maxOutputLength: LIMITS.blobBytes * 2 });
-  const value = JSON.parse(bytes.toString("utf8"), (_key, item) => item && typeof item === "object" && typeof item.cursorBytes === "string" && Object.keys(item).length === 1 ? new Uint8Array(Buffer.from(item.cursorBytes, "base64")) : item);
+  const bytes2 = await decompress(Buffer.from(snapshot, "base64"), { maxOutputLength: LIMITS.blobBytes * 2 });
+  const value = JSON.parse(bytes2.toString("utf8"), (_key, item) => item && typeof item === "object" && typeof item.cursorBytes === "string" && Object.keys(item).length === 1 ? new Uint8Array(Buffer.from(item.cursorBytes, "base64")) : item);
   if (![1, 2, 3, 4].includes(value.version) || typeof value.id !== "string" || !value.id || value.resume !== void 0 && (typeof value.resume.anchor !== "string" || typeof value.resume.finalText !== "string") || value.state !== void 0 && !(value.state instanceof Uint8Array) || value.version === 1 && (!value.resume || !value.state) || value.version >= 2 && (typeof value.blobEncryptionKey !== "string" || !/^[0-9a-f]{64}$/u.test(value.blobEncryptionKey)) || value.contextTokens !== void 0 && (!Number.isSafeInteger(value.contextTokens) || value.contextTokens <= 0) || value.hostHistory !== void 0 && (!Number.isSafeInteger(value.hostHistory.count) || value.hostHistory.count < 0 || typeof value.hostHistory.digest !== "string") || !Array.isArray(value.blobs) || !Array.isArray(value.notes)) {
     throw new Error("Invalid Cursor conversation snapshot");
   }
@@ -7678,14 +7577,14 @@ async function restoreCursorConversation(snapshot, external) {
   }
   const blobs = new BlobStore();
   if (value.version === 4) {
-    for (const hash of value.blobs) {
-      if (typeof hash !== "string" || !/^[0-9a-f]{64}$/u.test(hash)) throw new Error("Invalid Cursor blob pack reference");
-      const encoded = external?.get(hash);
+    for (const hash2 of value.blobs) {
+      if (typeof hash2 !== "string" || !/^[0-9a-f]{64}$/u.test(hash2)) throw new Error("Invalid Cursor blob pack reference");
+      const encoded = external?.get(hash2);
       if (encoded === void 0) throw new Error("Cursor snapshot blob pack is missing");
       const packed = JSON.parse((await decompress(Buffer.from(encoded, "base64"), { maxOutputLength: LIMITS.blobBytes * 2 })).toString("utf8"));
       if (!Array.isArray(packed) || packed.length > 64 || packed.some((entry) => !Array.isArray(entry) || entry.length !== 2 || entry.some((part) => typeof part !== "string"))) throw new Error("Invalid Cursor blob pack");
       const entries = packed.map(([id, data]) => [new Uint8Array(Buffer.from(id, "base64")), new Uint8Array(Buffer.from(data, "base64"))]);
-      if (packHash(entries) !== hash) throw new Error("Cursor blob pack checksum mismatch");
+      if (packHash(entries) !== hash2) throw new Error("Cursor blob pack checksum mismatch");
       for (const [id, data] of entries) blobs.set(id, data);
     }
   } else {
@@ -7821,13 +7720,13 @@ async function imageBlock(url, signal) {
     mediaType = inline[1];
     data = inline[2] ? Buffer.from(inline[3], "base64") : Buffer.from(decodeURIComponent(inline[3]));
   } else {
-    const response2 = await fetch(url, { signal });
-    if (!response2.ok) throw new LlmError(`Cursor image input could not be fetched (HTTP ${response2.status}).`, "UNSUPPORTED_CONTENT");
-    mediaType = (response2.headers.get("content-type") ?? "").split(";")[0].trim();
-    data = Buffer.from(await response2.arrayBuffer());
+    const response = await fetch(url, { signal });
+    if (!response.ok) throw new LlmError(`Cursor image input could not be fetched (HTTP ${response.status}).`, "UNSUPPORTED_CONTENT");
+    mediaType = (response.headers.get("content-type") ?? "").split(";")[0].trim();
+    data = Buffer.from(await response.arrayBuffer());
   }
-  const bytes = new Uint8Array(data);
-  return { type: "image", data: bytes, mediaType: mediaType || "image/png", ...imageSize(bytes) };
+  const bytes2 = new Uint8Array(data);
+  return { type: "image", data: bytes2, mediaType: mediaType || "image/png", ...imageSize(bytes2) };
 }
 async function contentBlocks(content, signal) {
   if (typeof content === "string") return content ? [{ type: "text", text: content }] : [];
@@ -7869,8 +7768,8 @@ async function chatMessages(chat, signal) {
         const content = [];
         const reasoning = reasoningOf(message2);
         if (reasoning) content.push({ type: "reasoning", text: reasoning });
-        const text2 = textOf2(message2.content);
-        if (text2) content.push({ type: "text", text: text2 });
+        const text = textOf2(message2.content);
+        if (text) content.push({ type: "text", text });
         for (const call of message2.tool_calls ?? []) {
           if (call?.type !== "function" && call?.type !== void 0) continue;
           const args = call.function?.arguments;
@@ -7941,11 +7840,11 @@ function assertOptions(options, auxiliary) {
   }
 }
 var CursorRuntime = class {
-  constructor(ctx, auth, catalog, hooks = {}) {
+  constructor(ctx, auth, catalog2, hooks = {}) {
     this.ctx = ctx;
     this.logger = typeof ctx?.logger === "function" ? ctx.logger("cursor") : void 0;
     this.auth = auth;
-    this.catalog = catalog;
+    this.catalog = catalog2;
     this.openRun = hooks.openCursorRun ?? openCursorRun;
     this.project = hooks.projectRequest ?? projectRequest;
     this.projectResult = hooks.projectToolResult ?? projectToolResult;
@@ -8080,27 +7979,27 @@ var CursorRuntime = class {
     const started = Date.now();
     const session = scope.sessionId ?? "ephemeral";
     const shown = /* @__PURE__ */ new Set(["resume-checkpoint", "recover-checkpoint", "rebuild-history", "first-thinking", "first-text", "inject", "injection"]);
-    return (event, detail) => {
+    return (event, detail2) => {
       const elapsedMs = Date.now() - started;
       if (event === "resume-checkpoint" || event === "recover-checkpoint" || event === "rebuild-history") {
         scope.diagnostics = {
           opening: event,
-          messages: detail?.messages,
-          ...detail?.reason ? { reason: detail.reason } : {},
-          ...detail?.transport ? { transport: detail.transport, historyBytes: detail.historyBytes } : {}
+          messages: detail2?.messages,
+          ...detail2?.reason ? { reason: detail2.reason } : {},
+          ...detail2?.transport ? { transport: detail2.transport, historyBytes: detail2.historyBytes } : {}
         };
       } else if (event === "upload") {
         scope.diagnostics ??= {};
         scope.diagnostics.upload ??= { bytes: 0, wireBytes: 0, lastPayloadMs: 0 };
-        scope.diagnostics.upload.bytes += detail.bytes;
-        scope.diagnostics.upload.wireBytes += detail.wireBytes;
-        if (detail.bytes >= 1024) scope.diagnostics.upload.lastPayloadMs = elapsedMs;
+        scope.diagnostics.upload.bytes += detail2.bytes;
+        scope.diagnostics.upload.wireBytes += detail2.wireBytes;
+        if (detail2.bytes >= 1024) scope.diagnostics.upload.lastPayloadMs = elapsedMs;
       } else if (event === "first-thinking" || event === "first-text") {
         scope.diagnostics ??= {};
         scope.diagnostics[event === "first-text" ? "firstTextMs" : "firstThinkingMs"] = elapsedMs;
       }
       if (!shown.has(event)) return;
-      logger?.warn(`cursor: ${session} ${event} +${elapsedMs}ms ${detail ? JSON.stringify(detail) : ""}`);
+      logger?.warn(`cursor: ${session} ${event} +${elapsedMs}ms ${detail2 ? JSON.stringify(detail2) : ""}`);
     };
   }
   async open(scope, options, captured, selection, tools) {
@@ -8114,21 +8013,21 @@ var CursorRuntime = class {
       throw failure("Cursor auxiliary requests require a text-only history projection", "CURSOR_AUXILIARY_TEXT_ONLY");
     }
     scope.controller.signal.throwIfAborted();
-    const conversation = await this.conversationFor(scope, grant.loginId, captured.settings);
+    const conversation2 = await this.conversationFor(scope, grant.loginId, captured.settings);
     scope.controller.signal.throwIfAborted();
-    if (conversation.store) {
-      const covered = conversation.store.hostHistory;
+    if (conversation2.store) {
+      const covered = conversation2.store.hostHistory;
       const changed = covered && this.fingerprint({ ...options, messages: options.messages.slice(0, covered.count) }) !== covered.digest;
-      if (changed || conversation.store.resume && !covered) resetCursorConversation(conversation.store);
+      if (changed || conversation2.store.resume && !covered) resetCursorConversation(conversation2.store);
     }
     scope.run = await this.openRun({
-      conversationId: conversation.id,
-      ...conversation.store ? { conversation: conversation.store } : {},
+      conversationId: conversation2.id,
+      ...conversation2.store ? { conversation: conversation2.store } : {},
       selection,
       messages,
       tools,
-      ...conversation.store && this.conversationCache ? {
-        onCheckpoint: (store) => this.conversationCache.save(scope.sessionId, conversation.binding, store)
+      ...conversation2.store && this.conversationCache ? {
+        onCheckpoint: (store) => this.conversationCache.save(scope.sessionId, conversation2.binding, store)
       } : {},
       ...scope.resolved.cwd === void 0 ? {} : { cwd: scope.resolved.cwd }
     }, {
@@ -8145,11 +8044,11 @@ var CursorRuntime = class {
   async pump(scope) {
     try {
       for await (const event of scope.run.events) {
-        const bytes = eventBytes(event);
-        if (scope.queue.length >= MAX_QUEUED_EVENTS || scope.queueBytes + bytes > MAX_QUEUED_BYTES) {
+        const bytes2 = eventBytes(event);
+        if (scope.queue.length >= MAX_QUEUED_EVENTS || scope.queueBytes + bytes2 > MAX_QUEUED_BYTES) {
           throw failure("Cursor event buffer limit exceeded", "CURSOR_BUFFER_LIMIT");
         }
-        scope.queueBytes += bytes;
+        scope.queueBytes += bytes2;
         scope.queue.push(event);
         scope.wake?.();
         if (event.type === "done") {
@@ -8199,14 +8098,14 @@ var CursorRuntime = class {
       if (timedOut) return void 0;
     }
   }
-  recordUsage(scope, usage) {
-    if (usage.cacheReadTokens !== void 0) {
+  recordUsage(scope, usage2) {
+    if (usage2.cacheReadTokens !== void 0) {
       scope.diagnostics ??= {};
-      scope.diagnostics.turnUsage = { ...usage };
-      this.logger?.warn(`cursor: ${scope.sessionId ?? "ephemeral"} turn usage ${JSON.stringify({ input: usage.inputTokens, cacheRead: usage.cacheReadTokens, cacheWrite: usage.cacheWriteTokens, output: usage.outputTokens, context: usage.contextTokens })}`);
+      scope.diagnostics.turnUsage = { ...usage2 };
+      this.logger?.warn(`cursor: ${scope.sessionId ?? "ephemeral"} turn usage ${JSON.stringify({ input: usage2.inputTokens, cacheRead: usage2.cacheReadTokens, cacheWrite: usage2.cacheWriteTokens, output: usage2.outputTokens, context: usage2.contextTokens })}`);
     }
-    if (usage.outputTokens !== void 0) scope.usage.outputTokens = Math.max(scope.usage.outputTokens ?? 0, usage.outputTokens);
-    if (usage.contextTokens !== void 0) scope.usage.contextTokens = usage.contextTokens;
+    if (usage2.outputTokens !== void 0) scope.usage.outputTokens = Math.max(scope.usage.outputTokens ?? 0, usage2.outputTokens);
+    if (usage2.contextTokens !== void 0) scope.usage.contextTokens = usage2.contextTokens;
   }
   /**
    * One DSH step reports the context it actually occupied, from Cursor's latest
@@ -8252,12 +8151,12 @@ var CursorRuntime = class {
         }
       }
     } finally {
-      const bytes = deferredEvents.reduce((sum, event) => sum + eventBytes(event), 0);
-      if (scope.queue.length + deferredEvents.length > MAX_QUEUED_EVENTS || scope.queueBytes + bytes > MAX_QUEUED_BYTES) {
+      const bytes2 = deferredEvents.reduce((sum, event) => sum + eventBytes(event), 0);
+      if (scope.queue.length + deferredEvents.length > MAX_QUEUED_EVENTS || scope.queueBytes + bytes2 > MAX_QUEUED_BYTES) {
         throw failure("Cursor event buffer limit exceeded", "CURSOR_BUFFER_LIMIT");
       }
       scope.queue.unshift(...deferredEvents);
-      scope.queueBytes += bytes;
+      scope.queueBytes += bytes2;
       scope.listedCount = void 0;
     }
     if (scope.failure) throw scope.failure;
@@ -8321,19 +8220,19 @@ var CursorRuntime = class {
     await this.project(options, this.projectionOptions(scope.controller.signal));
     const projected = await Promise.all([...scope.pending].map(async ([id, call]) => {
       const message2 = results.get(id);
-      const result = await this.projectResult(message2, this.projectionOptions(scope.controller.signal));
-      return { callKey: call.callKey, result: { ...result, isError: message2.isError === true } };
+      const result2 = await this.projectResult(message2, this.projectionOptions(scope.controller.signal));
+      return { callKey: call.callKey, result: { ...result2, isError: message2.isError === true } };
     }));
     const injection = injected.length ? (await this.project(
       { ...options, system: void 0, messages: injected, tools: [], toolHistory: void 0 },
       this.projectionOptions(scope.controller.signal)
     )).map((message2) => message2.content) : [];
     scope.deliveryStarted = true;
-    for (const { callKey, result } of projected) {
+    for (const { callKey, result: result2 } of projected) {
       scope.controller.signal.throwIfAborted();
       if (scope.failure) throw scope.failure;
       try {
-        await scope.run.reply(callKey, result);
+        await scope.run.reply(callKey, result2);
       } catch (error) {
         throw failure("Cursor tool-result delivery was interrupted; recovery requires the committed host history", "CURSOR_RUN_LOST", error);
       }
@@ -8404,8 +8303,8 @@ var CursorRuntime = class {
           source: { provider: options.provider, model: options.model }
         }));
         this.snapshotHistory(scope);
-        const usage = this.usageChunk(scope);
-        if (usage) yield usage;
+        const usage2 = this.usageChunk(scope);
+        if (usage2) yield usage2;
         scope.status = "parked";
         yield {
           type: "finish",
@@ -8421,8 +8320,8 @@ var CursorRuntime = class {
       } else if (event.type === "done") {
         const ended = endBlock();
         if (ended) yield ended;
-        const usage = this.usageChunk(scope);
-        if (usage) yield usage;
+        const usage2 = this.usageChunk(scope);
+        if (usage2) yield usage2;
         if (scope.conversation) {
           const completed = [...scope.expectedMessages, createAssistantMessage({
             content: blocks,
@@ -8532,17 +8431,17 @@ var CursorRuntime = class {
     if (scope.closing) return scope.closing;
     scope.closing = (async () => {
       const errors = [];
-      const run2 = await scope.ready.promise;
-      if (run2) {
+      const run3 = await scope.ready.promise;
+      if (run3) {
         if (cancel) {
           try {
-            await run2.cancel(error);
+            await run3.cancel(error);
           } catch (cause) {
             errors.push(cause);
           }
         }
         try {
-          await run2.close();
+          await run3.close();
         } catch (cause) {
           errors.push(cause);
         }
@@ -8585,7 +8484,7 @@ var CursorRuntime = class {
   }
   async closeMany(scopes, error) {
     const settled = await Promise.allSettled([...scopes].map((scope) => this.closeScope(scope, error, true)));
-    const errors = settled.filter((result) => result.status === "rejected").map((result) => result.reason);
+    const errors = settled.filter((result2) => result2.status === "rejected").map((result2) => result2.reason);
     if (errors.length) throw new AggregateError(errors, "Cursor runtime cleanup failed");
   }
   async dispose() {
@@ -8597,107 +8496,4474 @@ var CursorRuntime = class {
   }
 };
 
-// ../dsh-cursor/lib/catalog-codec.js
-var CURSOR_AVAILABLE_MODELS_PATH = "/aiserver.v1.AiService/AvailableModels";
-function encodeAvailableModelsRequest() {
-  return new BinaryWriter().tag(2, 0).bool(true).tag(5, 0).bool(true).tag(7, 0).bool(true).tag(12, 0).bool(true).finish();
-}
-var parameterValue = { 1: ["id", "string"], 2: ["value", "string"] };
-var booleanValue = {
-  1: ["value", "string"],
-  2: ["displayName", "string"],
-  3: ["increasesModelCost", "bool"],
-  4: ["defaultBlockedInAdminAllowlist", "bool"],
-  5: ["hideFromUserPickerWhenAdminBlocked", "bool"],
-  6: ["blockedByAdminAllowlist", "bool"]
-};
-var enumValue = {
-  1: ["value", "string"],
-  2: ["displayName", "string"],
-  3: ["increasesModelCost", "bool"],
-  4: ["blockedByAdminAllowlist", "bool"]
-};
-var parameterType = {
-  1: ["booleanParameter", { 1: ["values", booleanValue, true] }],
-  2: ["enumParameter", { 1: ["values", enumValue, true] }]
-};
-var parameterDefinition = {
-  1: ["id", "string"],
-  2: ["name", "string"],
-  4: ["parameterType", parameterType]
-};
-var variant = {
-  1: ["parameterValues", parameterValue, true],
-  2: ["displayName", "string"],
-  3: ["isMaxMode", "bool"],
-  4: ["isDefaultMaxConfig", "bool"],
-  5: ["isDefaultNonMaxConfig", "bool"],
-  7: ["tagline", "string"],
-  8: ["displayNameOutsidePicker", "string"],
-  9: ["variantStringRepresentation", "string"],
-  10: ["confirmationDialogue", { 4: ["blocksSubmission", "bool"] }],
-  11: ["legacySlug", "string"]
-};
-var modelDetails = {
-  1: ["name", "string"],
-  2: ["defaultOn", "bool"],
-  3: ["isLongContextOnly", "bool"],
-  4: ["isChatOnly", "bool"],
-  5: ["supportsAgent", "bool"],
-  6: ["degradationStatus", "uint32"],
-  9: ["supportsThinking", "bool"],
-  10: ["supportsImages", "bool"],
-  14: ["supportsMaxMode", "bool"],
-  15: ["contextTokenLimit", "uint32"],
-  16: ["contextTokenLimitForMaxMode", "uint32"],
-  17: ["clientDisplayName", "string"],
-  18: ["serverModelName", "string"],
-  19: ["supportsNonMaxMode", "bool"],
-  24: ["inputboxShortModelName", "string"],
-  27: ["onlySupportsCmdK", "bool"],
-  29: ["parameterDefinitions", parameterDefinition, true],
-  30: ["variants", variant, true],
-  35: ["isHidden", "bool"],
-  36: ["legacySlugs", "string", true],
-  37: ["idAliases", "string", true],
-  39: ["tagline", "string"],
-  43: ["defaultDisabledInAdminAllowlist", "bool"],
-  46: ["requiresDataRetention", "bool"]
-};
-var response = {
-  1: ["modelNames", "string", true],
-  2: ["models", modelDetails, true],
-  11: ["useModelParameters", "bool"]
-};
-function decode(bytes, schema) {
-  const reader = new BinaryReader(bytes);
-  const output = {};
-  for (const field2 of Object.values(schema)) if (field2[2]) output[field2[0]] = [];
-  while (reader.pos < reader.len) {
-    const [number, wire] = reader.tag();
-    const field2 = schema[number];
-    if (!field2) {
-      reader.skip(wire, number, 16);
-      continue;
+// ../dsh-cursor/lib/conversation-cache.js
+var MAX_AGE_MS = 24 * 60 * 60 * 1e3;
+var MAX_RECORDS = 64;
+function createConversationCache(records, logger, blobs) {
+  const warn = () => logger?.warn("cursor: conversation cache unavailable; continuing with in-memory state");
+  let tail = Promise.resolve();
+  const enqueue = (action) => {
+    const result2 = tail.then(action);
+    tail = result2.catch(() => {
+    });
+    return result2;
+  };
+  const repository = blobs && {
+    has: (hash2) => blobs.get(hash2) !== void 0,
+    get: (hash2) => blobs.get(hash2)?.encoded,
+    put: (hash2, encoded) => blobs.put(hash2, { encoded })
+  };
+  async function collect2() {
+    const ordered = [...records.entries()].sort((a, b) => b[1].savedAt - a[1].savedAt);
+    for (const [index, [id, record]] of ordered.entries()) {
+      if (index >= MAX_RECORDS || Date.now() - record.savedAt > MAX_AGE_MS) await records.delete(id);
     }
-    const [name, type, repeated] = field2;
-    const expected = type === "bool" || type === "uint32" ? 0 : 2;
-    if (wire !== expected) throw new Error("Invalid Cursor catalog protobuf field");
-    const value = typeof type === "object" ? decode(reader.bytes(), type) : reader[type]();
-    if (repeated) output[name].push(value);
-    else output[name] = value;
+    if (blobs) {
+      const retained = new Set([...records.entries()].flatMap(([, record]) => record.blobRefs ?? []));
+      for (const hash2 of blobs.keys()) if (!retained.has(hash2)) await blobs.delete(hash2);
+    }
   }
-  return output;
-}
-function decodeAvailableModelsResponse(bytes) {
-  if (!(bytes instanceof Uint8Array) || bytes.byteLength > 8 * 1024 * 1024) {
-    throw new Error("Invalid Cursor catalog protobuf size");
-  }
-  return decode(bytes, response);
+  return {
+    load(sessionId, binding) {
+      return enqueue(async () => {
+        const record = records.get(sessionId);
+        if (!record || record.binding !== binding || Date.now() - record.savedAt > MAX_AGE_MS) return void 0;
+        try {
+          return await restoreCursorConversation(record.snapshot, repository);
+        } catch {
+          warn();
+          return void 0;
+        }
+      });
+    },
+    save(sessionId, binding, store) {
+      return enqueue(async () => {
+        const references = /* @__PURE__ */ new Set();
+        let storageFailure;
+        const sink = repository && {
+          ...repository,
+          has: (hash2) => {
+            references.add(hash2);
+            return repository.has(hash2);
+          },
+          put: async (hash2, encoded) => {
+            try {
+              await repository.put(hash2, encoded);
+            } catch (error) {
+              storageFailure = error;
+              throw error;
+            }
+          }
+        };
+        let snapshot;
+        try {
+          snapshot = await snapshotCursorConversation(store, sink);
+        } catch (error) {
+          if (storageFailure !== error) throw error;
+          warn();
+          return;
+        }
+        try {
+          const previous = records.get(sessionId);
+          const blobRefs = references.size > 0 || previous?.binding !== binding ? [...references] : previous?.blobRefs ?? [];
+          await records.put(sessionId, {
+            binding,
+            savedAt: Date.now(),
+            snapshot,
+            ...repository ? { blobRefs } : {}
+          });
+          await collect2();
+        } catch {
+          warn();
+        }
+      });
+    },
+    discard(sessionId) {
+      return enqueue(async () => {
+        try {
+          await records.delete(sessionId);
+          await collect2();
+        } catch {
+          warn();
+        }
+      });
+    },
+    flush: () => tail
+  };
 }
 
+// node_modules/.pnpm/@magpie-community+opencode-cursor-auth@0.2.44/node_modules/@magpie-community/opencode-cursor-auth/native-session.mjs
+import { createHash as createHash8, randomBytes as randomBytes3 } from "node:crypto";
+import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+var NATIVE_LIMITS = {
+  resultWait: 12e4,
+  lifetime: 15 * 6e4,
+  // How much of the lifetime a retained Run must have left to take a tool
+  // batch's results and go on; with less, the step starts on a fresh Run
+  // from the supplied history. One step can be a long answer: a Pi turn on
+  // grok-4.7 went on with 494 s left and was still answering at the
+  // deadline (plugins#616, yetone/magpie#4419). At most two thirds of the
+  // lifetime, so a short one set in a test still has room to continue.
+  continueReserve: 10 * 6e4,
+  batchWait: 3e4,
+  // How long a stateless step whose calls came waits for Cursor's count of
+  // them (update 27) with nothing but heartbeats before it hands the calls
+  // that came to the caller (plugins#550). A count comes within ms of the
+  // step's last call; a Run that sent calls and then only heartbeats has
+  // stopped, and the caller's next request goes on from the calls' results.
+  countWait: 6e4,
+  drain: 6e3,
+  replayWait: 12e4,
+  blobBytes: 64 << 20,
+  outputBytes: 16 << 20,
+  argumentBytes: 1 << 20,
+  argumentFields: 1e5,
+  argumentDepth: 64,
+  outboundBytes: 16 << 20,
+  outboundMessages: 256,
+  // How long a KV reply waits for room in the outbound queue (Cursor's own
+  // flow control taking the writes before it) before the Run fails.
+  writeWait: 3e4,
+  // How long a Run waits on Cursor before it ends as gone quiet
+  // (yetone/magpie#2672): idle, with no message at all, as @cursor/sdk's
+  // stall detector ends one (30 s there; Cursor's client retries, this one
+  // can't once output went out); quiet, with heartbeats and nothing else,
+  // under the 5 minutes magpie keeps a silent reply alive. Only time spent
+  // waiting on Cursor counts, never a Run parked for the caller's results.
+  idle: 6e4,
+  quiet: 24e4,
+  perAccount: 8,
+  perProcess: 32
+};
+var HANDLE = /^call_cursor_[a-f0-9]+_\d+_\d+$/;
+var hash = (s) => createHash8("sha256").update(s).digest("hex");
+var canonical3 = (v) => JSON.stringify(v, (_k, x) => x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map((k) => [k, x[k]])) : x);
+var bytes = (v) => Buffer.byteLength(canonical3(v));
+var later = (fn, ms) => {
+  const timer = setTimeout(fn, ms);
+  timer.unref?.();
+  return timer;
+};
+var NativeSessionError = class extends Error {
+  constructor(status, message2) {
+    super(message2);
+    this.status = status;
+  }
+};
+var invalid = (message2, status = 409) => {
+  throw new NativeSessionError(status, message2);
+};
+var failureOf = (e) => ({ status: e?.status ?? 502, message: e?.message ?? String(e) });
+var UPDATES = {
+  1: "text",
+  2: "tool call started",
+  3: "tool call completed",
+  4: "thinking",
+  5: "thinking done",
+  6: "user message",
+  7: "partial tool call",
+  8: "token count",
+  9: "summary",
+  10: "summary started",
+  11: "summary done",
+  12: "shell output",
+  14: "turn end",
+  15: "tool call delta",
+  16: "step started",
+  17: "step done",
+  27: "tool count",
+  31: "model call completed"
+};
+var MESSAGES = { 2: "tool call", 3: "checkpoint", 4: "blob request" };
+function kindOf(f) {
+  if (f.end) return "stream end";
+  try {
+    const fs = nativeFields(f.data);
+    const updates = fs.filter((m) => m.num === 1).flatMap((m) => nativeFields(m.data));
+    if (fs.length && fs.every((m) => m.num === 1) && updates.length && updates.every((u2) => u2.num === 13)) return null;
+    const u = updates.find((u2) => u2.num !== 13);
+    if (u) return UPDATES[u.num] ?? `update #${u.num}`;
+    return MESSAGES[fs[0]?.num] ?? `message #${fs[0]?.num}`;
+  } catch {
+    return "malformed message";
+  }
+}
+var Quiet = class {
+  constructor(limits, stop, meta = {}) {
+    this.limits = limits;
+    this.stop = stop;
+    this.heard = 0;
+    this.heartbeats = 0;
+    this.last = "";
+    this.since = null;
+    this.paused = false;
+    this.waiting = false;
+    this.why = "";
+    this.checkpoints = 0;
+    this.step = 0;
+    this.stepCheckpoints = 0;
+    this.trail = [];
+    this.trace = WireTrace.open(meta);
+  }
+  arm() {
+    clearTimeout(this.timer);
+    if (this.paused || !this.waiting || this.why || this.done) return;
+    this.since = Date.now();
+    this.timer = later(() => this.fire(), Math.max(0, Math.min(this.limits.idle, this.limits.quiet - this.heard)));
+  }
+  // waited stops the clock: Cursor answered, or the Run paused
+  waited() {
+    clearTimeout(this.timer);
+    if (this.since != null) this.heard += Date.now() - this.since;
+    this.since = null;
+  }
+  fire() {
+    const gap = Date.now() - this.since;
+    const what = this.heard + gap >= this.limits.quiet ? `${this.heartbeats} heartbeats and nothing else for ${Math.round((this.heard + gap) / 1e3)} s` : `no message for ${Math.round(gap / 1e3)} s`;
+    this.why = `Cursor went quiet: ${what}${this.last ? ", its last message " + this.lastSaid() : ""} (try again)`;
+    this.trace?.event("quiet", { heard: this.heard + gap, heartbeats: this.heartbeats });
+    this.gone?.();
+    this.stop({ status: 502, message: this.why });
+    this.failed({ status: 502, message: this.why });
+  }
+  // lastSaid is the last frame's kind as the error names it; a checkpoint
+  // with its number, its place in the step and what came before it
+  lastSaid() {
+    if (this.last !== "checkpoint") return this.last;
+    const row = this.trail.at(-1)?.[1] ?? 1;
+    const before = this.trail.slice(0, -1).map(([k, n]) => n > 1 ? `${k} \xD7${n}` : k).join(", ");
+    const nth = this.stepCheckpoints === 1 ? "the first" : `number ${this.stepCheckpoints}`;
+    return `checkpoint #${this.checkpoints} of the Run` + (this.step ? `, ${nth} of step ${this.step}` : "") + (row > 1 ? `, ${row} in a row` : "") + `, after ${before || "nothing else"}`;
+  }
+  // nextStep is the Run's next model call (NativeSession counts them)
+  nextStep(n) {
+    this.step = n;
+    this.stepCheckpoints = 0;
+    this.trace?.event("step", { n });
+  }
+  // failed is how the Run ended, when it failed: a wire trace, if on, is
+  // written then (once)
+  failed(error) {
+    this.trace?.write(error, this);
+  }
+  // pause stops the clock while the Run waits on the caller's tool results;
+  // resume starts it again from nothing, for Cursor's next model call
+  pause() {
+    this.waited();
+    this.paused = true;
+    this.trace?.event("pause");
+  }
+  resume() {
+    this.paused = false;
+    this.heard = 0;
+    this.heartbeats = 0;
+    this.trace?.event("resume");
+    this.arm();
+  }
+  // frames passes on a Run's frames; once Cursor has gone quiet, the read
+  // that was waiting ends in its error, whether or not the stream does
+  async *frames(stream) {
+    const it = (stream[Symbol.asyncIterator] ?? stream[Symbol.iterator]).call(stream);
+    try {
+      for (; ; ) {
+        this.waiting = true;
+        this.arm();
+        let r;
+        try {
+          const next = Promise.resolve(it.next());
+          next.catch(() => {
+          });
+          r = await Promise.race([next, new Promise((wake) => {
+            this.gone = wake;
+          })]);
+        } catch (e) {
+          if (!this.why) throw e;
+        } finally {
+          this.gone = null;
+          this.waiting = false;
+          this.waited();
+        }
+        if (this.why) throw Object.assign(new NativeSessionError(502, this.why), { quiet: true });
+        if (r.done) {
+          this.trace?.event("eof");
+          return;
+        }
+        const kind = kindOf(r.value);
+        this.trace?.frame("in", r.value, kind);
+        if (kind == null) this.heartbeats++;
+        else {
+          [this.heard, this.heartbeats, this.last] = [0, 0, kind];
+          if (kind === "checkpoint") {
+            this.checkpoints++;
+            this.stepCheckpoints++;
+          }
+          if (this.trail.at(-1)?.[0] === kind) this.trail.at(-1)[1]++;
+          else {
+            this.trail.push([kind, 1]);
+            if (this.trail.length > 4) this.trail.shift();
+          }
+        }
+        yield r.value;
+      }
+    } finally {
+      this.done = true;
+      clearTimeout(this.timer);
+      Promise.resolve(it.return?.()).catch(() => {
+      });
+    }
+  }
+};
+var traceDir = () => "";
+function setWireTrace(dir) {
+  traceDir = typeof dir === "function" ? dir : () => dir || "";
+}
+var TRACE_HEAD = 2e3;
+var TRACE_TAIL = 3e3;
+var TRACE_FILES = 20;
+function shape(data, children) {
+  return nativeFields(data).map((f) => {
+    const own = [f.num, f.wire, f.wire === 0 ? 0 : f.data.length];
+    if (!children || f.wire !== 2) return own;
+    try {
+      return [...own, nativeFields(f.data).map((c) => [c.num, c.wire, c.wire === 0 ? 0 : c.data.length])];
+    } catch {
+      return own;
+    }
+  });
+}
+function scrub(s) {
+  return String(s ?? "").replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, "<email>").replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, "<id>").replace(/(auth0|user|google-oauth2|github)\|[\w-]+/gi, "<account>").replace(/[A-Za-z0-9_\-+/=.]{24,}/g, "<redacted>").slice(0, 2e3);
+}
+function detail(data) {
+  const out = {};
+  for (const m of nativeFields(data)) {
+    if (m.num === 1) {
+      for (const u of nativeFields(m.data)) {
+        if (u.num === 27) out.count = num(nativeFields(u.data), 1);
+        else if (u.num === 2 || u.num === 3 || u.num === 7) {
+          const tc = field2(nativeFields(u.data), 2);
+          const kind = tc && nativeFields(tc.data)[0];
+          if (kind) out.tool = kind.wire === 2 ? [kind.num, nativeFields(kind.data)[0]?.num ?? 0] : [kind.num];
+        }
+      }
+    } else if (m.num === 3) out.pending = pendingCalls(m.data);
+  }
+  return out;
+}
+var WireTrace = class _WireTrace {
+  static open(meta) {
+    let dir = "";
+    try {
+      dir = traceDir();
+    } catch {
+    }
+    return dir ? new _WireTrace(dir, meta) : null;
+  }
+  constructor(dir, meta = {}) {
+    this.dir = dir;
+    this.meta = { path: String(meta.path ?? ""), model: String(meta.model ?? "") };
+    if (meta.why) this.meta.why = String(meta.why);
+    this.started = Date.now();
+    this.head = [];
+    this.tail = [];
+    this.dropped = 0;
+  }
+  push(entry) {
+    if (this.written) return;
+    if (this.head.length < TRACE_HEAD) return void this.head.push(entry);
+    this.tail.push(entry);
+    if (this.tail.length > TRACE_TAIL) {
+      this.tail.shift();
+      this.dropped++;
+    }
+  }
+  // frame is one frame of the Run: "in" from Cursor ({data} or {end, data}),
+  // "out" a message this side sent
+  frame(dir, f, kind) {
+    const t = Date.now() - this.started;
+    const data = dir === "in" ? f.data : f;
+    const entry = { t, dir, size: data?.length ?? 0 };
+    if (dir === "in") entry.kind = kind ?? "heartbeat";
+    if (dir === "in" && f.end) entry.end = true;
+    else try {
+      entry.fields = shape(data, true);
+    } catch {
+      entry.malformed = true;
+    }
+    if (dir === "in" && !f.end) try {
+      Object.assign(entry, detail(data));
+    } catch {
+    }
+    this.push(entry);
+  }
+  event(name, extra = {}) {
+    this.push({ t: Date.now() - this.started, event: name, ...extra });
+  }
+  // write saves the trace once, when the Run failed; a write that fails
+  // leaves the Run's error as it was
+  write(error, quiet) {
+    if (this.written) return;
+    this.written = true;
+    try {
+      const at = new Date(this.started).toISOString().replace(/[:.]/g, "-");
+      const body = {
+        trace: 1,
+        plugin: "@magpie-community/opencode-cursor-auth",
+        version: version(),
+        ...this.meta,
+        started: new Date(this.started).toISOString(),
+        ms: Date.now() - this.started,
+        error: { status: error?.status ?? 0, message: scrub(error?.message) },
+        quiet: quiet ? { last: quiet.last, checkpoints: quiet.checkpoints, step: quiet.step, stepCheckpoints: quiet.stepCheckpoints, heartbeats: quiet.heartbeats, heard: quiet.heard, trail: quiet.trail } : void 0,
+        frames: [...this.head, ...this.dropped ? [{ dropped: this.dropped }] : [], ...this.tail]
+      };
+      mkdirSync(this.dir, { recursive: true });
+      const file = join(this.dir, `${at}-${randomBytes3(3).toString("hex")}.json`);
+      writeFileSync(file + ".tmp", JSON.stringify(body) + "\n", { mode: 384 });
+      renameSync(file + ".tmp", file);
+      this.file = file;
+      const old = readdirSync(this.dir).filter((n) => n.endsWith(".json")).sort();
+      for (const n of old.slice(0, Math.max(0, old.length - TRACE_FILES))) rmSync(join(this.dir, n), { force: true });
+    } catch {
+    }
+    this.head = this.tail = [];
+  }
+};
+function version() {
+  try {
+    return JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")).version ?? "";
+  } catch {
+    return "";
+  }
+}
+function nativeFields(input, maxFields = Infinity) {
+  const b = Buffer.from(input);
+  const out = [];
+  let at = 0;
+  const uv = () => {
+    let n = 0;
+    let scale = 1;
+    for (let i = 0; i < 10 && at < b.length; i++) {
+      const c = b[at++];
+      n += (c & 127) * scale;
+      if (c < 128 && Number.isSafeInteger(n)) return n;
+      scale *= 128;
+    }
+    invalid("malformed native protobuf", 502);
+  };
+  while (at < b.length) {
+    const key = uv();
+    const num2 = Math.floor(key / 8);
+    const wire = key % 8;
+    if (!num2 || num2 > 536870911) invalid("malformed native protobuf field", 502);
+    let n = 0;
+    let data = Buffer.alloc(0);
+    if (wire === 0) n = uv();
+    else if (wire === 2 || wire === 1 || wire === 5) {
+      const size = wire === 2 ? uv() : wire === 1 ? 8 : 4;
+      if (at + size > b.length) invalid("truncated native protobuf", 502);
+      data = b.subarray(at, at + size);
+      at += size;
+    } else invalid("unsupported native protobuf wire type", 502);
+    if (out.length >= maxFields) invalid("native protobuf field limit reached", 502);
+    out.push({ num: num2, wire, n, data });
+  }
+  return out;
+}
+function nativeMcpArgs(input, limits = NATIVE_LIMITS) {
+  if (input.length > limits.argumentBytes) invalid("native MCP argument byte limit reached", 502);
+  let remaining = limits.argumentFields;
+  const read = (b) => {
+    const fs2 = nativeFields(b, remaining);
+    remaining -= fs2.length;
+    return fs2;
+  };
+  const typed = (f, wire) => {
+    if (f.wire !== wire) invalid("invalid native MCP argument field type", 502);
+  };
+  const utf8 = (b) => {
+    try {
+      return new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(b);
+    } catch {
+      invalid("invalid UTF-8 in native MCP arguments", 502);
+    }
+  };
+  function mapEntry(b, depth) {
+    let key = "", value = null;
+    for (const f of read(b)) {
+      if (f.num === 1) {
+        typed(f, 2);
+        key = utf8(f.data);
+      } else if (f.num === 2) {
+        typed(f, 2);
+        value = decodeValue(f.data, depth);
+      }
+    }
+    return [key, value];
+  }
+  function decodeStruct(b, depth) {
+    const entries2 = [];
+    for (const f of read(b)) if (f.num === 1) {
+      typed(f, 2);
+      entries2.push(mapEntry(f.data, depth));
+    }
+    return Object.fromEntries(entries2);
+  }
+  function decodeValue(b, depth = 0) {
+    if (depth > limits.argumentDepth) invalid("native MCP argument nesting limit reached", 502);
+    let value = null;
+    for (const f of read(b)) {
+      if (f.num < 1 || f.num > 6) continue;
+      typed(f, [0, 1, 2, 0, 2, 2][f.num - 1]);
+      switch (f.num) {
+        case 1:
+          if (f.n !== 0) invalid("invalid native protobuf NullValue", 502);
+          value = null;
+          break;
+        case 2:
+          value = f.data.readDoubleLE(0);
+          if (!Number.isFinite(value)) invalid("nonfinite native MCP argument number", 502);
+          break;
+        case 3:
+          value = utf8(f.data);
+          break;
+        case 4:
+          value = f.n !== 0;
+          break;
+        case 5:
+          value = decodeStruct(f.data, depth + 1);
+          break;
+        case 6:
+          value = [];
+          for (const item of read(f.data)) if (item.num === 1) {
+            typed(item, 2);
+            value.push(decodeValue(item.data, depth + 1));
+          }
+          break;
+      }
+    }
+    return value;
+  }
+  const fs = read(input), entries = [];
+  for (const f of fs) {
+    if ([1, 3, 4, 5, 9].includes(f.num)) {
+      typed(f, 2);
+      utf8(f.data);
+    } else if (f.num === 2) {
+      typed(f, 2);
+      entries.push(mapEntry(f.data, 0));
+    } else if (f.num === 6) typed(f, 2);
+    else if (f.num === 7) typed(f, 0);
+  }
+  return { fields: fs, args: Object.fromEntries(entries) };
+}
+var field2 = (fs, n) => fs.find((f) => f.num === n);
+var str = (fs, n) => field2(fs, n)?.data.toString("utf8") ?? "";
+var num = (fs, n) => field2(fs, n)?.n ?? 0;
+var StepCalls = class {
+  constructor(parse) {
+    this.parse = parse;
+    this.started = /* @__PURE__ */ new Set();
+    this.execs = /* @__PURE__ */ new Set();
+    this.partial = /* @__PURE__ */ new Set();
+    this.byCursor = /* @__PURE__ */ new Set();
+    this.listedAfter = false;
+  }
+  // update takes an InteractionUpdate's own field (num) and its fields; it
+  // says whether a call was completed by Cursor: one this step wrote (7)
+  // and completed (3) with no start on the client (2) and no exec. A
+  // completion of an earlier step's call is never counted again.
+  update(n, uf) {
+    if (n !== 2 && n !== 3 && n !== 7) return false;
+    this.listedAfter = false;
+    const id = str(uf, 1);
+    if (!id) return false;
+    if (n === 2) this.started.add(id);
+    if (n === 7) this.partial.add(id);
+    if (n !== 3) return false;
+    if (!this.partial.has(id) || this.started.has(id) || this.execs.has(id) || this.byCursor.has(id)) return false;
+    this.byCursor.add(id);
+    return true;
+  }
+  // exec notes an exec's args, whatever its kind: each kind keeps its
+  // tool_call_id at a field of its own (ShellArgs 4, ReadArgs 2, McpArgs 3).
+  // If #3 came before its exec, it was not completed by Cursor after all.
+  exec(data) {
+    this.listedAfter = false;
+    try {
+      for (const e of this.parse(data)) {
+        if (e.wire !== 2 || e.num === 15 || e.num === 19) continue;
+        for (const a of this.parse(e.data)) if (a.wire === 2 && a.data.length && a.data.length <= 512) {
+          const s = a.data.toString("utf8");
+          this.execs.add(s);
+          this.byCursor.delete(s);
+        }
+      }
+    } catch {
+    }
+  }
+  listed() {
+    this.listedAfter = true;
+  }
+  get completed() {
+    return this.byCursor.size;
+  }
+  // writing is how many calls the step wrote (7) that are neither started
+  // on the client, sent as an exec, nor completed by Cursor: a call of
+  // Cursor's own still running, or one still to be sent
+  get writing() {
+    let n = 0;
+    for (const id of this.partial) if (!this.started.has(id) && !this.execs.has(id) && !this.byCursor.has(id)) n++;
+    return n;
+  }
+  // nextStep starts the next step's count
+  nextStep() {
+    this.partial.clear();
+    this.byCursor.clear();
+    this.listedAfter = false;
+  }
+};
+function pendingCalls(data, parse = nativeFields) {
+  try {
+    return parse(data).filter((f) => f.num === 4).length;
+  } catch {
+    return null;
+  }
+}
+function argsOf(s) {
+  try {
+    const v = typeof s === "string" ? JSON.parse(s) : s;
+    if (v && typeof v === "object" && !Array.isArray(v)) return v;
+  } catch {
+  }
+  invalid("invalid tool arguments in native continuation", 400);
+}
+function assistantDisplay(message2) {
+  const parts = typeof message2.content === "string" ? [{ type: "text", text: message2.content }] : message2.content ?? [];
+  if (!Array.isArray(parts) || parts.some((p) => !["text", "reasoning"].includes(p?.type) || typeof p.text !== "string")) invalid("unsupported native assistant display");
+  const reasoning = [message2.reasoning_content, message2.reasoning, message2.reasoning_text].find((v) => typeof v === "string" && v.trim()) ?? "";
+  return {
+    text: parts.filter((p) => p.type === "text").map((p) => p.text).join(""),
+    reasoning: reasoning + parts.filter((p) => p.type === "reasoning").map((p) => p.text).join("")
+  };
+}
+function resultParts(message2, limits) {
+  const parts = typeof message2.content === "string" ? [{ type: "text", text: message2.content }] : message2.content;
+  if (!Array.isArray(parts)) invalid("unsupported native tool result");
+  let retained = 0;
+  return parts.map((part) => {
+    if (part?.type === "text" && typeof part.text === "string") {
+      retained += Buffer.byteLength(part.text);
+      if (retained > limits.outputBytes) invalid("native tool result limit reached");
+      return { text: part.text };
+    }
+    const url = part?.type === "image_url" ? typeof part.image_url === "string" ? part.image_url : part.image_url?.url : part?.type === "image" && part.source?.type === "base64" ? `data:${part.source.media_type};base64,${part.source.data}` : "";
+    const image = /^data:(image\/(?:png|jpeg|gif|webp));base64,([A-Za-z0-9+/]*={0,2})$/.exec(url ?? "");
+    if (!image) invalid("unsupported native tool result content");
+    const data = Buffer.from(image[2], "base64");
+    retained += data.length;
+    if (retained > limits.outputBytes) invalid("native tool result limit reached");
+    if (!data.length || data.toString("base64").replace(/=+$/, "") !== image[2].replace(/=+$/, "")) invalid("invalid native result image");
+    return { data, mimeType: image[1] };
+  });
+}
+function normalizeMessage(m) {
+  if (m?.role !== "assistant") return m;
+  const { text, reasoning } = assistantDisplay(m);
+  const out = { ...m, content: text };
+  delete out.reasoning;
+  delete out.reasoning_content;
+  delete out.reasoning_text;
+  if (reasoning) out.reasoning_content = reasoning;
+  if (m.tool_calls) out.tool_calls = m.tool_calls.map((c) => ({
+    ...c,
+    type: c.type ?? "function",
+    function: { ...c.function, arguments: argsOf(c.function?.arguments ?? "{}") }
+  }));
+  return out;
+}
+var historyDigest = (messages) => hash(canonical3(messages.map(normalizeMessage)));
+function controlsOf(chat, selector, tools) {
+  const controls = { ...chat };
+  for (const k of ["messages", "stream", "stream_options"]) delete controls[k];
+  return hash(canonical3({ selector, controls, tools }));
+}
+var toolAttachment = (m) => m?.role === "user" && Array.isArray(m.content) && m.content.length > 1 && m.content[0]?.type === "text" && m.content[0].text === "Attached image(s) from tool result:" && m.content.slice(1).every((p) => p?.type === "image_url");
+function matchResults(batch, messages) {
+  if (historyDigest(messages.slice(0, batch.prefixLength)) !== batch.prefixDigest) invalid("native continuation history diverged");
+  const suffix = messages.slice(batch.prefixLength);
+  const assistants = [];
+  while (suffix[assistants.length]?.role === "assistant") assistants.push(suffix[assistants.length]);
+  if (!assistants.length) invalid("native continuation is missing its assistant tool calls", 400);
+  let content = "";
+  let reasoning = "";
+  const calls = [];
+  for (const m of assistants) {
+    const unknown = Object.keys(m).filter((k) => !["role", "content", "tool_calls", "reasoning", "reasoning_content", "reasoning_text"].includes(k));
+    if (unknown.length) invalid("unsupported assistant fields in native continuation", 400);
+    const display = assistantDisplay(m);
+    content += display.text;
+    reasoning += display.reasoning;
+    for (const c of m.tool_calls ?? []) {
+      if (c.type && c.type !== "function") invalid("unsupported native continuation tool call", 400);
+      calls.push({ id: c.id, name: c.function?.name, args: argsOf(c.function?.arguments ?? "{}") });
+    }
+  }
+  if (content !== batch.content || reasoning && reasoning !== batch.reasoning) invalid("native continuation assistant output changed");
+  const expected = batch.calls.map((c) => ({ id: c.id, name: c.name, args: argsOf(c.args) }));
+  const sorted = (v) => [...v].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+  if (canonical3(sorted(calls)) !== canonical3(sorted(expected))) invalid("native continuation tool calls changed");
+  let results = suffix.slice(assistants.length);
+  if (batch.calls.length === 1 && results.length === 2 && results[0]?.role === "tool" && toolAttachment(results[1])) {
+    const [result2, attachment] = results;
+    const content2 = typeof result2.content === "string" ? [{ type: "text", text: result2.content }] : result2.content;
+    if (!Array.isArray(content2)) invalid("unsupported native tool result");
+    results = [{ ...result2, content: [...content2, ...attachment.content.slice(1)] }];
+  }
+  if (results.some((m) => m?.role !== "tool")) invalid("new input cannot be interleaved with pending native results");
+  const ids = /* @__PURE__ */ new Set();
+  for (const m of results) {
+    if (ids.has(m.tool_call_id)) invalid("duplicate native tool result", 400);
+    ids.add(m.tool_call_id);
+    if (!expected.some((c) => c.id === m.tool_call_id)) invalid("unknown native tool result", 400);
+  }
+  if (ids.size !== expected.length) invalid("all parallel native tool results must be submitted together", 400);
+  return [...results].sort((a, b) => a.tool_call_id.localeCompare(b.tool_call_id));
+}
+var Segment = class {
+  constructor(owner, chat) {
+    this.owner = owner;
+    this.prefixLength = chat.messages.length;
+    this.prefixDigest = historyDigest(chat.messages);
+    this.events = [];
+    this.calls = [];
+    this.answered = 0;
+    this.content = "";
+    this.reasoning = "";
+    this.expected = null;
+    this.closed = false;
+    this.clean = false;
+    this.waiters = /* @__PURE__ */ new Set();
+  }
+  wake() {
+    for (const wake of this.waiters) wake();
+    this.waiters.clear();
+  }
+  emit(e) {
+    this.owner.retain(bytes(e));
+    if (e.text) this.content += e.text;
+    if (e.reasoning) this.reasoning += e.reasoning;
+    this.events.push(e);
+    this.wake();
+  }
+  finish(stop) {
+    for (const [index, c] of this.calls.entries()) {
+      const e = { tool: { index, id: c.id, name: c.name, args: c.args } };
+      this.owner.retain(bytes(e));
+      this.events.push(e);
+    }
+    this.owner.retain(bytes(stop));
+    this.events.push(stop);
+    this.closed = true;
+    this.wake();
+  }
+  fail(error) {
+    this.events = [{ error }];
+    this.closed = true;
+    this.wake();
+  }
+  iterator({ replay = false } = {}) {
+    const segment = this;
+    let at = 0;
+    let errorSent = false;
+    return {
+      async next() {
+        while (!segment.closed && at >= segment.events.length) await new Promise((r) => segment.waiters.add(r));
+        if (!replay && segment.owner.error) {
+          if (errorSent) return { done: true };
+          errorSent = true;
+          return { value: { error: segment.owner.error }, done: false };
+        }
+        if (at < segment.events.length) {
+          const event = segment.events[at++];
+          if (replay && event.stop) return { value: { ...event, usage: {
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
+            prompt_tokens_details: { cached_tokens: 0, cache_write_tokens: 0 },
+            magpie_native: { accounting: "replayed" }
+          } }, done: false };
+          return { value: event, done: false };
+        }
+        return { done: true };
+      },
+      async return() {
+        if (!replay) await segment.owner.cancel("the Chat response was cancelled");
+        return { done: true };
+      },
+      [Symbol.asyncIterator]() {
+        return this;
+      }
+    };
+  }
+};
+var LIFETIME_EXPIRED = "native Run lifetime expired: the Run timed out; retry your request";
+var NativeSessionPool = class {
+  constructor(limits = NATIVE_LIMITS) {
+    this.limits = limits;
+    this.entries = /* @__PURE__ */ new Set();
+    this.handles = /* @__PURE__ */ new Map();
+    this.selectors = /* @__PURE__ */ new Map();
+  }
+  // selector is conversationID(chat, session): session/cache key AND first
+  // user identity. Task subagents sharing a session must not own its parent.
+  prepare(tok, chat, selector, tools) {
+    const fallback = (reason) => ({ fallback: reason });
+    if (!Array.isArray(chat.messages) || bytes(chat) > this.limits.outputBytes) return fallback("history retention limit");
+    const account = hash(tok);
+    const controls = controlsOf(chat, selector, tools);
+    const trailing = [];
+    const end = chat.messages.length - (toolAttachment(chat.messages.at(-1)) ? 2 : 1);
+    for (let i = end; i >= 0 && chat.messages[i]?.role === "tool"; i--) trailing.push(chat.messages[i].tool_call_id);
+    const handles = trailing.filter((id) => typeof id === "string" && HANDLE.test(id));
+    if (handles.length) {
+      const found = handles.map((id) => this.handles.get(id));
+      if (found.some((v) => !v)) return fallback("owner unavailable");
+      const { owner, batch } = found[0];
+      if (found.some((v) => v.owner !== owner || v.batch !== batch)) return fallback("different native batches");
+      if (owner.account !== account || owner.controls !== controls || owner.error) return fallback("owner incompatible or expired");
+      try {
+        const results = matchResults(batch, chat.messages);
+        const encoded = results.map((m) => owner.encodeResult(m));
+        const digest2 = hash(canonical3(results));
+        if (batch.resultDigest) {
+          if (batch.resultDigest !== digest2 || !batch.next?.clean) return fallback("result already submitted or busy");
+          return { owner, batch, replay: true, segment: batch.next };
+        }
+        if (owner.state !== "awaiting-results" || owner.segment !== batch || !batch.clean) return fallback("owner busy");
+        const reserve = Math.min(owner.limits.continueReserve, owner.limits.lifetime * 2 / 3);
+        if (owner.expiresAt - Date.now() <= reserve) {
+          owner.fail({ status: 410, message: "native Run retired before lifetime deadline" }, "expired");
+          return fallback("owner near lifetime deadline");
+        }
+        return { owner, batch, results, encoded, digest: digest2, chat };
+      } catch (e) {
+        if (!(e instanceof NativeSessionError)) throw e;
+        return fallback("history incompatible with retained owner");
+      }
+    }
+    const historical = chat.messages.flatMap((m) => (m?.tool_calls ?? []).filter((c) => HANDLE.test(c?.id ?? "")));
+    if (historical.length) {
+      const answered = new Set(chat.messages.filter((m) => m?.role === "tool").map((m) => m.tool_call_id));
+      const last = chat.messages.at(-1);
+      const freshTurn = last?.role === "user" && !toolAttachment(last);
+      if (!freshTurn || historical.some((c) => !answered.has(c.id))) return fallback("historical native calls");
+    }
+    if (selector && this.selectors.has(account + ":" + selector)) {
+      if (!historical.length) return fallback("owner busy");
+      return { account, selector, controls, selected: false, chat };
+    }
+    return { account, selector, controls, selected: !!selector, chat };
+  }
+  create(prepared, resolution, wire) {
+    if (prepared.fallback || prepared.selected && this.selectors.has(prepared.account + ":" + prepared.selector)) return null;
+    const crowded = () => this.entries.size >= this.limits.perProcess || [...this.entries].filter((e) => e.account === prepared.account).length >= this.limits.perAccount;
+    while (crowded()) {
+      const accountFull = [...this.entries].filter((e) => e.account === prepared.account).length >= this.limits.perAccount;
+      const finished = [...this.entries].find((e) => ["complete", "failed", "cancelled", "expired"].includes(e.state) && (!accountFull || e.account === prepared.account));
+      if (!finished) return null;
+      this.forget(finished);
+    }
+    let owner;
+    try {
+      owner = new NativeSession(this, prepared, resolution, wire);
+    } catch (e) {
+      if (!(e instanceof NativeSessionError)) throw e;
+      return null;
+    }
+    const at = Date.now();
+    for (const e of this.entries) {
+      if (e.account !== owner.account || !e.selector || e.selector !== owner.selector) continue;
+      e.laterRunAt ??= at;
+      if (e.state === "awaiting-results") e.accounting?.handover();
+    }
+    this.entries.add(owner);
+    if (prepared.selected) this.selectors.set(owner.account + ":" + owner.selector, owner);
+    return owner;
+  }
+  release(owner) {
+    const key = owner.account + ":" + owner.selector;
+    if (this.selectors.get(key) === owner) this.selectors.delete(key);
+  }
+  forget(owner) {
+    owner.accounting?.abandon();
+    clearTimeout(owner.replayTimer);
+    this.release(owner);
+    this.entries.delete(owner);
+    for (const [id, h] of this.handles) if (h.owner === owner) this.handles.delete(id);
+    owner.blobs.clear();
+    owner.checkpoint = null;
+    owner.execs.clear();
+    owner.nativeCalls.clear();
+    owner.stepUsages.clear();
+    owner.lastStepUsage = null;
+  }
+  async clear() {
+    await Promise.all([...this.entries].map((e) => e.cancel("native owner removed")));
+    for (const e of this.entries) {
+      clearTimeout(e.replayTimer);
+      this.forget(e);
+    }
+  }
+};
+var NativeSession = class {
+  constructor(pool, prepared, resolution, wire) {
+    Object.assign(this, prepared);
+    this.pool = pool;
+    this.limits = pool.limits;
+    this.resolution = resolution;
+    this.wire = wire;
+    this.identity = randomBytes3(12).toString("hex");
+    this.state = "opening";
+    this.ac = new AbortController();
+    this.execs = /* @__PURE__ */ new Map();
+    this.nativeCalls = /* @__PURE__ */ new Map();
+    this.stepCalls = new StepCalls(nativeFields);
+    this.blobs = /* @__PURE__ */ new Map();
+    this.knownHashes = /* @__PURE__ */ new Set();
+    this.blobSize = 0;
+    this.retainedBytes = 0;
+    this.sequence = 0;
+    this.segments = 0;
+    this.steps = 1;
+    this.stepSaid = 0;
+    this.stepUsages = /* @__PURE__ */ new Map();
+    this.lastStepUsage = null;
+    this.said = 0;
+    this.wrote = 0;
+    this.terminal = false;
+    this.segment = new Segment(this, prepared.chat);
+    this.retain(bytes(prepared.chat));
+    this.expireIn(this.limits.lifetime);
+    this.quiet = new Quiet(this.limits, (e) => this.fail(e), { path: "native", model: resolution?.id });
+    this.quiet.nextStep(this.steps);
+  }
+  // expireIn sets the Run's absolute deadline ms from now: from its start,
+  // the whole lifetime; a test brings it in after the first answer
+  expireIn(ms) {
+    clearTimeout(this.lifetimeTimer);
+    this.expiresAt = Date.now() + ms;
+    this.lifetimeTimer = later(() => this.fail({ status: 410, message: LIFETIME_EXPIRED }, "expired"), ms);
+  }
+  retain(n) {
+    if (this.retainedBytes + n > this.limits.outputBytes) invalid("native output/history retention limit reached", 503);
+    this.retainedBytes += n;
+  }
+  attach(signal, segment = this.segment) {
+    if (signal?.aborted) {
+      this.fail({ status: 410, message: "the Chat request was already cancelled" }, "cancelled");
+      return;
+    }
+    const abort = () => this.fail({ status: 410, message: "the Chat request was cancelled" }, "cancelled");
+    signal?.addEventListener("abort", abort, { once: true });
+    segment.detach = () => signal?.removeEventListener("abort", abort);
+  }
+  delivered(segment = this.segment) {
+    if (this.error) return;
+    segment.clean = true;
+    segment.detach?.();
+    if (this.state === "complete" && segment === this.segment) this.accounting?.delivered();
+  }
+  closeTransport() {
+    if (this.transportClosed) return;
+    this.transportClosed = true;
+    clearInterval(this.runHeartbeat);
+    clearInterval(this.execHeartbeat);
+    clearTimeout(this.batchTimer);
+    clearTimeout(this.resultTimer);
+    clearTimeout(this.drainTimer);
+    clearTimeout(this.lifetimeTimer);
+    this.quiet.pause();
+    this.ac.abort();
+    this.transport?.close();
+  }
+  fail(error, state = "failed") {
+    if (this.error || this.state === "complete") return;
+    this.error = error;
+    this.state = state;
+    if (state !== "cancelled") this.quiet.failed(error);
+    this.segment.fail(error);
+    for (const segment of this.batches ?? []) segment.detach?.();
+    this.segment.detach?.();
+    this.closeTransport();
+    this.pool.forget(this);
+  }
+  async cancel(message2) {
+    this.fail({ status: 410, message: message2 }, "cancelled");
+    await this.pumpTask;
+  }
+  bind(transport, blobs, estimate) {
+    if (this.transportClosed || this.error) {
+      transport.close();
+      return;
+    }
+    this.transport = transport;
+    this.estimate = estimate;
+    this.stepEstimate = estimate;
+    this.blobs = blobs;
+    this.knownHashes = new Set(blobs.keys());
+    this.blobSize = [...blobs.values()].reduce((n, b) => n + b.length, 0);
+    if (this.blobSize > this.limits.blobBytes) invalid("native bootstrap blob limit reached", 503);
+    if (this.error) return this.closeTransport();
+    this.state = "running";
+    const { pb: pb2 } = this.wire;
+    const heartbeat = (message2) => {
+      try {
+        this.send(message2);
+      } catch (e) {
+        this.fail(failureOf(e));
+      }
+    };
+    this.runHeartbeat = setInterval(() => heartbeat(pb2().bytes(7, Buffer.alloc(0)).done()), 5e3);
+    this.execHeartbeat = setInterval(() => {
+      for (const c of this.execs.values()) if (!c.submitted) heartbeat(pb2().bytes(5, pb2().bytes(3, pb2().varint(1, c.requestID))).done());
+    }, 3e3);
+    this.runHeartbeat.unref?.();
+    this.execHeartbeat.unref?.();
+  }
+  send(message2) {
+    if (this.error || this.transportClosed) invalid("native transport is no longer writable", 410);
+    this.quiet.trace?.frame("out", message2);
+    this.transport.send(message2);
+  }
+  // reply answers one of Cursor's KV requests once the outbound queue has
+  // room. Cursor asks for every history blob at once, hundreds for a long
+  // conversation, faster than a slow link takes the replies: the decoder
+  // waits for the queue rather than failing the Run (#142).
+  async reply(message2) {
+    await this.transport.room?.(message2.length + 5);
+    this.send(message2);
+  }
+  execClose(id) {
+    this.send(this.wire.pb().bytes(5, this.wire.pb().bytes(1, this.wire.pb().varint(1, id))).done());
+  }
+  encodeResult(message2) {
+    const { pb: pb2 } = this.wire;
+    const success = pb2();
+    for (const item of resultParts(message2, this.limits)) {
+      if (item.text !== void 0) success.bytes(1, pb2().bytes(1, pb2().str(1, item.text)));
+      else success.bytes(1, pb2().bytes(2, pb2().bytes(1, item.data).str(2, item.mimeType)));
+    }
+    if (message2.is_error === true || message2.isError === true) success.varint(2, 1);
+    return pb2().bytes(1, success).done();
+  }
+  resume(prepared, signal) {
+    if (prepared.replay) return this.response(prepared.segment, true);
+    const batch = prepared.batch;
+    if (this.error || this.state !== "awaiting-results" || this.segment !== batch || batch.resultDigest) invalid("native continuation is already reserved");
+    const next = new Segment(this, prepared.chat);
+    this.attach(signal, next);
+    if (this.error) invalid(this.error.message, this.error.status);
+    batch.resultDigest = prepared.digest;
+    batch.next = next;
+    this.segment = next;
+    this.state = "submitting";
+    this.accounting?.resumed();
+    clearTimeout(this.resultTimer);
+    clearTimeout(this.batchTimer);
+    this.batchTimer = null;
+    this.nextStep(prepared.estimate);
+    try {
+      for (let i = 0; i < prepared.results.length; i++) {
+        const call = batch.calls.find((c) => c.id === prepared.results[i].tool_call_id);
+        const msg = this.wire.pb().varint(1, call.requestID);
+        if (call.execID) msg.str(15, call.execID);
+        msg.bytes(11, prepared.encoded[i]);
+        this.resultSubmitted = true;
+        this.send(this.wire.pb().bytes(2, msg).done());
+        call.submitted = true;
+        this.execClose(call.requestID);
+      }
+      this.state = "running";
+      this.quiet.resume();
+    } catch (e) {
+      const error = failureOf(e);
+      this.fail({ status: error.status, message: `${error.message}; native result submission failed; its outcome is uncertain and cannot be replayed` });
+    }
+    return this.response(next);
+  }
+  response(segment = this.segment, replay = false) {
+    return {
+      events: segment.iterator({ replay }),
+      cancel: () => replay ? Promise.resolve() : this.cancel("the Chat response was cancelled"),
+      resolution: this.resolution,
+      delivered: () => replay || this.delivered(segment),
+      diagnostic: `same-run; bootstrap=imported-history; new-turn=stateless; missing-owner=stateless${replay ? "; replay=true" : ""}`
+    };
+  }
+  acceptCall(call) {
+    if (!Number.isInteger(call.requestID)) invalid("native tool call is missing its exec request ID", 502);
+    const prior = this.execs.get(call.requestID);
+    const digest2 = hash(canonical3({ requestID: call.requestID, execID: call.execID, nativeID: call.nativeID, name: call.name, args: argsOf(call.args) }));
+    if (prior) {
+      if (prior.digest !== digest2) invalid("native exec identity changed during retransmission", 502);
+      return;
+    }
+    if (this.terminal || this.state === "awaiting-results") invalid("native call arrived after its batch was sealed", 502);
+    if (call.nativeID && this.nativeCalls.has(call.nativeID)) invalid("native tool-call ID was reused for another exec", 502);
+    call.id = `call_cursor_${this.identity}_${this.segments}_${this.segment.calls.length}`;
+    call.digest = digest2;
+    this.execs.set(call.requestID, call);
+    if (call.nativeID) this.nativeCalls.set(call.nativeID, call);
+    this.segment.calls.push(call);
+    this.retain(bytes(call));
+    this.said += call.args.length;
+    this.waitForBatch();
+    this.sealBatch();
+  }
+  // nextStep is Cursor's next model call in the same turn: after the
+  // caller's results, or after a step whose calls were all answered here.
+  nextStep(estimate) {
+    this.steps++;
+    this.stepCalls.nextStep();
+    this.quiet.nextStep(this.steps);
+    this.stepSaid = this.said;
+    this.lastStepUsage = null;
+    if (estimate != null) this.stepEstimate = estimate;
+  }
+  modelCallCompleted(fields2) {
+    const id = str(fields2, 1);
+    const entry = {
+      usage: this.wire.usageOf(fields2, 1),
+      measuredInput: fields2.some((f) => [2, 4, 5].includes(f.num)),
+      measuredOutput: fields2.some((f) => f.num === 3),
+      hasReasoning: fields2.some((f) => f.num === 6)
+    };
+    this.stepUsages.set(id || `step:${this.steps}:${this.stepUsages.size}`, entry);
+    this.lastStepUsage = entry;
+  }
+  // waitForBatch gives the step batchWait from its latest call, answered
+  // call, count, text or heartbeat, not from its first. Cursor sends each
+  // call once the model has written its arguments, so a step of many long
+  // calls arrives over longer than batchWait while never pausing that long
+  // (#155), and one long call is written with only heartbeats meanwhile
+  // (#377); a heartbeat-only stretch is bounded by quiet. The failure says
+  // how much of the batch came, so a stall reads apart from a slow call.
+  waitForBatch() {
+    clearTimeout(this.batchTimer);
+    const since = Date.now();
+    this.batchTimer = later(() => {
+      const s = this.segment;
+      if (s.expected == null && s.calls.length && !this.resultSubmitted) this.missingCount();
+      else this.fail({ status: 502, message: `Cursor did not complete its declared native tool batch: ${s.calls.length} of ${s.expected ?? "?"} calls came, ${s.answered} answered here${this.stepCalls.completed ? `, ${this.stepCalls.completed} completed by Cursor` : ""}, none since ${Date.now() - since} ms` });
+    }, this.limits.batchWait);
+  }
+  missingCount() {
+    this.fail({ status: 502, message: "Cursor did not declare its native tool batch", retentionIneligible: !this.resultSubmitted });
+  }
+  // A call of the model's step the bridge answered itself: a refused tool (a
+  // name it doesn't serve, Cursor's own tools) or get_mcp_tools. Cursor's
+  // count is of every call the step made, so it counts toward the batch;
+  // never handed to the caller (#142).
+  answeredCall() {
+    if (this.terminal || this.state === "awaiting-results") return;
+    this.segment.answered++;
+    if (this.batchTimer) this.waitForBatch();
+    this.sealBatch();
+  }
+  // A call of the step Cursor completed by itself (plugins#550): in its
+  // count, and never sent as an exec.
+  completedByCursor() {
+    if (this.terminal || this.state === "awaiting-results") return;
+    if (this.batchTimer) this.waitForBatch();
+    this.sealBatch();
+  }
+  // A checkpoint whose state waits on just the calls handed to the caller,
+  // after the step's count came at the end of the step's calls, is a step
+  // Cursor has finished: what more the count says will not come (plugins#550).
+  // When the count was sent before or between the step's calls, a mid-batch
+  // checkpoint after an early call has only the calls sent so far in
+  // pending_tool_calls and must not seal the batch early before the
+  // remaining calls arrive.
+  waitedOn(data) {
+    const s = this.segment;
+    if (this.terminal || this.state === "awaiting-results" || s.closed || s.expected == null || !s.calls.length || !this.stepCalls.listedAfter) return;
+    if (pendingCalls(data) !== s.calls.length) return;
+    s.waitedOn = true;
+    this.sealBatch();
+  }
+  listed(count) {
+    if (!Number.isSafeInteger(count) || count < 1) invalid("invalid native tool count", 502);
+    if (this.segment.expected != null && this.segment.expected !== count) {
+      this.fail({ status: 502, message: "inconsistent native tool count", retentionIneligible: !this.resultSubmitted, continuityReason: "inconsistent-batch-count" });
+      return;
+    }
+    this.segment.expected = count;
+    this.stepCalls.listed();
+    if (this.state === "awaiting-results") return;
+    this.waitForBatch();
+    this.sealBatch();
+  }
+  sealBatch() {
+    const segment = this.segment;
+    if (segment.expected == null) return;
+    const made = segment.calls.length + segment.answered;
+    if (made > segment.expected) invalid("native tool batch exceeded its declared count", 502);
+    if (made + this.stepCalls.completed < segment.expected && !segment.waitedOn || segment.closed) return;
+    if (!segment.calls.length) {
+      segment.expected = null;
+      segment.answered = 0;
+      clearTimeout(this.batchTimer);
+      this.batchTimer = null;
+      this.nextStep();
+      return;
+    }
+    clearTimeout(this.batchTimer);
+    this.batchTimer = null;
+    this.state = "awaiting-results";
+    this.quiet.pause();
+    this.batches ??= [];
+    this.batches.push(segment);
+    for (const c of segment.calls) this.pool.handles.set(c.id, { owner: this, batch: segment });
+    segment.finish({ stop: "tool_calls", usage: {
+      prompt_tokens: 0,
+      completion_tokens: 0,
+      total_tokens: 0,
+      prompt_tokens_details: { cached_tokens: 0, cache_write_tokens: 0 },
+      magpie_native: { accounting: "pending" }
+    } });
+    this.segments++;
+    this.resultTimer = later(() => this.fail({ status: 410, message: "native tool-result deadline expired" }, "expired"), this.limits.resultWait);
+  }
+  store(id, data) {
+    if (!id.length) invalid("native blob ID is empty", 502);
+    const key = id.toString("hex");
+    if (this.knownHashes.has(key) && hash(data) !== key) invalid("native content-addressed bootstrap blob changed", 502);
+    const size = this.blobSize - (this.blobs.get(key)?.length ?? 0) + data.length;
+    if (size + (this.checkpoint?.bytes.length ?? 0) > this.limits.blobBytes) invalid("native blob retention limit reached", 503);
+    this.blobs.set(key, Buffer.from(data));
+    this.blobSize = size;
+    this.validateCheckpoint();
+  }
+  checkpointReceived(data) {
+    if (data.length + this.blobSize > this.limits.blobBytes) invalid("native checkpoint retention limit reached", 503);
+    nativeFields(data);
+    this.checkpoint = { bytes: Buffer.from(data), sequence: ++this.sequence, status: "incomplete", terminal: this.terminal };
+    this.validateCheckpoint();
+  }
+  validateCheckpoint() {
+    if (!this.checkpoint) return;
+    const state = nativeFields(this.checkpoint.bytes);
+    const missing = /* @__PURE__ */ new Set();
+    let supported = true;
+    const get = (id) => {
+      const key = id.toString("hex");
+      const b = this.blobs.get(key);
+      if (!b) missing.add(key);
+      return b;
+    };
+    const refs = /* @__PURE__ */ new Set([1, 3, 6, 7, 11, 13]);
+    const known = new Set(Array.from({ length: 34 }, (_, i) => i + 1).filter((n) => n !== 2));
+    const complex = /* @__PURE__ */ new Set([3, 6, 7, 11, 12, 13, 15, 16, 20, 24, 29, 30, 31, 32]);
+    for (const f of state) {
+      if (!known.has(f.num) || complex.has(f.num)) supported = false;
+      if (refs.has(f.num) && f.data.length) get(f.data);
+      if (f.num !== 8) continue;
+      const turn = get(f.data);
+      if (!turn) continue;
+      const tf = nativeFields(turn);
+      const agent = field2(tf, 1);
+      if (!agent || tf.some((f2) => f2.num !== 1)) {
+        supported = false;
+        continue;
+      }
+      const agentFields = nativeFields(agent.data);
+      if (!field2(agentFields, 1)?.data.length) supported = false;
+      for (const a of agentFields) {
+        if (a.num === 1) {
+          const user = get(a.data);
+          if (user) nativeFields(user);
+        } else if (a.num === 2) {
+          const step = get(a.data);
+          if (step) {
+            const sf = nativeFields(step);
+            if (sf.length !== 1 || ![1, 2, 3].includes(sf[0].num)) supported = false;
+            else {
+              const stepFields = nativeFields(sf[0].data);
+              if (sf[0].num === 2 && (stepFields.length !== 1 || stepFields[0].num !== 15)) supported = false;
+            }
+          }
+        } else if (![3, 4, 5, 6].includes(a.num)) supported = false;
+      }
+    }
+    this.checkpoint.missing = missing.size;
+    this.checkpoint.status = !supported ? "unsupported" : missing.size ? "incomplete" : "complete";
+    this.checkpoint.terminal = this.terminal;
+  }
+  terminalSeen(fields2) {
+    if (this.segment.calls.length) invalid("Cursor ended a turn with unresolved native tool calls", 502);
+    this.terminal = true;
+    this.state = "finalizing";
+    this.usageFields = fields2;
+    if (this.checkpoint) this.checkpoint.terminal = true;
+    clearTimeout(this.batchTimer);
+    this.drainTimer = later(() => {
+      Promise.resolve().then(() => this.complete()).catch((e) => this.fail(failureOf(e)));
+    }, this.limits.drain);
+  }
+  complete() {
+    if (this.completionTask) return this.completionTask;
+    if (this.error || this.state === "complete") return;
+    if (!this.terminal) invalid("native Run ended before TurnEnded or a complete final answer", 502);
+    const { usageOf: usageOf2 } = this.wire;
+    const turnInput = this.usageFields?.some((f) => [1, 3, 4].includes(f.num));
+    const turnOutput = this.usageFields?.some((f) => f.num === 2);
+    const last = this.lastStepUsage;
+    const measuredInput = turnInput || !!last?.measuredInput;
+    const measuredOutput = turnOutput || !!last?.measuredOutput;
+    const u = usageOf2(this.usageFields ?? []);
+    if (!turnInput && last?.measuredInput) Object.assign(u, { input: last.usage.input, cacheRead: last.usage.cacheRead, cacheWrite: last.usage.cacheWrite });
+    if (!turnOutput && last?.measuredOutput) Object.assign(u, { output: last.usage.output, reasoning: last.usage.reasoning });
+    if (!measuredInput) u.input = this.estimate;
+    if (!measuredOutput) u.output = Math.floor((this.said + 3) / 4);
+    let earlier = null;
+    if (this.steps > 1) {
+      if (last && (last.measuredInput || last.measuredOutput)) {
+        const prev = [...this.stepUsages.values()].filter((e) => e !== last);
+        const sum = (k) => prev.reduce((s, e) => s + e.usage[k], 0);
+        const whole2 = u.input + u.cacheRead + u.cacheWrite;
+        const share = (total, own2) => total > 0 ? Math.min(1, Math.max(own2, total / this.steps) / total) : 0;
+        const fi = share(whole2, turnInput ? this.stepEstimate ?? 0 : whole2);
+        const fo = share(u.output, Math.floor((this.said - this.stepSaid + 3) / 4));
+        const own = {
+          input: last.measuredInput ? last.usage.input : Math.round(u.input * fi),
+          cacheRead: last.measuredInput ? last.usage.cacheRead : Math.round(u.cacheRead * fi),
+          cacheWrite: last.measuredInput ? last.usage.cacheWrite : Math.round(u.cacheWrite * fi),
+          output: last.measuredOutput ? last.usage.output : Math.round(u.output * fo),
+          reasoning: last.hasReasoning ? last.usage.reasoning : last.measuredOutput ? Math.min(u.reasoning, last.usage.output) : Math.round(u.reasoning * fo)
+        };
+        earlier = {
+          input: turnInput ? Math.max(0, u.input - own.input) : sum("input"),
+          cacheRead: turnInput ? Math.max(0, u.cacheRead - own.cacheRead) : sum("cacheRead"),
+          cacheWrite: turnInput ? Math.max(0, u.cacheWrite - own.cacheWrite) : sum("cacheWrite"),
+          output: turnOutput ? Math.max(0, u.output - own.output) : sum("output")
+        };
+        Object.assign(u, own);
+      } else {
+        const whole2 = u.input + u.cacheRead + u.cacheWrite;
+        const share = (total, own2) => total > 0 ? Math.min(1, Math.max(own2, total / this.steps) / total) : 0;
+        const fi = share(whole2, measuredInput ? this.stepEstimate ?? 0 : whole2);
+        const fo = share(u.output, Math.floor((this.said - this.stepSaid + 3) / 4));
+        const own = {
+          input: Math.round(u.input * fi),
+          cacheRead: Math.round(u.cacheRead * fi),
+          cacheWrite: Math.round(u.cacheWrite * fi),
+          output: Math.round(u.output * fo),
+          reasoning: Math.round(u.reasoning * fo)
+        };
+        earlier = { input: u.input - own.input, cacheRead: u.cacheRead - own.cacheRead, cacheWrite: u.cacheWrite - own.cacheWrite, output: u.output - own.output };
+        Object.assign(u, own);
+      }
+    }
+    const counted2 = this.accounting?.counted?.();
+    if (counted2) for (const k of ["input", "cacheRead", "cacheWrite", "output"]) {
+      const off = Math.min(earlier?.[k] ?? 0, counted2[k] ?? 0);
+      if (earlier) earlier[k] -= off;
+      u[k] = Math.max(0, u[k] - ((counted2[k] ?? 0) - off));
+    }
+    const prompt = u.input + u.cacheRead + u.cacheWrite;
+    this.finalUsage = {
+      prompt_tokens: prompt,
+      completion_tokens: u.output,
+      total_tokens: prompt + u.output,
+      prompt_tokens_details: { cached_tokens: u.cacheRead, cache_write_tokens: u.cacheWrite },
+      ...this.usageFields?.some((f) => f.num === 5) || last?.hasReasoning ? { completion_tokens_details: { reasoning_tokens: u.reasoning } } : {},
+      ...!measuredInput || !measuredOutput ? { magpie_native: { accounting: "estimated" } } : {}
+    };
+    this.state = "finalizing";
+    this.closeTransport();
+    const finish = (settled) => {
+      if (this.error) return;
+      const more = earlier && settled ? Object.fromEntries(Object.keys(earlier).map((k) => [k, earlier[k] + settled[k]])) : earlier ?? settled;
+      const deferred2 = more && more.input + more.output + more.cacheRead + more.cacheWrite > 0;
+      this.segment.finish({ stop: "stop", usage: {
+        ...this.finalUsage,
+        ...deferred2 ? { magpie_deferred: {
+          prompt_tokens: more.input + more.cacheRead + more.cacheWrite,
+          completion_tokens: more.output,
+          cached_tokens: more.cacheRead,
+          cache_write_tokens: more.cacheWrite
+        } } : {}
+      } });
+      this.state = "complete";
+      this.pool.release(this);
+      this.replayTimer = later(() => this.pool.forget(this), this.limits.replayWait);
+    };
+    if (!this.accounting) return finish(null);
+    this.completionTask = this.accounting.settle().then(finish);
+    return this.completionTask;
+  }
+  async pump(stream) {
+    const { pb: pb2, exec: exec2, failure: failure3 } = this.wire;
+    try {
+      for await (const f of this.quiet.frames(stream)) {
+        if (this.error || this.state === "complete") return;
+        if (f.end) {
+          const e = failure3(200, f.data);
+          if (e.status < 200 || e.status > 299) throw new NativeSessionError(e.status, e.message);
+          if (this.segment.calls.length && this.segment.expected == null) {
+            this.missingCount();
+            return;
+          }
+          if (!this.terminal && !this.segment.calls.length && this.segment.content) this.terminalSeen([]);
+          await this.complete();
+          return;
+        }
+        for (const m of nativeFields(f.data)) {
+          switch (m.num) {
+            case 1:
+              for (const u of nativeFields(m.data)) {
+                const uf = nativeFields(u.data);
+                if (u.num === 1 || u.num === 4) {
+                  const text = str(uf, 1);
+                  if (this.terminal || this.state === "awaiting-results") invalid("native output arrived outside a running Chat segment", 502);
+                  if (text) {
+                    this.said += text.length;
+                    if (u.num === 1) this.wrote += text.length;
+                    this.segment.emit(u.num === 1 ? { text } : { reasoning: text });
+                    if (this.batchTimer) this.waitForBatch();
+                  }
+                } else if (u.num === 14) {
+                  if (!this.segment.content && !this.segment.calls.length) invalid("an empty reply (Cursor ended the turn without text or a tool call)", 502);
+                  this.terminalSeen(uf);
+                } else if (u.num === 31) {
+                  this.modelCallCompleted(uf);
+                } else if (u.num === 27) {
+                  this.listed(num(uf, 1));
+                  if (this.error) return;
+                } else if (u.num === 13) {
+                  if (this.batchTimer && !this.terminal && this.state !== "awaiting-results") this.waitForBatch();
+                } else if ((u.num === 2 || u.num === 3 || u.num === 7) && this.stepCalls.update(u.num, uf)) {
+                  this.completedByCursor();
+                  if (this.error) return;
+                }
+              }
+              break;
+            case 2: {
+              this.stepCalls.exec(m.data);
+              const c = exec2(m.data, this.chatTools, (b) => this.send(b), (id) => this.execClose(id), null, true);
+              if (c) this.acceptCall(c);
+              else if (!nativeFields(m.data).some((e) => e.num === 10)) this.answeredCall();
+              break;
+            }
+            case 3:
+              this.checkpointReceived(m.data);
+              this.waitedOn(m.data);
+              break;
+            case 4: {
+              const kv = nativeFields(m.data);
+              const id = num(kv, 1);
+              for (const k of kv) {
+                if (k.num === 2) {
+                  const want = field2(nativeFields(k.data), 1)?.data.toString("hex") ?? "";
+                  const b = this.blobs.get(want);
+                  const res = b ? pb2().bytes(1, b) : pb2().bytes(2, pb2().str(1, "blob not found"));
+                  await this.reply(pb2().bytes(3, pb2().varint(1, id).bytes(2, res)).done());
+                } else if (k.num === 3) {
+                  try {
+                    const set = nativeFields(k.data);
+                    this.store(field2(set, 1)?.data ?? Buffer.alloc(0), field2(set, 2)?.data ?? Buffer.alloc(0));
+                  } catch (e) {
+                    this.send(pb2().bytes(3, pb2().varint(1, id).bytes(3, pb2().bytes(1, pb2().str(1, "native blob could not be retained")))).done());
+                    throw e;
+                  }
+                  await this.reply(pb2().bytes(3, pb2().varint(1, id).bytes(3, Buffer.alloc(0))).done());
+                }
+              }
+              break;
+            }
+            case 5:
+              for (const c of nativeFields(m.data)) if (c.num === 1) {
+                const id = num(nativeFields(c.data), 1);
+                const pending = this.execs.get(id);
+                if (pending && !pending.submitted) invalid("Cursor cancelled a pending native tool exec; late results cannot be submitted", 410);
+              }
+              break;
+            case 7:
+              invalid("unsupported native interaction query", 502);
+          }
+        }
+      }
+      if (!this.error && this.state !== "complete") {
+        if (this.terminal) await this.complete();
+        else invalid("native reply broke off before completing its turn or tool batch: EOF", 502);
+      }
+    } catch (e) {
+      if (!this.error && this.state !== "complete") this.fail(failureOf(e));
+    }
+  }
+};
+var nativeSessions = new NativeSessionPool();
+
+// node_modules/.pnpm/@magpie-community+opencode-cursor-auth@0.2.44/node_modules/@magpie-community/opencode-cursor-auth/index.mjs
+import { isDeepStrictEqual } from "node:util";
+import http2 from "node:http2";
+import { STATUS_CODES } from "node:http";
+import { gunzipSync as gunzipSync3 } from "node:zlib";
+import { Duplex } from "node:stream";
+import { createHash as createHash9, randomBytes as randomBytes4, randomUUID as randomUUID5 } from "node:crypto";
+import { execFile } from "node:child_process";
+import { readFile, stat, readdir, realpath, writeFile, mkdir, rename } from "node:fs/promises";
+import { homedir, platform, tmpdir } from "node:os";
+import { basename, dirname, join as join2 } from "node:path";
+var ID = "cursor";
+var API = "https://api2.cursor.sh";
+var WEBSITE = "https://cursor.com";
+var AGENT = "https://agentn.global.api5.cursor.sh";
+var CHAT = "@ai-sdk/openai-compatible";
+var VERSION_FALLBACK = "2026.09.23-86fc751";
+var DEFAULT_CONTEXT = 2e5;
+var MODELS_KEEP = 10 * 60 * 1e3;
+var CALL = "CallDynamicTool";
+var NO_RESULT = "Tool use was interrupted and did not produce a result.";
+var CLI_MARK = "cursor-agent";
+var GOOS = { win32: "windows" }[platform()] ?? platform();
+var EMPTY = Buffer.alloc(0);
+var enc = new TextEncoder();
+var exists = (p) => stat(p).then((s) => !s.isDirectory(), () => false);
+function run(file, args, { timeout = 1e4, env: env2 } = {}) {
+  return new Promise((resolve) => {
+    execFile(file, args, { timeout, env: env2 ?? process.env, maxBuffer: 8 << 20 }, (err, stdout) => resolve({ ok: !err, out: String(stdout ?? ""), code: typeof err?.code === "number" ? err.code : err ? -1 : 0 }));
+  });
+}
+async function cursorExecutable() {
+  const dirs = (process.env.PATH ?? "").split(GOOS === "windows" ? ";" : ":").filter(Boolean);
+  for (const name of ["cursor-agent", "agent"]) {
+    for (const d of dirs) {
+      const p = join2(d, GOOS === "windows" ? name + ".exe" : name);
+      if (!await exists(p)) continue;
+      if (name === "cursor-agent") return p;
+      if ((await realpath(p).catch(() => "")).includes("cursor-agent")) return p;
+    }
+  }
+  const home = homedir();
+  for (const p of [join2(home, ".local", "bin", "cursor-agent"), "/usr/local/bin/cursor-agent", "/opt/homebrew/bin/cursor-agent"])
+    if (await exists(p)) return p;
+  return "";
+}
+var VERSION_RE = /^\d{4}\.\d{2}\.\d{2}-[0-9a-f]+$/;
+var versionSaid = "";
+async function clientVersion() {
+  if (versionSaid) return versionSaid;
+  let v = "";
+  const exe = await cursorExecutable();
+  if (exe) {
+    const d = basename(dirname(await realpath(exe).catch(() => exe)));
+    if (VERSION_RE.test(d)) v = d;
+  }
+  if (!v) {
+    const dirs = [join2(homedir(), ".local", "share", "cursor-agent", "versions")];
+    if (GOOS === "windows") dirs.push(join2(process.env.LOCALAPPDATA ?? "", "cursor-agent", "versions"));
+    for (const dir of dirs)
+      for (const n of await readdir(dir).catch(() => [])) if (VERSION_RE.test(n) && n > v) v = n;
+  }
+  versionSaid = "cli-" + (v || VERSION_FALLBACK);
+  return versionSaid;
+}
+function authFile() {
+  const home = homedir();
+  if (GOOS === "windows") return join2(process.env.APPDATA || join2(home, "AppData", "Roaming"), "Cursor", "auth.json");
+  if (GOOS === "darwin") return join2(home, ".cursor", "auth.json");
+  return join2(process.env.XDG_CONFIG_HOME || join2(home, ".config"), "cursor", "auth.json");
+}
+function cliConfigFile() {
+  const dir = process.env.CURSOR_CONFIG_DIR?.trim() || (process.env.XDG_CONFIG_HOME?.trim() ? join2(process.env.XDG_CONFIG_HOME, "cursor") : join2(homedir(), ".cursor"));
+  return join2(dir, "cli-config.json");
+}
+function tokenSub(tok) {
+  const parts = String(tok ?? "").split(".");
+  if (parts.length !== 3) return "";
+  try {
+    const sub = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"))?.sub;
+    return typeof sub === "string" ? sub : "";
+  } catch {
+    return "";
+  }
+}
+var teamOf = (v) => Number.isSafeInteger(v) && v > 0 ? v : void 0;
+var TEAM_TTL = 1e4;
+var teamRead = { at: 0, info: null };
+async function activeTeamId(tok) {
+  if (Date.now() - teamRead.at >= TEAM_TTL) {
+    try {
+      teamRead.info = JSON.parse(await readFile(cliConfigFile(), "utf8"))?.authInfo ?? null;
+    } catch (e) {
+      if (e?.code === "ENOENT") teamRead.info = null;
+    }
+    teamRead.at = Date.now();
+  }
+  const info = teamRead.info;
+  if (!info) return void 0;
+  if (!info.authId || info.authId !== tokenSub(tok)) return void 0;
+  return teamOf(info.activeTeamId);
+}
+async function teamHeader(tok) {
+  const id = await activeTeamId(tok);
+  return id ? { "x-cursor-team-id": String(id) } : {};
+}
+async function teamBody(tok) {
+  const id = await activeTeamId(tok);
+  return id ? { teamId: id } : {};
+}
+var TOKEN_TTL = 1e4;
+var KEYCHAIN_DENIED = 10 * 6e4;
+var keychain = { tok: "", at: 0, ask: 0, busy: null, now: () => Date.now(), read: (args) => run("security", args) };
+function keychainToken(fresh = false) {
+  const go = async () => {
+    const now = keychain.now();
+    const ttl = !keychain.tok && now - keychain.ask < KEYCHAIN_DENIED ? KEYCHAIN_DENIED : TOKEN_TTL;
+    if (!fresh && now - keychain.at < ttl) return keychain.tok;
+    const r = await keychain.read(["find-generic-password", "-s", "cursor-access-token", "-a", "cursor-user", "-w"]);
+    keychain.tok = "";
+    keychain.at = keychain.now();
+    if (r.ok) {
+      keychain.tok = r.out.trim();
+      keychain.ask = 0;
+    } else if (r.code !== 44) {
+      keychain.ask = keychain.at;
+    } else keychain.ask = 0;
+    return keychain.tok;
+  };
+  const p = (keychain.busy ?? Promise.resolve()).then(go, go);
+  keychain.busy = p.catch(() => {
+  });
+  return p;
+}
+async function cliToken(fresh = false) {
+  if (GOOS === "darwin") {
+    const t = await keychainToken(fresh);
+    if (t) return t;
+  }
+  try {
+    return JSON.parse(await readFile(authFile(), "utf8"))?.accessToken ?? "";
+  } catch {
+    return "";
+  }
+}
+function expiry(tok) {
+  const parts = String(tok ?? "").split(".");
+  if (parts.length !== 3) return 0;
+  try {
+    const exp = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"))?.exp;
+    return typeof exp === "number" && exp > 0 ? exp * 1e3 : 0;
+  } catch {
+    return 0;
+  }
+}
+var SOON = 5 * 60 * 1e3;
+var AuthError = class extends Error {
+  constructor(msg) {
+    super(msg);
+    this.status = 401;
+  }
+};
+var cliRefresh = null;
+async function cliTokenNow() {
+  let tok = await cliToken();
+  const exp = expiry(tok);
+  if (tok && (!exp || exp - Date.now() > SOON)) return tok;
+  const exe = await cursorExecutable();
+  if (exe) {
+    cliRefresh ??= run(exe, ["status"], { timeout: 3e4 }).finally(() => cliRefresh = null);
+    await cliRefresh;
+    tok = await cliToken(true);
+  }
+  if (!tok) throw new AuthError("Cursor isn't signed in; sign in from magpie's Providers page or run `cursor-agent login`");
+  const e = expiry(tok);
+  if (e && e <= Date.now()) throw new AuthError("Cursor's sign-in has run out; sign in again from magpie's Providers page or run `cursor-agent login`");
+  return tok;
+}
+async function headersFor(tok) {
+  return {
+    "Content-Type": "application/json",
+    "Connect-Protocol-Version": "1",
+    ...tok ? { Authorization: `Bearer ${tok}` } : {},
+    "x-cursor-client-version": await clientVersion(),
+    "x-cursor-client-type": "cli",
+    "x-ghost-mode": "true",
+    ...await teamHeader(tok)
+  };
+}
+async function unary(base, path, tok, body = {}, timeout = 15e3) {
+  const res = await fetch(base + "/" + path, {
+    method: "POST",
+    headers: await headersFor(tok),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(timeout)
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    const f = failure2(res.status, text);
+    const e = new Error(f.message);
+    e.status = f.status;
+    throw e;
+  }
+  return JSON.parse(text || "{}");
+}
+async function whoIs(tok) {
+  const [me, plan] = await Promise.allSettled([
+    unary(API, "aiserver.v1.DashboardService/GetMe", tok),
+    unary(API, "aiserver.v1.DashboardService/GetPlanInfo", tok)
+  ]);
+  return {
+    email: me.status === "fulfilled" ? String(me.value?.email ?? "").trim() : "",
+    plan: plan.status === "fulfilled" ? String(plan.value?.planInfo?.planName ?? "").trim() : ""
+  };
+}
+var plans = /* @__PURE__ */ new Map();
+var PLAN_TTL = 36e5;
+var PERIODS = { INCLUDED_USAGE_PERIOD_WEEKLY: "weekly", INCLUDED_USAGE_PERIOD_MONTHLY: "monthly", 1: "monthly", 2: "weekly" };
+async function planOf(tok) {
+  const had = plans.get(tok);
+  if (had && Date.now() - had.at < PLAN_TTL) return had;
+  try {
+    const info = await unary(API, "aiserver.v1.DashboardService/GetPlanInfo", tok);
+    const plan = String(info?.planInfo?.planName ?? "").trim();
+    const got = { plan: plan || had?.plan || "", merged: info?.isMerged === true, period: PERIODS[info?.planInfo?.includedUsagePeriod] ?? "", at: Date.now() };
+    if (plan || got.merged) plans.set(tok, got);
+    return got;
+  } catch {
+    return had ?? { plan: "" };
+  }
+}
+var exchanged = /* @__PURE__ */ new Map();
+async function keyToken(key) {
+  const h = createHash9("sha256").update(key).digest("hex");
+  const had = exchanged.get(h);
+  if (had && (!had.exp || had.exp - Date.now() > SOON)) return had.tok;
+  const res = await fetch(API + "/auth/exchange_user_api_key", {
+    method: "POST",
+    headers: { ...await headersFor(key), "Connect-Protocol-Version": void 0 },
+    body: "{}",
+    signal: AbortSignal.timeout(15e3)
+  }).catch((e) => {
+    throw Object.assign(new Error("couldn't reach Cursor's API: " + e.message), { status: 502 });
+  });
+  if (res.status >= 500) throw Object.assign(new Error(`exchange_user_api_key: HTTP ${res.status}`), { status: 502 });
+  const j = res.ok ? await res.json().catch(() => null) : null;
+  if (!j?.accessToken) throw new AuthError("Cursor didn't take this API key");
+  exchanged.set(h, { tok: j.accessToken, exp: expiry(j.accessToken) });
+  return j.accessToken;
+}
+async function tokenOf(auth) {
+  if (auth?.type === "api" && auth.key) return keyToken(auth.key);
+  if (auth?.type !== "oauth") throw new AuthError("Cursor isn't signed in");
+  if (auth.refresh === CLI_MARK) return cliTokenNow();
+  const exp = auth.expires || expiry(auth.access);
+  if (!auth.access) throw new AuthError("Cursor isn't signed in");
+  if (exp && exp <= Date.now()) throw new AuthError("Cursor's sign-in has run out; sign in to Cursor again");
+  return auth.access;
+}
+async function browserSignIn() {
+  const verifier = randomBytes4(32).toString("base64url");
+  const challenge = createHash9("sha256").update(verifier).digest("base64url");
+  const uuid2 = randomUUID5();
+  const url = new URL("/loginDeepControl", WEBSITE);
+  url.searchParams.set("challenge", challenge);
+  url.searchParams.set("uuid", uuid2);
+  url.searchParams.set("mode", "login");
+  url.searchParams.set("redirectTarget", "cli");
+  return {
+    url: url.toString(),
+    instructions: "Sign in to Cursor in the browser; this finishes by itself.",
+    method: "auto",
+    async callback() {
+      const headers2 = { "Content-Type": "application/json", "x-cursor-client-version": await clientVersion(), "x-cursor-client-type": "cli" };
+      let errors = 0;
+      for (let r = 0; r < 150; r++) {
+        const wait = Math.min(1e3 * 1.2 ** r, 1e4);
+        let res;
+        try {
+          res = await fetch(`${API}/auth/poll?uuid=${uuid2}&verifier=${verifier}`, { headers: headers2, signal: AbortSignal.timeout(15e3) });
+        } catch {
+          if (++errors >= 3) return { type: "failed", error: "couldn't reach Cursor" };
+          await sleep(wait);
+          continue;
+        }
+        if (res.status === 404) {
+          errors = 0;
+          await sleep(wait);
+          continue;
+        }
+        if (!res.ok) {
+          if (res.status === 403 || ++errors >= 3) return { type: "failed", error: res.status === 403 ? "Cursor refused the sign-in (403)" : `Cursor's sign-in answered HTTP ${res.status}` };
+          await sleep(wait);
+          continue;
+        }
+        const j = await res.json().catch(() => null);
+        if (!j?.accessToken || !("refreshToken" in j)) return { type: "failed", error: "Cursor sent back no token" };
+        const who = await whoIs(j.accessToken);
+        return {
+          type: "success",
+          access: j.accessToken,
+          refresh: j.refreshToken || "none",
+          expires: expiry(j.accessToken) || Date.now() + 30 * 24 * 3600 * 1e3,
+          ...who.email ? { accountId: who.email } : {},
+          ...who.plan ? { plan: who.plan } : {}
+        };
+      }
+      return { type: "failed", error: "the sign-in timed out" };
+    }
+  };
+}
+async function cliSignIn() {
+  return {
+    url: "",
+    instructions: "Uses the account `cursor-agent login` signed in to.",
+    method: "auto",
+    async callback() {
+      const tok = await cliToken(true);
+      const exp = expiry(tok);
+      if (!tok) return { type: "failed", error: "cursor-agent isn't signed in: run `cursor-agent login`" };
+      if (exp && exp <= Date.now()) return { type: "failed", error: "cursor-agent's sign-in has run out: run `cursor-agent login` again" };
+      const who = await whoIs(tok);
+      if (!who.email) return { type: "failed", error: "Cursor couldn't say which account is signed in" };
+      return { type: "success", access: "", refresh: CLI_MARK, expires: 0, accountId: who.email, ...who.plan ? { plan: who.plan } : {} };
+    }
+  };
+}
+var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+var statusText = (s) => ({ 413: "Request Entity Too Large", 414: "Request URI Too Long", 416: "Requested Range Not Satisfiable", 418: "I'm a teapot", 509: "" })[s] ?? STATUS_CODES[s] ?? "";
+var POOL_VARIANT = /-(fast|none|low|medium|high|xhigh|extra-high|max|thinking)$/;
+function poolBase(model) {
+  model = String(model).trim().toLowerCase().replace(/@[^@]*$/, "");
+  if (model.startsWith("cursor-")) model = model.slice("cursor-".length);
+  for (; ; ) {
+    const b = model.replace(POOL_VARIANT, "");
+    if (b === model) return model;
+    model = b;
+  }
+}
+function firstParty(model) {
+  model = model.replace(/@[^@]*$/, "");
+  if (model.startsWith("cursor-")) model = model.slice("cursor-".length);
+  if (model === "default" || model === "composer" || model.startsWith("composer-")) return true;
+  return ["grok-4.5", "grok-4.6", "grok-4.7"].some((b) => model === b || model.startsWith(b + "-"));
+}
+function onDemandOf(data, hard) {
+  const s = data?.spendLimitUsage;
+  const usedDollars = Number(s?.individualUsed ?? 0) / 100;
+  const own = s?.individualLimit === void 0 ? void 0 : Number(s.individualLimit) > 0 ? { kind: "fixed", usedDollars, limitDollars: Number(s.individualLimit) / 100 } : { kind: "disabled", usedDollars };
+  if (s?.limitType === "team") {
+    if (own) return own;
+    if (hard && (hard.noUsageBasedAllowed || !(Number(hard.hardLimit) > 0))) return { kind: "disabled", usedDollars };
+    const pool = Number(s.pooledLimit ?? 0);
+    if (pool > 0) return { kind: "fixed", usedDollars: Number(s.pooledUsed ?? 0) / 100, limitDollars: pool / 100, mineDollars: usedDollars };
+    return hard ? { kind: "unlimited", usedDollars } : { kind: "unavailable", usedDollars };
+  }
+  if (!hard) return own ?? { kind: "unavailable", usedDollars };
+  if (hard.noUsageBasedAllowed) return { kind: "disabled", usedDollars };
+  const limit = Number(hard.hardLimit ?? 0);
+  if (limit >= 2147483647) return { kind: "unlimited", usedDollars };
+  return limit > 0 ? { kind: "fixed", usedDollars, limitDollars: limit } : { kind: "disabled", usedDollars };
+}
+async function hardLimit(tok) {
+  try {
+    const res = await fetch(API + "/aiserver.v1.DashboardService/GetHardLimit", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json", "Connect-Protocol-Version": "1", ...await teamHeader(tok) },
+      body: "{}",
+      signal: AbortSignal.timeout(15e3)
+    });
+    return res.ok ? await res.json() ?? void 0 : void 0;
+  } catch {
+    return void 0;
+  }
+}
+var dollars = (n) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+async function creditGrants(tok) {
+  try {
+    const res = await fetch(API + "/aiserver.v1.DashboardService/GetUsageLimitStatusAndActiveGrants", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json", "Connect-Protocol-Version": "1", ...await teamHeader(tok) },
+      body: "{}",
+      signal: AbortSignal.timeout(15e3)
+    });
+    if (!res.ok) return [];
+    const g = (await res.json())?.activeGrants;
+    return Array.isArray(g) ? g : [];
+  } catch {
+    return [];
+  }
+}
+var tagOf = (s) => String(s).toLowerCase().replace(/-/g, ".");
+function credits(plan, grants, ids, resets, now = Date.now()) {
+  const windows = [];
+  const covers = /* @__PURE__ */ new Set();
+  let all = false;
+  const bonus = Number(plan?.bonusSpend ?? 0) / 100;
+  if (bonus > 0 || plan?.remainingBonus === true) {
+    windows.push({ name: "Free usage", used: 0, display: `+${dollars(bonus)} on us` + (plan?.remainingBonus === true ? ", more left" : ""), ...resets, aside: true });
+    if (plan?.remainingBonus === true) all = true;
+  }
+  for (const g of grants) {
+    const total = Number(g?.totalCents ?? 0) / 100;
+    const left = Math.max(0, Number(g?.remainingCents ?? 0) / 100);
+    if (!(total > 0) || !Number.isFinite(total) || !Number.isFinite(left)) continue;
+    const exp = Number(g.expiresAtMs ?? 0);
+    if (exp > 0 && exp <= now) continue;
+    const clients = (g.allowedClientTypes ?? []).map(String);
+    const mine2 = clients.length === 0 || clients.includes("cli");
+    const named2 = [...g.allowedModelIds ?? [], ...(g.allowedModelSelections ?? []).map((m) => m?.modelId).filter(Boolean)].map(String);
+    const tags = (g.allowedModelTags ?? []).map(String);
+    const limited = named2.length > 0 || tags.length > 0;
+    const bases = new Set(named2.map((m) => poolBase(m) === "auto" ? "default" : poolBase(m)));
+    const fits = (id) => {
+      const b = poolBase(id) === "auto" ? "default" : poolBase(id);
+      return bases.has(b) || tags.some((t) => tagOf(id).includes(tagOf(t)));
+    };
+    const matched = limited ? ids.filter(fits) : [];
+    const name = (String(g.campaignName ?? "").trim() || "Free credit") + (mine2 ? "" : clients.includes("glass") && !clients.includes("ide") ? " (Cloud Agents only)" : ` (${clients.join(", ")} only)`);
+    windows.push({
+      name,
+      used: Math.max(0, Math.min(100, 100 * (total - left) / total)),
+      display: `${dollars(total - left)} / ${dollars(total)}`,
+      amount: total - left,
+      limit: total,
+      unit: "USD",
+      ...exp > 0 ? { runsOutAt: new Date(exp).toISOString(), runsOut: left } : {},
+      ...limited ? { models: matched.length ? matched : [...named2, ...tags] } : {},
+      aside: true
+    });
+    if (!mine2 || !(left > 0)) continue;
+    if (!limited) all = true;
+    else for (const id of matched) covers.add(id);
+  }
+  return { windows, all, covers };
+}
+var INCLUDED_ONLY = "included_only";
+var WIRE_TRACE = "wire_trace";
+async function enterpriseUsage(tok, includedOnly = false) {
+  try {
+    const subject = JSON.parse(Buffer.from(tok.split(".")[1], "base64url").toString()).sub;
+    if (typeof subject !== "string") return void 0;
+    const user = subject.split("|").filter(Boolean).at(-1);
+    if (!user || !/^[a-zA-Z0-9._-]+$/.test(user)) return void 0;
+    const res = await fetch(WEBSITE + "/api/usage-summary", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Origin: WEBSITE,
+        Cookie: "WorkosCursorSessionToken=" + encodeURIComponent(user + "::" + tok)
+      },
+      redirect: "error",
+      signal: AbortSignal.timeout(15e3)
+    });
+    if (!res.ok) return void 0;
+    const data = await res.json();
+    if (String(data?.membershipType).toLowerCase() !== "enterprise") return void 0;
+    const overall = data?.individualUsage?.overall;
+    if (overall?.enabled !== true) return void 0;
+    const { used, limit } = overall;
+    if (typeof used !== "number" || !Number.isFinite(used) || used < 0) return void 0;
+    if (typeof limit !== "number" || !Number.isFinite(limit) || limit <= 0) return void 0;
+    const end = Date.parse(data.billingCycleEnd ?? "");
+    const resets = Number.isFinite(end) ? { resetsAt: new Date(end).toISOString() } : {};
+    const od = data.teamUsage?.onDemand;
+    const spent = typeof od?.used === "number" && Number.isFinite(od.used) && od.used >= 0;
+    const unlimited = od?.enabled === true && od.limit === null;
+    const fixed = od?.enabled === true && typeof od.limit === "number" && Number.isFinite(od.limit) && od.limit > 0 && spent;
+    const aside = !includedOnly && (unlimited || fixed && od.used < od.limit);
+    const windows = [{
+      name: "Enterprise",
+      used: Math.max(0, Math.min(100, 100 * used / limit)),
+      display: `${dollars(used / 100)} / ${dollars(limit / 100)}`,
+      amount: used / 100,
+      limit: limit / 100,
+      unit: "USD",
+      ...resets,
+      ...aside ? { aside: true } : {}
+    }];
+    if (fixed) windows.push({
+      name: "On-demand",
+      used: Math.min(100, 100 * od.used / od.limit),
+      display: `${dollars(od.used / 100)} / ${dollars(od.limit / 100)}`,
+      amount: od.used / 100,
+      limit: od.limit / 100,
+      unit: "USD",
+      ...resets,
+      ...includedOnly ? { aside: true } : {}
+    });
+    else if (unlimited && spent) windows.push({ name: "On-demand", used: 0, display: dollars(od.used / 100), ...resets, aside: true });
+    return windows;
+  } catch {
+    return void 0;
+  }
+}
+async function usage(tok, ids, includedOnly = false, plan = void 0) {
+  const [res, hard] = await Promise.all([
+    fetch(API + "/aiserver.v1.DashboardService/GetCurrentPeriodUsage", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json", "Connect-Protocol-Version": "1", ...await teamHeader(tok) },
+      body: "{}",
+      signal: AbortSignal.timeout(15e3)
+    }),
+    hardLimit(tok)
+  ]);
+  const grants = creditGrants(tok);
+  if (!res.ok) return { error: statusText(res.status), windows: [] };
+  const data = await res.json();
+  const u = data?.planUsage;
+  if (!u) {
+    const windows = await enterpriseUsage(tok, includedOnly);
+    return { windows: windows ?? [], credits: credits(void 0, await grants, ids, {}).windows };
+  }
+  const ms = /^[+-]?\d+$/.test(data.billingCycleEnd ?? "") ? Number(data.billingCycleEnd) : 0;
+  const resets = ms > 0 ? { resetsAt: new Date(ms).toISOString() } : {};
+  const bucket = new Set((data.autoBucketModels ?? []).map(poolBase));
+  const inPool = (model) => {
+    model = poolBase(model);
+    if (model === "auto") model = "default";
+    return bucket.has(model) || firstParty(model);
+  };
+  const asked = ids.flatMap((id) => [id, id.replace(/@[^@]*$/, "")]);
+  const pool = [.../* @__PURE__ */ new Set(["auto", ...asked, ...data.autoBucketModels ?? []])].filter(inPool);
+  const num2 = (v) => typeof v === "number" ? v : 0;
+  const od = onDemandOf(data, hard);
+  const free = credits(u, await grants, [...new Set(asked)], resets);
+  const pooled = !includedOnly && (od.kind === "fixed" || od.kind === "unlimited" || free.all) ? { aside: true } : {};
+  const covers = includedOnly ? /* @__PURE__ */ new Set() : free.covers;
+  const onDemand = od.kind === "fixed" ? [{ name: "On-demand", used: Math.max(0, Math.min(100, 100 * od.usedDollars / od.limitDollars)), display: `${dollars(od.usedDollars)} / ${dollars(od.limitDollars)}` + (od.mineDollars === void 0 ? "" : ` (you: ${dollars(od.mineDollars)})`), ...resets, ...includedOnly || free.all ? { aside: true } : {} }] : od.kind === "unlimited" ? [{ name: "On-demand", used: 0, display: dollars(od.usedDollars), ...resets, aside: true }] : [];
+  const info = await plan;
+  const spent = (used) => covers.size > 0 && !pooled.aside && used >= 100;
+  if (info?.merged === true) {
+    const weekly = info.period === "weekly";
+    const used = num2(u.totalPercentUsed);
+    return {
+      windows: [
+        { name: weekly ? "Weekly" : info.period === "monthly" ? "Monthly" : "Included", used, ...resets, ...weekly ? { span: 604800 } : {}, ...spent(used) ? { notModels: [...covers] } : {}, ...pooled },
+        ...onDemand
+      ],
+      credits: free.windows
+    };
+  }
+  const auto = num2(u.autoPercentUsed), api = num2(u.apiPercentUsed);
+  const cursorModels = spent(auto) ? pool.filter((m) => !covers.has(m)) : pool;
+  return {
+    windows: [
+      { name: "Cursor Models", used: auto, ...resets, models: cursorModels.length ? cursorModels : pool, ...cursorModels.length ? pooled : { aside: true } },
+      { name: "Other Models", used: api, ...resets, notModels: spent(api) ? [.../* @__PURE__ */ new Set([...pool, ...covers])] : pool, ...pooled },
+      ...onDemand,
+      { name: "Total", used: num2(u.totalPercentUsed), ...resets, aside: true }
+    ],
+    credits: free.windows
+  };
+}
+async function botUsage(tok) {
+  try {
+    const subject = JSON.parse(Buffer.from(tok.split(".")[1], "base64url").toString()).sub;
+    if (typeof subject !== "string") return [];
+    const user = subject.split("|").filter(Boolean).at(-1);
+    if (!user || !/^[a-zA-Z0-9._-]+$/.test(user)) return [];
+    const res = await fetch(WEBSITE + "/api/dashboard/get-sand-usage-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Origin: WEBSITE,
+        Cookie: "WorkosCursorSessionToken=" + encodeURIComponent(user + "::" + tok)
+      },
+      body: "{}",
+      redirect: "error",
+      signal: AbortSignal.timeout(5e3)
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const paid = typeof data?.includedLimitZero === "boolean" ? !data.includedLimitZero : data?.hasNonZeroIncludedLimit === true;
+    const trial = !paid && typeof data?.sandTrialExpiresAt === "string" && Date.parse(data.sandTrialExpiresAt) > Date.now();
+    if (!paid && !trial || typeof data?.usagePercent !== "number" || !Number.isFinite(data.usagePercent)) return [];
+    const reset = paid && typeof data.nextResetTimestampUtc === "string" ? Date.parse(data.nextResetTimestampUtc) : NaN;
+    return [{
+      name: trial ? "Grok Bot (trial)" : "Grok Bot",
+      used: Math.max(0, Math.min(100, data.usagePercent)),
+      aside: true,
+      // Bot exhaustion must not stop Cursor model requests.
+      ...Number.isFinite(reset) ? { resetsAt: new Date(reset).toISOString(), span: 604800 } : {}
+    }];
+  } catch {
+    return [];
+  }
+}
+var LEVEL_RANK = ["none", "minimal", "low", "medium", "high", "xhigh", "max"];
+var EFFORT_PARAMS = ["effort", "reasoning_effort", "reasoning"];
+var ID_EFFORTS = [["extra-high", "xhigh"], ["xhigh", "xhigh"], ["minimal", "minimal"], ["none", "none"], ["low", "low"], ["medium", "medium"], ["high", "high"], ["max", "max"]];
+var cut = (s, suffix) => s.endsWith(suffix) && s.length > suffix.length ? s.slice(0, -suffix.length) : null;
+function splitID(id) {
+  let s = id;
+  let fast = false;
+  let thinking = false;
+  let effort = "";
+  let b;
+  if ((b = cut(s, "-fast")) !== null) [s, fast] = [b, true];
+  if ((b = cut(s, "-thinking")) !== null) [s, thinking] = [b, true];
+  for (const [word, level] of ID_EFFORTS) {
+    if ((b = cut(s, "-" + word)) !== null) {
+      ;
+      [s, effort] = [b, level];
+      break;
+    }
+  }
+  if (!thinking && (b = cut(s, "-thinking")) !== null) [s, thinking] = [b, true];
+  if (thinking) s += "-thinking";
+  if (fast) s += "-fast";
+  return [s, effort];
+}
+var PICKER_SKIP = /* @__PURE__ */ new Set(["claude-4.5-haiku", "claude-4.5-haiku-thinking", "gemini-2.5-pro", "gemini-2.5-flash", "claude-haiku-4-5"]);
+var clean = (s) => String(s ?? "").replaceAll("\u200B", "").split(/\s+/).filter(Boolean).join(" ");
+function tokensOf(value) {
+  const m = /^(\d+(?:\.\d+)?)([km])$/i.exec(String(value ?? "").trim());
+  return m ? Math.round(Number(m[1]) * (m[2].toLowerCase() === "m" ? 1e6 : 1e3)) : 0;
+}
+function paramDefs(m) {
+  const out = {};
+  for (const d of m.parameterDefinitions ?? []) {
+    const t = d?.parameterType ?? {};
+    const vs = (t.enumParameter ?? t.booleanParameter)?.values ?? [];
+    if (d?.id) out[d.id] = vs.map((v) => String(v.value));
+  }
+  return out;
+}
+var valuesOf = (v) => Object.fromEntries((v?.parameterValues ?? []).map((p) => [String(p.id), String(p.value)]));
+var defaultVariant = (m) => {
+  const vs = m?.variants ?? [];
+  return vs.find((v) => v.isDefaultNonMaxConfig) ?? vs.find((v) => v.isDefaultMaxConfig) ?? vs[0];
+};
+var needsMax = (m, v) => m?.supportsNonMaxMode === false || v?.isMaxMode === true;
+function effortsOf(defs) {
+  const pid = EFFORT_PARAMS.find((p) => defs[p]?.length);
+  if (!pid && defs.thinking?.includes("true") && defs.thinking.includes("false")) return { pid: "thinking", levels: { none: "false", high: "true" } };
+  if (!pid) return { pid: "", levels: {} };
+  const levels = {};
+  for (const v of defs[pid]) {
+    const l = v === "extra-high" ? "xhigh" : v;
+    if (LEVEL_RANK.includes(l)) levels[l] = v;
+  }
+  return { pid, levels };
+}
+function served(m, ids) {
+  const vs = m.variants ?? [];
+  if (!ids) return vs;
+  const got = vs.filter((v) => !v.legacySlug || ids.has(v.legacySlug));
+  return got.some((v) => v.legacySlug) ? got : vs;
+}
+function familyOf(id) {
+  let [family, effort] = splitID(id);
+  const fast = family.endsWith("-fast") && family.length > "-fast".length;
+  if (fast) family = family.slice(0, -"-fast".length);
+  return { family, effort, fast };
+}
+function familiesOf(listed) {
+  const fams = /* @__PURE__ */ new Map();
+  for (const u of listed ?? []) {
+    const id = String(u?.modelId ?? "");
+    if (!id) continue;
+    const { family, effort, fast } = familyOf(id);
+    if (!fams.has(family)) fams.set(family, []);
+    fams.get(family).push({ id, effort, fast, maxMode: u.maxMode === true, name: clean(u.displayName || id) });
+  }
+  return fams;
+}
+function fromUsable(fam, effort, fast) {
+  let vs = fam.filter((u) => u.fast === !!fast);
+  if (!vs.length) vs = fam;
+  if (effort === "off") effort = "none";
+  const at = effort ? fitEffort(effort, vs.map((u) => u.effort).filter(Boolean)) : "";
+  return at && vs.find((u) => u.effort === at) || vs.find((u) => u.effort === "") || vs.find((u) => u.effort === "medium") || vs[0];
+}
+var EFFORT_WORDS = { none: ["None"], minimal: ["Minimal"], low: ["Low"], medium: ["Medium"], high: ["High"], xhigh: ["Extra High", "XHigh"], max: ["Max"] };
+function usableTitle(u) {
+  const ws = u.name.split(" ");
+  const cutLast = (phrase) => {
+    const p = phrase.toLowerCase().split(" ");
+    for (let i = ws.length - p.length; i >= 1; i--) {
+      if (p.every((w, k) => ws[i + k].toLowerCase() === w)) {
+        ws.splice(i, p.length);
+        return true;
+      }
+    }
+    return false;
+  };
+  for (const p of EFFORT_WORDS[u.effort] ?? []) if (cutLast(p)) break;
+  if (u.fast) cutLast("fast");
+  return ws.filter((w, i) => i === 0 || !/^\(?1m\)?$/i.test(w)).join(" ") || u.name;
+}
+function modelsOf(picker, ids, listed = []) {
+  const out = [];
+  const used = /* @__PURE__ */ new Set();
+  const fams = familiesOf(listed);
+  const named2 = /* @__PURE__ */ new Set();
+  for (const m of picker) {
+    if (!m?.name) continue;
+    for (const x of [m.name, ...m.legacySlugs ?? [], ...m.idAliases ?? [], ...(m.variants ?? []).map((v) => v.legacySlug)]) if (x) named2.add(x);
+  }
+  for (const m of picker) {
+    if (!m?.name || m.isHidden || m.isChatOnly || m.onlySupportsCmdK || m.supportsAgent === false || PICKER_SKIP.has(m.name)) continue;
+    const defs = paramDefs(m);
+    const variants = served(m, ids);
+    const partial = variants.length < (m.variants ?? []).length;
+    const has = (pid2, value) => !partial || !variants.some((v) => pid2 in valuesOf(v)) || variants.some((v) => valuesOf(v)[pid2] === value);
+    const def = defaultVariant({ variants });
+    const { pid, levels: all } = effortsOf(defs);
+    const levels = Object.fromEntries(Object.entries(all).filter(([, value]) => has(pid, value)));
+    const own = familyOf(def?.legacySlug || m.name).family;
+    const bare = own.replace(/-thinking$/, "");
+    const fam = fams.get(own) ?? fams.get(bare) ?? fams.get(bare + "-thinking") ?? [];
+    const base = { run: m.name, title: clean(m.clientDisplayName || m.name), pid, levels, fast: !!defs.fast?.length, variants, def, partial, model: m, fam, ids };
+    const contexts = (defs.context ?? []).filter((c) => has("context", c));
+    if (contexts.length) {
+      for (const c of contexts) {
+        const id = m.name + "@" + c;
+        if (used.has(id)) continue;
+        used.add(id);
+        out.push({ ...base, id, name: base.title + " @ " + c, context: tokensOf(c) || DEFAULT_CONTEXT, size: c, offersFast: fastAt(variants, c) });
+      }
+    } else if (!used.has(m.name)) {
+      used.add(m.name);
+      const limit = needsMax(m, def) ? m.contextTokenLimitForMaxMode || m.contextTokenLimit : m.contextTokenLimit;
+      out.push({ ...base, id: m.name === "default" ? "auto" : m.name, name: base.title, context: limit > 0 ? limit : DEFAULT_CONTEXT, size: "", offersFast: fastAt(variants, "") });
+    }
+  }
+  for (const [family, fam] of fams) {
+    if (fam.some((u) => named2.has(u.id)) || named2.has(family) || used.has(family)) continue;
+    used.add(family);
+    const levels = Object.fromEntries(fam.filter((u) => LEVEL_RANK.includes(u.effort)).map((u) => [u.effort, u.effort]));
+    const def = fromUsable(fam, "", false);
+    out.push({ id: family, run: family, name: usableTitle(def), title: usableTitle(def), pid: "", levels, fast: false, variants: [], def: void 0, partial: false, model: { name: family }, fam, ids, usableOnly: true, context: DEFAULT_CONTEXT, size: "", offersFast: fam.some((u) => u.fast) });
+  }
+  return out;
+}
+function slugFor(m, v) {
+  if (v.legacySlug) return v.legacySlug;
+  const have = valuesOf(v);
+  const level = (p) => String(p[EFFORT_PARAMS.find((k) => p[k])] ?? "").replace("extra-high", "xhigh");
+  const effort = level(have);
+  const slugs = (Array.isArray(m.legacySlugs) ? m.legacySlugs : []).filter((id) => typeof id === "string" && id).map((id) => ({ id, ...familyOf(id) }));
+  const says = (s, at) => (at === null || s.effort === at) && (have.thinking === void 0 || s.family.endsWith("-thinking") === (have.thinking === "true")) && (have.fast === void 0 || s.fast === (have.fast === "true"));
+  let hits = slugs.filter((s) => says(s, effort || null));
+  const def = m.variants.find((x) => x?.isDefaultNonMaxConfig);
+  if (!hits.length && effort && level(valuesOf(def)) === effort) hits = slugs.filter((s) => says(s, ""));
+  return hits.length === 1 ? hits[0].id : "";
+}
+var NO_ID = "\0no-id";
+function withSlugs(m) {
+  const defined = new Set((Array.isArray(m.parameterDefinitions) ? m.parameterDefinitions : []).map((d) => d?.id));
+  const vs = (Array.isArray(m.variants) ? m.variants : []).filter((v) => v && typeof v === "object" && Array.isArray(v.parameterValues ?? [])).map((v) => ({ ...v, parameterValues: (v.parameterValues ?? []).filter((p) => defined.has(p?.id)) }));
+  const full = { ...m, variants: vs };
+  return { ...full, variants: vs.map((v) => v.legacySlug ? v : { ...v, legacySlug: slugFor(full, v) || NO_ID }) };
+}
+function fromCatalog(picker, catalog2, ids) {
+  const have = new Set(picker.map((m) => m?.name));
+  const out = [];
+  for (const m of Array.isArray(catalog2) ? catalog2 : []) {
+    if (!m?.name || have.has(m.name) || m.isHidden || m.name === "default") continue;
+    if (m.vendor?.id !== "MODEL_VENDOR_ID_ANTHROPIC") continue;
+    if (m.isChatOnly || m.onlySupportsCmdK || m.supportsAgent === false || PICKER_SKIP.has(m.name)) continue;
+    const full = withSlugs(m);
+    if (full.variants.some((v) => ids.has(v.legacySlug))) out.push(full);
+  }
+  return out;
+}
+var fastAt = (variants, size) => variants.some((v) => {
+  const have = valuesOf(v);
+  return have.fast === "true" && (!size || have.context === void 0 || have.context === size);
+});
+function nearest(vs, want) {
+  let best;
+  let most = -1;
+  for (const v of vs) {
+    const have = valuesOf(v);
+    const n = Object.keys(want).filter((k) => have[k] === want[k]).length + (have.context === want.context ? 100 : 0);
+    if (n > most) [best, most] = [v, n];
+  }
+  return best;
+}
+function pick(entry, effort, fast, seed) {
+  if (entry.usableOnly) {
+    const u = fromUsable(entry.fam, effort, fast);
+    return { id: u.id, params: [], maxMode: u.maxMode };
+  }
+  const def = entry.def;
+  const want = { ...valuesOf(seed ?? def) };
+  if (entry.size) want.context = entry.size;
+  if (effort === "off") effort = "none";
+  if (entry.pid && entry.pid !== "thinking" && effort === "none" && !("none" in entry.levels) && "thinking" in want) {
+    want.thinking = "false";
+  } else if (entry.pid) {
+    const at = effort ? fitEffort(effort, Object.keys(entry.levels)) : "";
+    if (at && entry.levels[at]) want[entry.pid] = entry.levels[at];
+    if (!seed && entry.pid !== "thinking" && "thinking" in want && at) want.thinking = "true";
+  }
+  if (entry.fast) want.fast = fast ? "true" : "false";
+  const same = (v2) => {
+    const have = valuesOf(v2);
+    return Object.keys({ ...have, ...want }).every((k) => have[k] === void 0 || want[k] === void 0 || have[k] === want[k]);
+  };
+  const v = entry.variants.find(same) ?? (seed ? branch(entry, want) : void 0) ?? (entry.partial ? nearest(entry.variants, want) : void 0);
+  const params = Object.entries(v ? { ...want, ...valuesOf(v) } : want).map(([id2, value]) => ({ id: id2, value }));
+  const maxMode = v ? needsMax(entry.model, v) : needsMax(entry.model, def) || tokensOf(entry.size) > (entry.model.contextTokenLimit || Infinity);
+  const id = v?.legacySlug || def?.legacySlug || entry.run;
+  if (entry.ids && !entry.ids.has(id) && entry.fam?.length) {
+    const level = entry.pid && entry.pid !== "thinking" ? String(want[entry.pid] ?? "").replace("extra-high", "xhigh") : "";
+    const u = fromUsable(entry.fam, effort || level, fast);
+    return { id: u.id, params: [], maxMode: maxMode || u.maxMode };
+  }
+  return { id, params, maxMode };
+}
+function branch(entry, want) {
+  if (!entry.pid || entry.pid === "thinking") return void 0;
+  const level = (x) => x === "extra-high" ? "xhigh" : x;
+  const def = valuesOf(entry.def);
+  const named2 = entry.variants.some((v) => level(valuesOf(v)[entry.pid]) === level(want[entry.pid]));
+  if (!named2 && Object.keys(want).every((k) => k === entry.pid || k === "context" || def[k] === void 0 || def[k] === want[k])) return void 0;
+  const vs = entry.variants.filter((v) => {
+    const have = valuesOf(v);
+    return entry.pid in have && Object.keys(want).every((k) => k === entry.pid || have[k] === void 0 || have[k] === want[k]);
+  });
+  const at = fitEffort(level(want[entry.pid]), vs.map((v) => level(valuesOf(v)[entry.pid])));
+  return at ? vs.find((v) => level(valuesOf(v)[entry.pid]) === at) : void 0;
+}
+function fitEffort(want, levels) {
+  if (want === "ultra") want = "max";
+  if (!levels.length || levels.includes(want)) return want;
+  const at = LEVEL_RANK.indexOf(want);
+  if (at < 0) return "";
+  let best = "";
+  let dist = LEVEL_RANK.length;
+  for (const l of levels) {
+    const i = LEVEL_RANK.indexOf(l);
+    if (i < 0 || l === "none") continue;
+    const d = Math.abs(i - at);
+    if (d < dist || d === dist && i > at) [best, dist] = [l, d];
+  }
+  return best;
+}
+var lists = /* @__PURE__ */ new Map();
+var listings = /* @__PURE__ */ new Map();
+var listFailed = /* @__PURE__ */ new Map();
+async function usable(tok) {
+  const h = createHash9("sha256").update(tok).digest("hex");
+  const had = lists.get(h);
+  if (had && Date.now() - had.at < MODELS_KEEP) return had.raw;
+  return listing(tok, h);
+}
+function listing(tok, h) {
+  let p = listings.get(h);
+  if (p) return p;
+  p = (async () => {
+    const [j, listed, catalog2] = await Promise.all([
+      unary(API, "aiserver.v1.AiService/AvailableModels", tok, { useModelParameters: true, doNotUseMarkdown: true }, 3e4),
+      unary(API, "agent.v1.AgentService/GetUsableModels", tok, {}, 8e3).then(
+        (u) => Array.isArray(u?.models) ? u.models : [],
+        () => []
+      ),
+      // the full catalog, scope 3: the live models the picker lacks (Claude,
+      // on an account Cursor blocks it for); without it the list is the
+      // picker's and the usable list's, as before
+      unary(API, "aiserver.v1.AiService/AvailableModels", tok, { useModelParameters: true, doNotUseMarkdown: true, scope: 3 }, 8e3).then(
+        (c) => Array.isArray(c?.models) ? c.models : [],
+        () => []
+      )
+    ]);
+    const ids = new Set(listed.flatMap((m) => [m?.modelId, m?.displayModelId]).filter(Boolean));
+    const picker = Array.isArray(j?.models) ? j.models : [];
+    const raw = modelsOf(ids.size ? [...picker, ...fromCatalog(picker, catalog2, ids)] : picker, ids.size ? ids : null, listed);
+    if (!raw.length) throw new Error("Cursor listed no models");
+    lists.set(h, { at: Date.now(), raw });
+    listFailed.delete(h);
+    return raw;
+  })().catch((e) => {
+    listFailed.set(h, Date.now());
+    throw e;
+  }).finally(() => listings.delete(h));
+  listings.set(h, p);
+  return p;
+}
+var LIST_RETRY = 5 * 6e4;
+async function listFor(tok) {
+  const h = createHash9("sha256").update(tok).digest("hex");
+  const had = lists.get(h);
+  if (had && Date.now() - had.at < MODELS_KEEP) return had.raw;
+  if (had) {
+    listing(tok, h).catch(() => {
+    });
+    return had.raw;
+  }
+  const failed = listFailed.get(h);
+  if (failed && Date.now() - failed < LIST_RETRY) return [];
+  return listing(tok, h).catch(() => []);
+}
+function named(raw, id) {
+  const models = raw.filter((e, i) => raw.findIndex((x) => x.model === e.model) === i);
+  const at = (e, v) => raw.find((x) => x.model === e.model && x.size === (valuesOf(v).context ?? "")) ?? e;
+  const as = (e, vs, effort2) => {
+    const seed = nearest(vs, valuesOf(e.def));
+    return { entry: at(e, seed), seed, effort: effort2, fast: valuesOf(seed).fast === "true" };
+  };
+  for (const e of models) {
+    const vs = e.variants.filter((v) => v.legacySlug === id);
+    if (vs.length) return as(e, vs, "");
+  }
+  const [family, effort] = splitID(id);
+  for (const e of models) {
+    const vs = e.variants.filter((v) => v.legacySlug && splitID(v.legacySlug)[0] === family);
+    if (vs.length) return as(e, vs, effort);
+  }
+  for (const e of models) {
+    const m = e.model;
+    if (e.usableOnly) continue;
+    if ([m.name, ...m.legacySlugs ?? [], ...m.idAliases ?? []].includes(id)) return { entry: at(e, e.def), seed: void 0, effort: "", fast: false };
+  }
+  const of = familyOf(id);
+  for (const e of models) {
+    if (!e.usableOnly) continue;
+    const u = e.fam.find((x) => x.id === id);
+    if (u) return { entry: e, seed: void 0, effort: u.effort, fast: u.fast };
+    if (e.id === of.family) return { entry: e, seed: void 0, effort: of.effort, fast: of.fast };
+  }
+  const loose = (f) => f.replace(/-thinking$/, "");
+  const key = loose(of.family);
+  for (const e of models) {
+    if (e.usableOnly) {
+      if (loose(e.id) === key) return { entry: e, seed: void 0, effort: of.effort, fast: of.fast };
+      continue;
+    }
+    const vs = e.variants.filter((v) => v.legacySlug && loose(familyOf(v.legacySlug).family) === key);
+    if (vs.length) return as(e, vs, of.effort);
+  }
+  const sized = /^(.+)@([^@]+)$/.exec(id);
+  if (sized) {
+    const want = tokensOf(sized[2]);
+    const same = raw.filter((e) => e.run === sized[1] && e.size);
+    if (same.length) {
+      const near = same.reduce((a, b) => Math.abs(tokensOf(b.size) - want) < Math.abs(tokensOf(a.size) - want) ? b : a);
+      return { entry: near, seed: void 0, effort: "", fast: false };
+    }
+    const old = named(raw, sized[1]);
+    if (old) {
+      const sizes = raw.filter((e) => e.size && e.model === old.entry.model);
+      if (old.entry.size && sizes.length) {
+        const near = sizes.reduce((a, b) => Math.abs(tokensOf(b.size) - want) < Math.abs(tokensOf(a.size) - want) ? b : a);
+        return { ...old, entry: near };
+      }
+      return { ...old, max: !old.entry.size && want > old.entry.context };
+    }
+  }
+  return null;
+}
+function request(raw, model, effort, fast) {
+  const entry = raw.find((m) => m.id === model);
+  if (entry) return pick(entry, effort, fast);
+  const bare = raw.find((m) => m.id === model.replace(/@[^@]*$/, ""));
+  if (bare && model !== bare.id && !bare.size) {
+    const r = pick(bare, effort, fast);
+    return tokensOf(model.split("@").at(-1)) > bare.context ? { ...r, maxMode: true } : r;
+  }
+  const old = named(raw, model);
+  if (old) {
+    const r = pick(old.entry, effort || old.effort, fast || old.fast, old.seed);
+    return old.max ? { ...r, maxMode: true } : r;
+  }
+  return { id: model === "auto" ? "default" : model, params: [], maxMode: false };
+}
+function runtimeModel(m) {
+  const efforts = LEVEL_RANK.filter((l) => l in m.levels);
+  return {
+    id: m.id,
+    providerID: ID,
+    name: m.name,
+    api: { id: m.id, url: AGENT, npm: CHAT },
+    status: "active",
+    headers: {},
+    options: {},
+    cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+    limit: { context: m.context || DEFAULT_CONTEXT, output: 0 },
+    capabilities: {
+      temperature: false,
+      reasoning: efforts.length > 0,
+      attachment: true,
+      toolcall: true,
+      input: { text: true, image: true, audio: false, video: false, pdf: false },
+      output: { text: true, image: false, audio: false, video: false, pdf: false },
+      interleaved: false
+    },
+    release_date: "",
+    variants: Object.fromEntries(efforts.map((e) => [e, { reasoningEffort: e }])),
+    // a request's service_tier priority (or fast) runs it as Cursor's fast
+    // variant: magpie offers Fast for the models that have one
+    ...m.offersFast ? { fast: true } : {}
+  };
+}
+var PB = class _PB {
+  parts = [];
+  push(b) {
+    this.parts.push(b);
+    return this;
+  }
+  uv(v) {
+    const out = [];
+    while (v >= 128) {
+      out.push(v % 128 | 128);
+      v = Math.floor(v / 128);
+    }
+    out.push(v);
+    return this.push(Uint8Array.from(out));
+  }
+  tag(num2, wire) {
+    return this.uv(num2 * 8 + wire);
+  }
+  varint(num2, v) {
+    return this.tag(num2, 0).uv(v);
+  }
+  bytes(num2, v) {
+    const b = v instanceof _PB ? v.done() : v ?? EMPTY;
+    return this.tag(num2, 2).uv(b.length).push(b);
+  }
+  str(num2, s) {
+    return this.bytes(num2, Buffer.from(s, "utf8"));
+  }
+  double(num2, v) {
+    const b = Buffer.alloc(8);
+    b.writeDoubleLE(v);
+    return this.tag(num2, 1).push(b);
+  }
+  done() {
+    return Buffer.concat(this.parts);
+  }
+};
+var pb = () => new PB();
+function fields(b) {
+  b = Buffer.isBuffer(b) ? b : Buffer.from(b ?? EMPTY);
+  const out = [];
+  let i = 0;
+  const uv = () => {
+    let v = 0;
+    let m = 1;
+    while (i < b.length) {
+      const c = b[i++];
+      v += (c & 127) * m;
+      if (c < 128) return v;
+      m *= 128;
+    }
+    return -1;
+  };
+  while (i < b.length) {
+    const key = uv();
+    if (key < 0) break;
+    const f = { num: Math.floor(key / 8), wire: key % 8, n: 0, data: EMPTY };
+    switch (f.wire) {
+      case 0: {
+        const v = uv();
+        if (v < 0) return out;
+        f.n = v;
+        break;
+      }
+      case 1:
+        if (i + 8 > b.length) return out;
+        f.data = b.subarray(i, i + 8);
+        f.n = Number(b.readBigUInt64LE(i));
+        i += 8;
+        break;
+      case 2: {
+        const l = uv();
+        if (l < 0 || i + l > b.length) return out;
+        f.data = b.subarray(i, i + l);
+        i += l;
+        break;
+      }
+      case 5:
+        if (i + 4 > b.length) return out;
+        f.n = b.readUInt32LE(i);
+        i += 4;
+        break;
+      default:
+        return out;
+    }
+    out.push(f);
+  }
+  return out;
+}
+var field3 = (fs, num2) => fs.find((f) => f.num === num2);
+var pbStr = (fs, num2) => field3(fs, num2)?.data.toString("utf8") ?? "";
+var pbNum = (fs, num2) => field3(fs, num2)?.n ?? 0;
+function pbValue(v) {
+  if (v === null || v === void 0) return pb().varint(1, 0);
+  if (typeof v === "number") return pb().double(2, v);
+  if (typeof v === "string") return pb().str(3, v);
+  if (typeof v === "boolean") return pb().varint(4, v ? 1 : 0);
+  if (Array.isArray(v)) {
+    const l = pb();
+    for (const e of v) l.bytes(1, pbValue(e));
+    return pb().bytes(6, l);
+  }
+  if (typeof v === "object") {
+    const st = pb();
+    for (const k of Object.keys(v).sort()) st.bytes(1, pb().str(1, k).bytes(2, pbValue(v[k])));
+    return pb().bytes(5, st);
+  }
+  return pb().varint(1, 0);
+}
+function pbAny(b) {
+  for (const f of fields(b)) {
+    switch (f.num) {
+      case 1:
+        return null;
+      case 2:
+        return f.data.length === 8 ? f.data.readDoubleLE(0) : 0;
+      case 3:
+        return f.data.toString("utf8");
+      case 4:
+        return f.n !== 0;
+      case 5: {
+        const m = {};
+        for (const e of fields(f.data)) {
+          if (e.num !== 1) continue;
+          const kv = fields(e.data);
+          const v = field3(kv, 2);
+          m[pbStr(kv, 1)] = v ? pbAny(v.data) : null;
+        }
+        return m;
+      }
+      case 6:
+        return fields(f.data).filter((e) => e.num === 1).map((e) => pbAny(e.data));
+    }
+  }
+  return null;
+}
+function frame(msg) {
+  const head = Buffer.alloc(5);
+  head.writeUInt32BE(msg.length, 1);
+  return Buffer.concat([head, msg]);
+}
+async function* frames(body) {
+  let buf = EMPTY;
+  for await (const chunk of body) {
+    buf = buf.length ? Buffer.concat([buf, chunk]) : Buffer.from(chunk);
+    while (buf.length >= 5) {
+      const n = buf.readUInt32BE(1);
+      if (n > 64 << 20) throw new Error("a malformed stream");
+      if (buf.length < 5 + n) break;
+      const flags = buf[0];
+      let data = buf.subarray(5, 5 + n);
+      buf = buf.subarray(5 + n);
+      if (flags & 1) data = gunzipSync3(data);
+      yield { end: (flags & 2) !== 0, data };
+    }
+  }
+  if (buf.length) throw new Error("unexpected EOF");
+}
+var regional = (msg) => msg.toLowerCase().includes("region");
+function failure2(status, text) {
+  let e;
+  try {
+    e = JSON.parse(typeof text === "string" ? text : Buffer.from(text).toString("utf8"));
+  } catch {
+    return statusOf(status, "", String(text ?? "").trim());
+  }
+  const f = e?.error && typeof e.error === "object" ? e.error : e ?? {};
+  let msg = f.message ?? "";
+  for (const d of f.details ?? []) {
+    const t = `${d?.debug?.details?.title ?? ""}: ${d?.debug?.details?.detail ?? ""}`.trim();
+    if (t !== ":") msg = t.replace(/^[:\s]+|[:\s]+$/g, "");
+  }
+  if (!msg || msg === "Error") msg = f.code ?? "";
+  if (!f.code && status >= 200 && status < 300) return { status, message: msg };
+  return statusOf(status, f.code ?? "", msg);
+}
+function statusOf(status, code, msg) {
+  msg ||= statusText(status);
+  const low = msg.toLowerCase();
+  const out = (status2, message2) => ({ status: status2, message: message2 });
+  if (regional(msg)) return out(403, msg + " \u2014 Cursor serves your team only in some regions and turned this request away; signing in again won't change that");
+  if (code === "permission_denied") return out(403, msg);
+  if (code === "unauthenticated" || status === 401 || low.includes("expired"))
+    return out(401, msg + " \u2014 sign in to Cursor again in magpie");
+  if (code === "resource_exhausted" || low.includes("quota") || low.includes("rate limit") || low.includes("usage limit"))
+    return out(429, "usage limit reached: " + msg);
+  if (low.includes("too long") || low.includes("context length") || low.includes("too many tokens"))
+    return out(400, "input is too long for the model's context: " + msg);
+  if (code === "invalid_argument") return out(400, msg);
+  if (code === "unavailable") return out(503, msg);
+  if (code) return out(502, msg);
+  return out(status, msg);
+}
+var textOf3 = (c) => typeof c === "string" ? c : Array.isArray(c) ? c.filter((p) => p?.type === "text").map((p) => p.text ?? "").join("") : "";
+var reasoningOf2 = (m) => [m.reasoning_content, m.reasoning].find((s) => typeof s === "string" && s.trim()) ?? "";
+function joinSplitCalls(msgs) {
+  const out = [];
+  for (const m of msgs) {
+    const prev = out.at(-1);
+    if (m?.role === "assistant" && prev?.role === "assistant" && prev.tool_calls?.length) {
+      const content = [textOf3(prev.content), textOf3(m.content)].filter(Boolean).join("\n\n");
+      const reasoning_content = [reasoningOf2(prev), reasoningOf2(m)].filter(Boolean).join("\n\n");
+      out[out.length - 1] = { ...prev, content, reasoning_content, tool_calls: [...prev.tool_calls, ...m.tool_calls ?? []] };
+      continue;
+    }
+    out.push(m);
+  }
+  return out;
+}
+function parseArgs(s) {
+  if (s && typeof s === "object") return s;
+  try {
+    const v = JSON.parse(s || "{}");
+    return v && typeof v === "object" ? v : {};
+  } catch {
+    return {};
+  }
+}
+function toolsOf(chat) {
+  const choice = chat.tool_choice;
+  const only = typeof choice === "object" ? choice?.function?.name : "";
+  if (choice === "none") return [];
+  return (chat.tools ?? []).filter((t) => t?.type === "function" && t.function?.name && (!only || t.function.name === only)).map((t) => {
+    const schema = t.function.parameters ?? { type: "object", properties: {} };
+    return { name: t.function.name, description: t.function.description ?? "", schema, schemaText: JSON.stringify(schema) };
+  });
+}
+var NS = "tools";
+var NAMESPACES = [NS, "magpie"];
+var bareName = (s) => {
+  for (const ns of NAMESPACES) if (s.startsWith(ns + "-")) return s.slice(ns.length + 1);
+  return s;
+};
+function catalog(tools) {
+  if (!tools.length) return "";
+  let s = `
+
+<dynamic_tool_catalog>
+The MCP namespace "${NS}" has the tools below. They are reached only through \`${CALL}\`, never as tools of their own. Each entry is the exact call to make; its arguments must match the schema given. The schemas are complete, so there is no need to call \`GetDynamicTools\` first.
+`;
+  for (const t of tools) s += `<call>${CALL}({"namespace":"${NS}","toolName":"${t.name}","arguments":{...}})
+${t.description}
+arguments schema: ${t.schemaText}
+</call>
+`;
+  return s + "</dynamic_tool_catalog>";
+}
+var callID = (id) => id.startsWith("call_") ? id.replace("__fc_", "\nfc_") : id;
+function result(id, text, isError) {
+  let res = text;
+  try {
+    res = JSON.parse(text);
+  } catch {
+  }
+  return {
+    type: "tool-result",
+    toolCallId: callID(id),
+    toolName: CALL,
+    result: res,
+    experimental_content: [{ type: "text", text }],
+    ...isError ? { isError: true } : {}
+  };
+}
+function conversation(chat, tools) {
+  const out = [];
+  const add2 = (m) => out.push(Buffer.from(JSON.stringify(m)));
+  let size = 0;
+  const system = [];
+  let last = ".";
+  for (const m of chat.messages ?? [])
+    if (m.role === "system" || m.role === "developer") system.push(textOf3(m.content));
+  const sys = system.filter(Boolean).join("\n\n") + catalog(tools);
+  size += sys.length;
+  if (sys) add2({ role: "system", content: sys });
+  let pending = [];
+  let results = [];
+  const answer2 = () => {
+    for (const id of pending) results.push(result(id, NO_RESULT, true));
+    pending = [];
+    if (results.length) add2({ role: "tool", content: results });
+    results = [];
+  };
+  for (const m of joinSplitCalls(chat.messages ?? [])) {
+    if (m.role === "system" || m.role === "developer") continue;
+    if (m.role === "tool") {
+      const id = m.tool_call_id ?? "";
+      const i = pending.indexOf(id);
+      if (i >= 0) {
+        pending.splice(i, 1);
+        const text = textOf3(m.content);
+        size += text.length;
+        results.push(result(id, text, m.is_error === true || m.isError === true));
+      }
+      continue;
+    }
+    if (m.role === "assistant") {
+      answer2();
+      const content2 = [];
+      const reasoning = reasoningOf2(m);
+      if (reasoning) content2.push({ type: "reasoning", text: reasoning });
+      const text = textOf3(m.content);
+      if (text) content2.push({ type: "text", text });
+      size += reasoning.length + text.length;
+      for (const c of m.tool_calls ?? []) {
+        if (c?.type && c.type !== "function") continue;
+        const args = parseArgs(c.function?.arguments);
+        size += (c.function?.arguments ?? "").length + (c.function?.name ?? "").length;
+        content2.push({ type: "tool-call", toolCallId: callID(c.id), toolName: CALL, args: { namespace: NS, toolName: c.function?.name, arguments: args } });
+        pending.push(c.id);
+      }
+      if (content2.length) add2({ role: "assistant", content: content2 });
+      continue;
+    }
+    const content = [];
+    const parts = typeof m.content === "string" ? [{ type: "text", text: m.content }] : m.content ?? [];
+    let first2 = "";
+    for (const p of parts) {
+      if (p?.type === "text" && p.text) {
+        content.push({ type: "text", text: p.text });
+        size += p.text.length;
+        first2 ||= p.text;
+      } else if (p?.type === "image_url") {
+        const u = typeof p.image_url === "string" ? p.image_url : p.image_url?.url ?? "";
+        const d = /^data:([^;,]+);base64,(.*)$/s.exec(u);
+        if (d) content.push({ type: "image", mimeType: d[1], image: { __type: "Uint8Array", hex: Buffer.from(d[2], "base64").toString("hex") } });
+        else content.push({ type: "text", text: `[attachment image: ${u}]` });
+      } else if (p?.type === "file") {
+        content.push({ type: "text", text: `[attachment ${p.file?.filename ?? "file"}]` });
+      }
+    }
+    answer2();
+    if (first2) last = first2;
+    if (content.length) add2({ role: "user", content });
+  }
+  answer2();
+  for (const t of tools) size += t.name.length + t.description.length + t.schemaText.length;
+  return { msgs: out, last, estimate: Math.floor(size / 4) };
+}
+function toolDef(t) {
+  const d = pb().str(1, t.name);
+  if (t.description) d.str(2, t.description);
+  d.bytes(3, pbValue(t.schema));
+  return d.str(4, NS).str(5, t.name).str(6, t.schemaText).done();
+}
+var env = () => pb().str(1, GOOS).str(2, tmpdir()).str(10, "UTC");
+var SESSION = "x-magpie-cursor-session";
+function sessionOf(input) {
+  const s = String(input?.sessionID ?? "").trim();
+  if (!s || /^magpie-[0-9a-f]{24}$/.test(s)) return "";
+  return s.slice(0, 128);
+}
+function uuidOf(b) {
+  b = Buffer.from(b.subarray(0, 16));
+  b[6] = b[6] & 15 | 64;
+  b[8] = b[8] & 63 | 128;
+  const h = b.toString("hex");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+function conversationID(chat, session) {
+  const key = (typeof chat?.prompt_cache_key === "string" ? chat.prompt_cache_key.trim() : "") || session || "";
+  if (!key) return "";
+  const msgs = Array.isArray(chat?.messages) ? chat.messages : [];
+  const first2 = msgs.find((m) => m?.role === "user") ?? msgs[0];
+  const sum = createHash9("sha256").update("cursor conversation\0" + key + "\0" + (first2 === void 0 ? "" : JSON.stringify(first2))).digest();
+  return uuidOf(sum);
+}
+function usageOf(uf, shift = 0) {
+  const [inp, cr, cw] = [pbNum(uf, 1 + shift), pbNum(uf, 3 + shift), pbNum(uf, 4 + shift)];
+  return { input: Math.max(inp - cr - cw, 0), output: pbNum(uf, 2 + shift), cacheRead: cr, cacheWrite: cw, reasoning: pbNum(uf, 5 + shift) };
+}
+var STEP_WAIT = { first: 1500, every: 500, until: 6e3, ask: 5e3, skipAfter: 3, retryEvery: 10, owedAt: 5e3, owedFor: 6e5 };
+var claimed = /* @__PURE__ */ new Map();
+var owed = /* @__PURE__ */ new Map();
+var flights = /* @__PURE__ */ new Map();
+var unreadable = /* @__PURE__ */ new Map();
+var misses = /* @__PURE__ */ new Map();
+var tokKey = (tok) => createHash9("sha256").update(tok).digest("hex");
+var usageKey = (tok, conv) => tokKey(tok) + "\0" + conv;
+function canRead(tok) {
+  const at = unreadable.get(tokKey(tok));
+  if (at === void 0) return true;
+  if (Date.now() - at < STEP_WAIT.owedFor) return false;
+  unreadable.delete(tokKey(tok));
+  return true;
+}
+var ZERO = () => ({ input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0 });
+function addUsage(a, b) {
+  if (!b) return a;
+  if (!a) return { ...b };
+  for (const k of Object.keys(a)) a[k] += b[k] ?? 0;
+  return a;
+}
+var DEBT_GROUP_LIMIT = 64;
+function owe(key, { since = Date.now(), n = 0, ready = Date.now(), carry = null, before, tag }) {
+  for (const [k, d2] of owed) {
+    if (d2.groups) {
+      d2.groups = d2.groups.filter((g) => Date.now() - g.since <= STEP_WAIT.owedFor && g.tag?.state !== "withdrawn");
+      d2.n = d2.groups.reduce((sum, g) => sum + g.n, 0);
+      if (Date.now() - d2.since > STEP_WAIT.owedFor) d2.carry = null;
+      if (!d2.n && !d2.carry) owed.delete(k);
+      else if (d2.groups.length) d2.since = Math.min(...d2.groups.map((g) => g.since));
+    } else if (Date.now() - d2.since > STEP_WAIT.owedFor) owed.delete(k);
+  }
+  if (n <= 0 && !carry) return;
+  const d = owed.get(key);
+  if (!d && tag) return void owed.set(key, { since, n, ready, carry: carry && { ...carry }, groups: [{ since, n, ready, before, tag }] });
+  if (!d) return void owed.set(key, { since, n, ready, carry: carry && { ...carry }, ...before !== void 0 ? { before } : {} });
+  if (n > 0 && (d.groups || d.before !== void 0 || before !== void 0 || tag)) {
+    const groups = d.groups ?? (d.n > 0 ? [{ since: d.since, n: d.n, ready: d.ready, before: d.before }] : []);
+    const same = !tag && groups.find((g) => !g.tag && g.before === before);
+    if (same) {
+      same.since = Math.min(same.since, since);
+      same.n += n;
+      same.ready = Math.min(same.ready, ready);
+    } else groups.push({ since, n, ready, before, ...tag ? { tag } : {} });
+    groups.sort((a, b) => a.since - b.since);
+    d.groups = groups.slice(-DEBT_GROUP_LIMIT);
+    delete d.before;
+    d.n = d.groups.reduce((sum, g) => sum + g.n, 0);
+    d.since = Math.min(...d.groups.map((g) => g.since));
+  } else {
+    d.since = Math.min(d.since, since);
+    d.n += n;
+  }
+  d.ready = Math.min(d.ready, ready);
+  d.carry = addUsage(d.carry, carry);
+}
+function withdraw(key, tag) {
+  if (tag.state !== "owed") return;
+  tag.state = "withdrawn";
+  const d = owed.get(key);
+  if (!d?.groups) return;
+  d.groups = d.groups.filter((g) => g.tag !== tag);
+  d.n = d.groups.reduce((sum, g) => sum + g.n, 0);
+  if (!d.n && !d.carry) owed.delete(key);
+  else if (d.groups.length) d.since = Math.min(...d.groups.map((g) => g.since));
+}
+async function usageEvents(tok, conv, since, want, { poll = false, first: first2 = STEP_WAIT.first, signal, before = () => Infinity, groups, abortFetch = false } = {}) {
+  const key = usageKey(tok, conv);
+  const end = Date.now() + STEP_WAIT.until;
+  const wait = (ms) => new Promise((r) => {
+    const t = setTimeout(r, ms);
+    signal?.addEventListener("abort", () => (clearTimeout(t), r()), { once: true });
+  });
+  for (const [k, at] of claimed) if (Date.now() - at > 2 * STEP_WAIT.owedFor) claimed.delete(k);
+  const num2 = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
+  let usage2 = null;
+  let got = 0;
+  const events = [];
+  const counts = groups?.map(() => 0);
+  if (poll) await wait(first2);
+  while (!signal?.aborted) {
+    try {
+      const res = await fetch(API + "/aiserver.v1.DashboardService/GetFilteredUsageEvents", {
+        method: "POST",
+        headers: await headersFor(tok),
+        body: JSON.stringify({ ...await teamBody(tok), startDate: String(since - 6e4), endDate: String(Date.now() + 6e4), page: 1, pageSize: 50 }),
+        signal: abortFetch && signal ? AbortSignal.any([signal, AbortSignal.timeout(STEP_WAIT.ask)]) : AbortSignal.timeout(STEP_WAIT.ask)
+      });
+      if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+        unreadable.set(tokKey(tok), Date.now());
+        return { usage: usage2, events, got, counts, refused: true };
+      }
+      const evs = res.ok ? (await res.json())?.usageEventsDisplay ?? [] : [];
+      const found = evs.filter((e) => e?.conversationId === conv && e.tokenUsage && num2(e.timestamp) >= since - 1e3 && !claimed.has(key + "\0" + e.timestamp)).sort((a, b) => num2(a.timestamp) - num2(b.timestamp));
+      for (const ev of found) {
+        if (got >= want) break;
+        const at = num2(ev.timestamp);
+        if (at >= before()) continue;
+        const group = groups?.findIndex((g, i) => counts[i] < g.n && g.tag?.state !== "withdrawn" && at >= g.since - 1e3 && at < (g.before ?? Infinity));
+        if (groups && group === -1) continue;
+        if (groups) counts[group]++;
+        claimed.set(key + "\0" + ev.timestamp, Date.now());
+        const t = ev.tokenUsage;
+        const u = { input: num2(t.inputTokens), output: num2(t.outputTokens), cacheRead: num2(t.cacheReadTokens), cacheWrite: num2(t.cacheWriteTokens), reasoning: 0 };
+        const tag = groups?.[group].tag;
+        if (tag) {
+          tag.state = "collected";
+          tag.usage = addUsage(tag.usage, u);
+        }
+        usage2 = addUsage(usage2 ?? ZERO(), u);
+        events.push({ at: num2(ev.timestamp), usage: u });
+        got++;
+      }
+      if (got >= want) break;
+    } catch {
+    }
+    if (!poll || Date.now() + STEP_WAIT.every > end) break;
+    await wait(STEP_WAIT.every);
+  }
+  return { usage: usage2, events, got, counts, refused: false };
+}
+async function stepUsage(tok, conv, since, signal) {
+  return (await usageEvents(tok, conv, since, 1, { poll: true, signal })).usage;
+}
+function collect(tok, conv, { poll = false, first: first2, signal, over = () => false, abortFetch = false } = {}) {
+  const key = usageKey(tok, conv);
+  const d = owed.get(key);
+  if (!d) return Promise.resolve({ usage: null, carry: null, events: [], short: false });
+  owed.delete(key);
+  const now = Date.now();
+  const held = d.groups?.filter((g) => g.tag?.state === "owed" && g.ready > now) ?? [];
+  for (const g of held) owe(key, { since: g.since, n: g.n, ready: g.ready, before: g.before, tag: g.tag });
+  const p = (async () => {
+    const groups = (d.groups ?? [d]).filter((g) => !held.includes(g) && g.tag?.state !== "withdrawn" && (g.before === void 0 && !d.groups || Date.now() - g.since <= STEP_WAIT.owedFor));
+    const want = groups.reduce((sum, g) => sum + g.n, 0);
+    let r = { usage: null, events: [], got: 0 };
+    if (want > 0 && canRead(tok)) r = await usageEvents(tok, conv, Math.min(...groups.map((g) => g.since)), want, {
+      poll,
+      first: first2,
+      signal,
+      abortFetch,
+      before: () => d.before ?? Infinity,
+      ...d.groups ? { groups } : {}
+    }).catch(() => r);
+    let short = false;
+    for (const [i, g] of groups.entries()) {
+      const remaining = g.n - (d.groups ? r.counts?.[i] ?? 0 : r.got);
+      if (remaining > 0 && canRead(tok) && g.tag?.state !== "withdrawn") {
+        short = true;
+        owe(key, { since: g.since, n: remaining, ready: g.ready, before: g.before, tag: g.tag });
+      }
+    }
+    const carry = d.carry && { ...d.carry };
+    const usage2 = addUsage(d.carry, r.usage);
+    if (!over()) return { usage: usage2, carry, events: r.events ?? [], short };
+    owe(key, { carry: usage2 });
+    return { usage: null, carry: null, events: [], short };
+  })();
+  p.debt = d;
+  const set = flights.get(key) ?? /* @__PURE__ */ new Set();
+  flights.set(key, set.add(p));
+  p.finally(() => {
+    set.delete(p);
+    if (!set.size && flights.get(key) === set) flights.delete(key);
+  });
+  return p;
+}
+function ledger(tok, conv, since, signal, kept2, { before } = {}) {
+  const key = tokKey(tok);
+  const debtKey = usageKey(tok, conv);
+  if (kept2 && before !== void 0) {
+    const debts = [owed.get(debtKey), ...[...flights.get(debtKey) ?? []].map((p) => p.debt)];
+    for (const d of debts) for (const g of d?.groups ?? (d ? [d] : [])) g.before = Math.min(g.before ?? Infinity, before);
+  }
+  let mine2 = null;
+  let theirs = null;
+  let over = false;
+  const gather = (opts) => collect(tok, conv, { ...opts, over: () => over, abortFetch: before !== void 0 }).then((r) => {
+    theirs = addUsage(theirs, r.carry);
+    for (const e of r.events ?? []) {
+      if (e.at >= since - 1e3) mine2 = addUsage(mine2, e.usage);
+      else theirs = addUsage(theirs, e.usage);
+    }
+    return r;
+  });
+  const heldUntil = () => {
+    const now = Date.now();
+    return Math.max(0, ...(owed.get(debtKey)?.groups ?? []).filter((g) => g.tag?.state === "owed" && g.ready > now).map((g) => g.ready));
+  };
+  let collecting = null;
+  const debt = kept2 ? owed.get(debtKey) : void 0;
+  const timer = debt ? setTimeout(() => collecting = gather(), Math.max(0, debt.ready - Date.now())) : null;
+  timer?.unref?.();
+  const sleep2 = (ms) => new Promise((r) => {
+    if (signal?.aborted) return r();
+    const t = setTimeout(r, ms);
+    signal?.addEventListener("abort", () => (clearTimeout(t), r()), { once: true });
+  });
+  const takeMine = () => {
+    const u = mine2;
+    mine2 = null;
+    return u;
+  };
+  const take = () => {
+    const u = addUsage(theirs, mine2);
+    mine2 = theirs = null;
+    return u;
+  };
+  return {
+    async own() {
+      if (!canRead(tok)) return null;
+      const m = misses.get(key) ?? 0;
+      const waits = m < STEP_WAIT.skipAfter || m % STEP_WAIT.retryEvery === 0;
+      if (!kept2) {
+        const r = waits ? await usageEvents(tok, conv, since, 1, { poll: true, signal }).catch(() => ({})) : {};
+        if (r.usage) misses.delete(key);
+        else if (!r.refused) misses.set(key, m + 1);
+        return r.usage ?? null;
+      }
+      owe(debtKey, { since, n: 1, ready: Date.now() + STEP_WAIT.owedAt });
+      if (waits) {
+        const r = await gather({ poll: true, signal });
+        if (!canRead(tok)) return null;
+        if (r.short) misses.set(key, m + 1);
+        else misses.delete(key);
+      } else misses.set(key, m + 1);
+      return takeMine() ?? false;
+    },
+    async owed(final) {
+      if (!kept2) return null;
+      if (final) {
+        await collecting;
+        await Promise.all([...flights.get(debtKey) ?? []]);
+        const until = heldUntil();
+        if (until) await sleep2(until - Date.now());
+        await Promise.all([...flights.get(debtKey) ?? []]);
+        if (owed.has(debtKey)) await gather({ poll: owed.get(debtKey).n > 0, first: 0, signal });
+      }
+      return take();
+    },
+    // handover: a later Run of the conversation began while this one waits
+    // on the caller's results. That Run collects from here on: what this one
+    // collected and has not given out goes to it, as does what an ask still
+    // going brings. A step that ends this Run after all still collects.
+    handover() {
+      clearTimeout(timer);
+      const give = () => {
+        const u = take();
+        if (u) owe(debtKey, { carry: u });
+      };
+      give();
+      collecting?.then(give, () => {
+      });
+    },
+    done() {
+      over = true;
+      clearTimeout(timer);
+      const u = take();
+      if (u) owe(debtKey, { carry: u });
+    }
+  };
+}
+function buildRun(msgs, lastUser, tools, model, conv = "", { maxMode = false, params = [] } = {}) {
+  const blobs = /* @__PURE__ */ new Map();
+  const put = (b) => {
+    const id = createHash9("sha256").update(b).digest();
+    blobs.set(id.toString("hex"), b);
+    return id;
+  };
+  const state = pb();
+  for (const m of msgs) state.bytes(1, put(m));
+  const mid = randomUUID5();
+  const user = pb().str(1, lastUser).str(2, mid).varint(4, 1).done();
+  const turn = pb().bytes(1, pb().bytes(1, put(user)).str(10, mid)).done();
+  state.bytes(8, put(turn)).varint(10, 1).str(22, "cli");
+  const defs = tools.map(toolDef);
+  const rc = pb().bytes(4, env());
+  const mcp = pb();
+  for (const d of defs) {
+    rc.bytes(7, d);
+    mcp.bytes(1, d);
+  }
+  const action = pb().bytes(2, pb().bytes(2, rc));
+  const details = pb().str(1, model).str(3, model).str(4, model);
+  const requested = pb().str(1, model);
+  if (maxMode) {
+    details.varint(7, 1);
+    requested.varint(2, 1);
+  }
+  for (const p of params) requested.bytes(3, pb().str(1, p.id).str(2, p.value));
+  const rr = pb().bytes(1, state).bytes(2, action).bytes(3, details).bytes(4, mcp).str(5, conv || randomUUID5()).bytes(9, requested).varint(19, 1).varint(37, 1);
+  return { first: pb().bytes(1, rr).done(), blobs };
+}
+var endpoints = /* @__PURE__ */ new Map();
+async function agentURL(tok, fresh) {
+  const key = createHash9("sha256").update(tok).digest("hex");
+  const had = endpoints.get(key);
+  if (!fresh && had && (had.listed || Date.now() - had.at < 6e4)) return had.url;
+  let url = AGENT;
+  let listed = false;
+  try {
+    const cfg = await unary(API, "aiserver.v1.ServerConfigService/GetServerConfig", tok, {}, 1e4);
+    for (const raw of [cfg?.agentUrlConfig?.agentUrl, cfg?.agentUrlConfig?.agentnUrl]) {
+      try {
+        const u = new URL(raw);
+        if ((u.protocol === "https:" || u.protocol === "http:") && u.host) {
+          url = raw.replace(/\/+$/, "");
+          listed = true;
+          break;
+        }
+      } catch {
+      }
+    }
+  } catch {
+  }
+  endpoints.set(key, { url, at: Date.now(), listed });
+  return url;
+}
+var h1Until = 0;
+var cancelledOpen = () => ({ error: { status: 410, message: "the request was cancelled" }, h2Failed: false });
+async function open(base, headers2, signal, atOnce = H1.atOnce, overlaps) {
+  if (signal?.aborted) return cancelledOpen();
+  if (Date.now() >= h1Until) {
+    const o = await openH2(base, headers2, signal);
+    if (signal?.aborted) {
+      o.req?.close(http2.constants.NGHTTP2_CANCEL);
+      o.session?.destroy();
+      return cancelledOpen();
+    }
+    if (!o.h2Failed) return o;
+    if (o.blocked) h1Until = Date.now() + H2.retryAfter;
+  }
+  if (signal?.aborted) return cancelledOpen();
+  return openH1(headers2, signal, atOnce, overlaps);
+}
+var H2 = {
+  wait: 15e3,
+  // ms an HTTP/2 Run waits for its response's head
+  retryAfter: 10 * 6e4
+  // ms the Runs after one found HTTP/2 blocked stay on HTTP/1.1
+};
+var NET = ["ECONNREFUSED", "ENOTFOUND", "EAI_AGAIN", "ENETUNREACH", "EHOSTUNREACH", "ECONNRESET", "ETIMEDOUT", "ECONNABORTED", "EPIPE"];
+function h2Blocked(e) {
+  if (e?.h2Timeout) return true;
+  const code = String(e?.code ?? "");
+  const text = `${code} ${e?.message ?? ""}`;
+  if (NET.some((c) => text.includes(c))) return false;
+  if (code === "ERR_HTTP2_STREAM_ERROR") return false;
+  return code.startsWith("ERR_HTTP2") || /h2 is not supported|alpn|nghttp2|protocol error/i.test(text);
+}
+function openH2(base, headers2, signal) {
+  if (signal?.aborted) return Promise.resolve(cancelledOpen());
+  return new Promise((resolve) => {
+    const u = new URL(base);
+    const session = http2.connect(u.origin);
+    let done = false;
+    const fail = (e, h2Failed = true) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      session.destroy();
+      resolve({ error: { status: h2Failed ? 502 : 410, message: e?.message ?? String(e) }, h2Failed, blocked: h2Failed && h2Blocked(e) });
+    };
+    const abort = () => fail(new Error("the request was cancelled"), false);
+    const timer = setTimeout(() => fail(Object.assign(new Error(`no answer over HTTP/2 in ${H2.wait / 1e3}s`), { h2Timeout: true })), H2.wait);
+    session.on("error", fail);
+    const req = session.request({
+      ":method": "POST",
+      ":path": u.pathname.replace(/\/+$/, "") + "/agent.v1.AgentService/Run",
+      ...headers2
+    });
+    req.on("error", fail);
+    req.once("close", () => fail(Object.assign(new Error(`the HTTP/2 stream closed before its response (code ${req.rstCode ?? "?"})`), { code: "ERR_HTTP2_STREAM_ERROR" })));
+    req.once("response", (h) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      resolve({ session, req, status: Number(h[":status"]) });
+    });
+    signal?.addEventListener("abort", abort, { once: true });
+    if (signal?.aborted) abort();
+  });
+}
+var H1 = {
+  appendWait: 6e4,
+  // ms a BidiAppend may take before the Run fails, as cursor-agent's appendTimeoutMs
+  // BidiAppends on their way at once, numbered in order, as cursor-agent
+  // keeps them: one at a time, a new Run's history (a blob a message,
+  // hundreds for a long conversation, all asked for at once) took a round
+  // trip to Cursor each before the model could start. A native session's
+  // Run sends only its KV replies that way (kvReply); each of its other
+  // messages waits for every append before it, and goes alone (runNative).
+  atOnce: 16
+};
+function kvReply(msg) {
+  const b = Buffer.isBuffer(msg) ? msg : Buffer.from(msg ?? EMPTY);
+  return b.length > 0 && b[0] === 26;
+}
+function connectCode(status) {
+  return { 400: "invalid_argument", 401: "unauthenticated", 403: "permission_denied", 429: "resource_exhausted" }[status] ?? "unavailable";
+}
+function openH1(headers2, signal, atOnce = H1.atOnce, overlaps = () => true) {
+  if (signal?.aborted) return Promise.resolve(cancelledOpen());
+  const ac = new AbortController();
+  const id = headers2["x-request-id"];
+  const h = { ...headers2, "accept-encoding": "identity", "x-cursor-streaming": "true" };
+  let ended = false;
+  let seq = 0;
+  let reader;
+  const going = /* @__PURE__ */ new Set();
+  const req = new Duplex({
+    read() {
+    },
+    write(chunk, _enc, cb) {
+      const msg = Buffer.from(chunk).subarray(5);
+      const go = () => {
+        const p = append(msg, seq++);
+        going.add(p);
+        const gone = () => going.delete(p);
+        p.then(gone, gone);
+        return p;
+      };
+      if (!overlaps(msg)) {
+        Promise.allSettled([...going]).then(go).then(() => cb(), (e) => cb(e));
+        return;
+      }
+      go();
+      if (going.size < atOnce) return cb();
+      Promise.race(going).then(() => cb(), (e) => cb(e));
+    }
+  });
+  const cleanup = () => {
+    signal?.removeEventListener("abort", close);
+    ac.abort();
+    reader?.cancel().catch(() => {
+    });
+  };
+  const end = (body) => {
+    if (ended || req.destroyed) return;
+    ended = true;
+    const f = frame(Buffer.from(body));
+    f[0] = 2;
+    req.push(f);
+    req.push(null);
+    cleanup();
+  };
+  const failed = async (res) => {
+    const text = await res.text().catch(() => "");
+    let e;
+    try {
+      e = JSON.parse(text);
+    } catch {
+    }
+    end(JSON.stringify({ error: typeof e?.code === "string" ? e : { code: connectCode(res.status), message: text.trim() || `HTTP ${res.status}` } }));
+  };
+  const append = async (msg, n) => {
+    if (ended || ac.signal.aborted) return;
+    const body = pb().str(1, msg.toString("hex")).bytes(2, pb().str(1, id).done()).varint(3, n).done();
+    const ms = H1.appendWait + Math.ceil(body.length / 65536) * 1e3;
+    const deadline = AbortSignal.timeout(ms);
+    try {
+      const res = await fetch(API + "/aiserver.v1.BidiService/BidiAppend", {
+        method: "POST",
+        headers: { ...h, "content-type": "application/proto", "connect-protocol-version": "1" },
+        body,
+        signal: AbortSignal.any([ac.signal, deadline])
+      });
+      if (ended || ac.signal.aborted) {
+        await res.body?.cancel().catch(() => {
+        });
+        return;
+      }
+      if (!res.ok) return failed(res);
+      await res.arrayBuffer();
+    } catch (e) {
+      if (ac.signal.aborted) return;
+      if (deadline.aborted) return end(JSON.stringify({ error: { code: "deadline_exceeded", message: `BidiAppend got no answer in ${Math.round(ms / 1e3)}s` } }));
+      end(JSON.stringify({ error: { code: "unavailable", message: `BidiAppend: ${e?.message ?? e}` } }));
+    }
+  };
+  const close = () => {
+    ended = true;
+    cleanup();
+    req.destroy();
+  };
+  signal?.addEventListener("abort", close, { once: true });
+  if (signal?.aborted) {
+    close();
+    return Promise.resolve(cancelledOpen());
+  }
+  ;
+  (async () => {
+    try {
+      const res = await fetch(API + "/agent.v1.AgentService/RunSSE", {
+        method: "POST",
+        headers: { ...h, "content-type": "application/connect+proto", "connect-protocol-version": "1" },
+        body: frame(pb().str(1, id).done()),
+        signal: ac.signal
+      });
+      if (ended || ac.signal.aborted) {
+        await res.body?.cancel().catch(() => {
+        });
+        return;
+      }
+      if (!res.ok) return failed(res);
+      reader = res.body.getReader();
+      try {
+        while (!ended && !req.destroyed) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (!ended && !req.destroyed) req.push(Buffer.from(value));
+        }
+      } finally {
+        reader.releaseLock();
+        reader = void 0;
+      }
+      if (!ended && !req.destroyed) {
+        ended = true;
+        req.push(null);
+        cleanup();
+      }
+    } catch (e) {
+      if (!ac.signal.aborted) end(JSON.stringify({ error: { code: "unavailable", message: `RunSSE: ${e?.message ?? e}` } }));
+    }
+  })();
+  return Promise.resolve(signal?.aborted ? cancelledOpen() : { session: { close, destroy: close }, req: Object.assign(req, { close }), status: 200, h1: true });
+}
+function nativeTransport(req, close, fail, limits = NATIVE_LIMITS) {
+  const outbound = { bytes: 0, messages: 0 };
+  const queue = [];
+  let closed = false, flushing = false, rejectWrite;
+  const waiters = /* @__PURE__ */ new Set();
+  const spare = (n) => Math.floor(n / 8);
+  const fits = (size) => outbound.messages === 0 || outbound.messages + 1 + spare(limits.outboundMessages) <= limits.outboundMessages && outbound.bytes + size + spare(limits.outboundBytes) <= limits.outboundBytes;
+  const wake = () => {
+    for (const w of waiters) if (closed || fits(w.size)) w.done();
+  };
+  const flush = async () => {
+    if (closed || flushing) return;
+    flushing = true;
+    try {
+      while (!closed && queue.length) {
+        const packet = queue.shift();
+        await new Promise((resolve, reject) => {
+          let written = false, drained = false, started = false, settled = false;
+          const finish = (error) => {
+            if (settled) return;
+            settled = true;
+            rejectWrite = void 0;
+            req.removeListener("drain", drain);
+            req.removeListener("error", failed);
+            req.removeListener("close", lost);
+            error ? reject(error) : resolve();
+          };
+          const check = () => {
+            if (started && written && drained) finish();
+          };
+          const drain = () => {
+            drained = true;
+            check();
+          };
+          const failed = (e) => finish(e);
+          const lost = () => finish(new NativeSessionError(502, "native transport closed during a write; its outcome is uncertain"));
+          rejectWrite = finish;
+          req.once("drain", drain);
+          req.once("error", failed);
+          req.once("close", lost);
+          try {
+            drained = req.write(packet, (e) => {
+              if (e) return finish(e);
+              written = true;
+              check();
+            }) || drained;
+            started = true;
+            if (drained) req.removeListener("drain", drain);
+            check();
+          } catch (e) {
+            finish(e);
+          }
+        });
+        if (!closed) {
+          outbound.bytes -= packet.length;
+          outbound.messages--;
+          wake();
+        }
+      }
+    } catch (e) {
+      if (!closed) fail(e);
+    } finally {
+      flushing = false;
+    }
+  };
+  return {
+    outbound,
+    send(message2) {
+      if (closed || req.destroyed || !req.writable) throw new NativeSessionError(502, "native transport is no longer writable");
+      const size = message2.length + 5;
+      if (outbound.bytes + size > limits.outboundBytes) throw new NativeSessionError(503, "native outbound bytes limit reached");
+      if (outbound.messages + 1 > limits.outboundMessages) throw new NativeSessionError(503, "native outbound messages limit reached");
+      outbound.bytes += size;
+      outbound.messages++;
+      queue.push(frame(message2));
+      void flush();
+    },
+    // room resolves once a message of size fits the queue with the spare
+    // kept, and fails the Run when the queue doesn't drain for writeWait.
+    room(size) {
+      if (closed || fits(size)) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const w = {
+          size,
+          done() {
+            waiters.delete(w);
+            clearTimeout(w.timer);
+            resolve();
+          }
+        };
+        w.timer = setTimeout(() => {
+          waiters.delete(w);
+          const which = outbound.bytes + size + spare(limits.outboundBytes) > limits.outboundBytes ? "bytes" : "messages";
+          reject(new NativeSessionError(503, `native outbound ${which} limit reached: the queue did not drain for ${Math.round(limits.writeWait / 1e3)}s`));
+        }, limits.writeWait);
+        w.timer.unref?.();
+        waiters.add(w);
+      });
+    },
+    close() {
+      if (closed) return;
+      closed = true;
+      queue.length = 0;
+      outbound.bytes = 0;
+      outbound.messages = 0;
+      wake();
+      rejectWrite?.(new NativeSessionError(410, "native transport was cancelled"));
+      close();
+    }
+  };
+}
+var OWN_KEEP = 40 * 864e5;
+var mine = { ids: /* @__PURE__ */ new Map(), read: null, timer: null, file: () => join2(process.env.XDG_DATA_HOME || join2(homedir(), ".local", "share"), "opencode-cursor-auth", "conversations.json") };
+function readMine() {
+  mine.read ??= readFile(mine.file(), "utf8").then((t) => {
+    const kept2 = JSON.parse(t);
+    for (const [id, at] of Object.entries(kept2 && typeof kept2 === "object" ? kept2 : {}))
+      if (typeof at === "number" && !mine.ids.has(id)) mine.ids.set(id, at);
+  }).catch(() => {
+  });
+  return mine.read;
+}
+function saveMine() {
+  if (mine.timer) return;
+  mine.timer = setTimeout(async () => {
+    mine.timer = null;
+    await readMine();
+    const now = Date.now();
+    for (const [id, at] of mine.ids) if (now - at > OWN_KEEP) mine.ids.delete(id);
+    const file = mine.file();
+    try {
+      await mkdir(dirname(file), { recursive: true });
+      const tmp = file + "." + process.pid + ".tmp";
+      await writeFile(tmp, JSON.stringify(Object.fromEntries(mine.ids)));
+      await rename(tmp, file);
+    } catch {
+    }
+  }, 1e3);
+  mine.timer.unref?.();
+}
+function ownConversation(cid) {
+  mine.ids.set(cid, Date.now());
+  saveMine();
+}
+var mes = /* @__PURE__ */ new Map();
+async function meOf(tok) {
+  const had = mes.get(tok);
+  if (had && Date.now() - had.at < 36e5) return had.id;
+  try {
+    const me = await unary(API, "aiserver.v1.DashboardService/GetMe", tok);
+    const id = me?.userId == null ? "" : String(me.userId);
+    mes.set(tok, { id, at: Date.now() });
+    return id;
+  } catch {
+    return had?.id ?? "";
+  }
+}
+var CALLS_PAGE = 100;
+var CALLS_PAGES = 50;
+async function callsOf(tok, since, signal) {
+  await readMine();
+  const me = await meOf(tok);
+  const num2 = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const out = [];
+  const end = Date.now();
+  for (let page = 1; page <= CALLS_PAGES; page++) {
+    const res = await fetch(API + "/aiserver.v1.DashboardService/GetFilteredUsageEvents", {
+      method: "POST",
+      headers: await headersFor(tok),
+      body: JSON.stringify({ ...await teamBody(tok), startDate: String(since), endDate: String(end), page, pageSize: CALLS_PAGE }),
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15e3)]) : AbortSignal.timeout(15e3)
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      const f = failure2(res.status, text);
+      const e = new Error(f.message);
+      e.status = f.status;
+      throw e;
+    }
+    const body = JSON.parse(text || "{}");
+    const evs = body?.usageEventsDisplay ?? [];
+    for (const ev of evs) {
+      const t = ev?.tokenUsage;
+      const at = num2(ev?.timestamp);
+      if (!t || !at || at < since) continue;
+      if (me && ev.owningUser != null && String(ev.owningUser) !== me) continue;
+      if (ev.conversationId && mine.ids.has(ev.conversationId)) continue;
+      const rid = String(ev.usageEventId ?? "") || `${ev.conversationId ?? ""}:${at}:${ev.model ?? ""}`;
+      const cents = t.totalCents ?? ev.chargedCents;
+      out.push({
+        rid,
+        t: at,
+        model: String(ev.model ?? ""),
+        in: num2(t.inputTokens),
+        out: num2(t.outputTokens),
+        cache_read: num2(t.cacheReadTokens),
+        cache_write: num2(t.cacheWriteTokens),
+        ...cents == null ? {} : { cost: num2(cents) / 100 },
+        ...ev.conversationId ? { session: String(ev.conversationId) } : {}
+      });
+    }
+    const total = num2(body?.totalUsageEventsCount);
+    if (evs.length < CALLS_PAGE || total && page * CALLS_PAGE >= total) break;
+  }
+  return out.sort((a, b) => a.t - b.t);
+}
+async function runNative({ tok, base, id, tools, conv, convID, signal, maxMode, params, native }) {
+  const cid = convID || randomUUID5();
+  ownConversation(cid);
+  const since = Date.now();
+  const accounting = new AbortController();
+  const book = ledger(tok, cid, since, accounting.signal, !!convID, { before: since });
+  const debtKey = usageKey(tok, cid);
+  let started = false, settled = false, deferred2 = null;
+  let handed = null;
+  const owes = () => started && native.segments > 0 && !native.finalUsage && convID && canRead(tok);
+  native.accounting = {
+    started() {
+      started = true;
+    },
+    // A later Run of the conversation began (NativeSessionPool.create) while
+    // this one waits on the caller's results. Its step's event is owed now,
+    // bounded before that start, for the later Run to collect, rather than
+    // when this one is abandoned at resultWait. Cursor stamps a Run's one
+    // event at its start and adds each step to it as the step ends.
+    handover() {
+      if (settled || handed && handed.state !== "withdrawn" || !owes()) return;
+      handed = { state: "owed" };
+      owe(debtKey, { since, n: 1, ready: Date.now() + STEP_WAIT.owedAt, before: native.laterRunAt, tag: handed });
+      book.handover();
+    },
+    // resumed by its own results after all: a step not collected yet is this
+    // Run's to count again, in its final; one collected is counted (below)
+    resumed() {
+      if (handed?.state === "owed") withdraw(debtKey, handed);
+    },
+    // what a later Run collected of this Run's event: its final leaves it out
+    counted() {
+      return handed?.state === "collected" ? handed.usage : null;
+    },
+    async settle() {
+      const more = await book.owed(true);
+      if (settled) {
+        if (more) owe(debtKey, { carry: more });
+        return null;
+      }
+      deferred2 = more;
+      return more;
+    },
+    delivered() {
+      if (settled) return;
+      settled = true;
+      deferred2 = null;
+      book.done();
+      accounting.abort();
+    },
+    abandon() {
+      if (settled) return;
+      settled = true;
+      book.done();
+      accounting.abort();
+      if (deferred2) owe(debtKey, { carry: deferred2 });
+      deferred2 = null;
+      if (handed && handed.state !== "withdrawn") return;
+      if (owes()) {
+        owe(debtKey, { since, n: 1, ready: Date.now() + STEP_WAIT.owedAt, before: native.laterRunAt });
+      }
+    }
+  };
+  const { first: first2, blobs } = buildRun(conv.msgs, conv.last, tools, id, cid, { maxMode, params });
+  native.chatTools = tools;
+  native.attach(signal);
+  if (native.error) {
+    nativeSessions.forget(native);
+    return { error: native.error };
+  }
+  const o = await open(
+    base,
+    {
+      "content-type": "application/connect+proto",
+      "connect-protocol-version": "1",
+      authorization: `Bearer ${tok}`,
+      "x-cursor-client-version": await clientVersion(),
+      "x-cursor-client-type": "cli",
+      // else Cursor adds a prompt of its own
+      "x-ghost-mode": "true",
+      // privacy mode: nothing kept for training
+      "x-request-id": randomUUID5(),
+      ...await teamHeader(tok),
+      // none of Cursor's own tools, only the caller's
+      "x-cursor-agent-allowed-tools": "mcp_tool_call,get_mcp_tools_tool_call"
+    },
+    native.ac.signal,
+    // Over HTTP/1.1 the history's blobs go up H1.atOnce at a time, as
+    // cursor-agent sends them; one at a time, a Run with a long history
+    // waited a round trip to api2 a blob before its first token (ysm119 on
+    // Discord: 135 blobs, 37 s against 3 s over HTTP/2). Everything else
+    // goes alone, after the appends before it were answered, and counts as
+    // written only once Cursor answered it, so a tool result is never
+    // uncertain.
+    H1.atOnce,
+    kvReply
+  );
+  if (o.error) {
+    native.fail(o.error);
+    nativeSessions.forget(native);
+    return o;
+  }
+  const { session, req } = o;
+  const close = () => {
+    try {
+      req.close(http2.constants.NGHTTP2_CANCEL);
+    } catch {
+    }
+    session.close();
+    session.destroy();
+  };
+  const transport = nativeTransport(req, close, (e) => native.fail({ status: e.status ?? 502, message: e.message }), native.limits);
+  try {
+    native.bind(transport, blobs, conv.estimate);
+    if (native.error) {
+      nativeSessions.forget(native);
+      return { error: native.error };
+    }
+    native.send(first2);
+    native.accounting.started();
+    if (o.status < 200 || o.status > 299) {
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      native.fail(failure2(o.status, Buffer.concat(chunks).toString("utf8").slice(0, 1 << 20)));
+      nativeSessions.forget(native);
+      return { error: native.error, h1: !!o.h1 };
+    }
+    native.pumpTask = (async () => {
+      await native.pump(frames(req));
+    })();
+    const response = native.response();
+    const it = response.events;
+    const head = await it.next();
+    if (head.done || head.value.error) {
+      const error = head.value?.error ?? { status: 502, message: "an empty reply" };
+      await native.cancel(error.message);
+      nativeSessions.forget(native);
+      return { error, h1: !!o.h1 };
+    }
+    let firstEvent = head;
+    response.events = {
+      next() {
+        if (firstEvent) {
+          const r = firstEvent;
+          firstEvent = null;
+          return Promise.resolve(r);
+        }
+        return it.next();
+      },
+      return: () => it.return(),
+      [Symbol.asyncIterator]() {
+        return this;
+      }
+    };
+    return response;
+  } catch (e) {
+    native.fail({ status: e.status ?? 502, message: e.message });
+    await native.pumpTask;
+    nativeSessions.forget(native);
+    return { error: native.error, h1: !!o.h1 };
+  }
+}
+async function runOnce({ tok, base, id, tools, conv, convID, signal, maxMode, params, why }) {
+  const cid = convID || randomUUID5();
+  ownConversation(cid);
+  const since = Date.now();
+  const book = ledger(tok, cid, since, signal, !!convID);
+  const { first: first2, blobs } = buildRun(conv.msgs, conv.last, tools, id, cid, { maxMode, params });
+  const o = await open(
+    base,
+    {
+      "content-type": "application/connect+proto",
+      "connect-protocol-version": "1",
+      authorization: `Bearer ${tok}`,
+      "x-cursor-client-version": await clientVersion(),
+      "x-cursor-client-type": "cli",
+      // else Cursor adds a prompt of its own
+      "x-ghost-mode": "true",
+      // privacy mode: nothing kept for training
+      "x-request-id": randomUUID5(),
+      ...await teamHeader(tok),
+      // none of Cursor's own tools, only the caller's
+      "x-cursor-agent-allowed-tools": "mcp_tool_call,get_mcp_tools_tool_call"
+    },
+    signal
+  );
+  if (o.error) return book.done(), o;
+  const { session, req } = o;
+  let closed = false;
+  let heartbeat;
+  const quiet = new Quiet(NATIVE_LIMITS, () => close(), { path: "stateless", model: id, why });
+  const send = (msg) => {
+    if (!closed && !req.destroyed && req.writable) {
+      quiet.trace?.frame("out", msg);
+      req.write(frame(msg));
+    }
+  };
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    clearInterval(heartbeat);
+    signal?.removeEventListener("abort", close);
+    try {
+      req.close(http2.constants.NGHTTP2_CANCEL);
+    } catch {
+    }
+    session.close();
+    setTimeout(() => session.destroy(), 1e3).unref?.();
+  };
+  signal?.addEventListener("abort", close, { once: true });
+  if (signal?.aborted) {
+    close();
+    book.done();
+    return cancelledOpen();
+  }
+  heartbeat = setInterval(() => send(pb().bytes(7, EMPTY).done()), 5e3);
+  send(first2);
+  if (o.status < 200 || o.status > 299) {
+    const chunks = [];
+    try {
+      for await (const c of req) chunks.push(c);
+    } catch {
+    }
+    close();
+    book.done();
+    return { error: failure2(o.status, Buffer.concat(chunks).toString("utf8").slice(0, 1 << 20)) };
+  }
+  const it = decode(quiet.frames(frames(req)), {
+    send,
+    blobs,
+    tools,
+    estimate: conv.estimate,
+    close,
+    stepUsage: book.own,
+    owedUsage: book.owed,
+    note: (name) => quiet.trace?.event(name)
+  });
+  const wrapped = (async function* () {
+    try {
+      for await (const v of it) {
+        if (v?.error) quiet.failed(v.error);
+        yield v;
+      }
+    } finally {
+      close();
+      book.done();
+    }
+  })();
+  const head = await wrapped.next();
+  if (head.done) return book.done(), { error: { status: 502, message: "an empty reply" } };
+  if (head.value.error) {
+    await wrapped.return();
+    return { error: head.value.error, h1: !!o.h1 };
+  }
+  return {
+    events: (async function* () {
+      yield head.value;
+      yield* wrapped;
+    })()
+  };
+}
+async function* decode(stream, { send, blobs, tools, estimate, close, stepUsage: stepUsage3, owedUsage, note, countWait = NATIVE_LIMITS.countWait }) {
+  let calls = 0;
+  let answered = 0;
+  let ended = false;
+  let listed = 0;
+  const step = new StepCalls(fields);
+  const stepDone = () => {
+    if (!listed || calls + answered + step.completed < listed) return false;
+    if (calls > 0) return true;
+    listed = 0;
+    answered = 0;
+    step.nextStep();
+    return false;
+  };
+  let said = 0;
+  let wrote = 0;
+  const seen = { thinking: 0, refused: /* @__PURE__ */ new Map(), updates: /* @__PURE__ */ new Map(), messages: /* @__PURE__ */ new Map() };
+  const count = (m, k) => m.set(k, (m.get(k) ?? 0) + 1);
+  const empty = (how) => ({ error: { status: 502, message: "an empty reply" + emptyWhy(how, seen, ended ? usage2 : null) } });
+  let usage2 = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0 };
+  let counted2 = false;
+  const finish = (more) => {
+    if (!counted2 && !usage2.output) usage2.output = Math.floor((said + 3) / 4);
+    if (!counted2 && !usage2.input && !usage2.cacheRead && !usage2.cacheWrite) usage2.input = estimate;
+    const prompt = usage2.input + usage2.cacheRead + usage2.cacheWrite;
+    const deferred2 = more && more.input + more.output + more.cacheRead + more.cacheWrite > 0;
+    return {
+      stop: calls > 0 ? "tool_calls" : "stop",
+      usage: {
+        prompt_tokens: prompt,
+        completion_tokens: usage2.output,
+        total_tokens: prompt + usage2.output,
+        prompt_tokens_details: { cached_tokens: usage2.cacheRead, cache_write_tokens: usage2.cacheWrite },
+        ...usage2.reasoning ? { completion_tokens_details: { reasoning_tokens: usage2.reasoning } } : {},
+        ...deferred2 ? {
+          magpie_deferred: {
+            prompt_tokens: more.input + more.cacheRead + more.cacheWrite,
+            completion_tokens: more.output,
+            cached_tokens: more.cacheRead,
+            cache_write_tokens: more.cacheWrite
+          }
+        } : {}
+      }
+    };
+  };
+  const settled = async () => {
+    if (calls > 0 && !ended && !counted2 && stepUsage3) {
+      close?.();
+      const u = await stepUsage3().catch(() => null);
+      if (u) usage2 = u;
+      counted2 = u === false || !!u;
+    }
+    return finish(owedUsage ? await owedUsage(calls === 0).catch(() => null) : null);
+  };
+  const closeExec = (id) => send(pb().bytes(5, pb().bytes(1, pb().varint(1, id))).done());
+  const it = (stream[Symbol.asyncIterator] ?? stream[Symbol.iterator]).call(stream);
+  let heardAt = Date.now();
+  const read = async () => {
+    const next = Promise.resolve(it.next());
+    if (!calls || listed || step.writing) return next;
+    next.catch(() => {
+    });
+    let timer;
+    const cut2 = new Promise((r) => {
+      timer = setTimeout(() => r({ cut: true }), Math.max(0, heardAt + countWait - Date.now()));
+      timer.unref?.();
+    });
+    try {
+      return await Promise.race([next, cut2]);
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+  const beat = (data) => {
+    try {
+      const ms = fields(data);
+      return ms.length > 0 && ms.every((m) => m.num === 1 && fields(m.data).every((u) => u.num === 13));
+    } catch {
+      return false;
+    }
+  };
+  try {
+    for (; ; ) {
+      const r = await read();
+      if (r.cut) {
+        note?.("no count");
+        yield await settled();
+        return;
+      }
+      if (r.done) break;
+      const f = r.value;
+      if (f.end || !beat(f.data)) heardAt = Date.now();
+      if (f.end) {
+        const e = failure2(200, f.data);
+        if (e.status < 200 || e.status > 299) yield { error: e };
+        else if (wrote === 0 && calls === 0) yield empty(endFrame(f.data));
+        else yield await settled();
+        return;
+      }
+      for (const m of fields(f.data)) {
+        switch (m.num) {
+          case 1:
+            for (const u of fields(m.data)) {
+              const uf = fields(u.data);
+              switch (u.num) {
+                case 1: {
+                  const t = pbStr(uf, 1);
+                  if (t) {
+                    said += t.length;
+                    wrote += t.length;
+                    yield { text: t };
+                  }
+                  break;
+                }
+                case 4: {
+                  const t = pbStr(uf, 1);
+                  if (t) {
+                    said += t.length;
+                    seen.thinking += t.length;
+                    yield { reasoning: t };
+                  }
+                  break;
+                }
+                case 14:
+                  usage2 = usageOf(uf);
+                  ended = true;
+                  if (calls === 0) {
+                    yield wrote === 0 ? empty("Cursor ended the turn") : await settled();
+                    return;
+                  }
+                  break;
+                case 27:
+                  listed = pbNum(uf, 1);
+                  step.listed();
+                  if (stepDone()) {
+                    yield await settled();
+                    return;
+                  }
+                  break;
+                case 31:
+                  if (!ended && uf.some((f2) => f2.num >= 2 && f2.num <= 6)) {
+                    usage2 = usageOf(uf, 1);
+                    counted2 = true;
+                  }
+                  break;
+                case 2:
+                // a call started on the client
+                case 3:
+                // a call completed: by Cursor itself when it never started here
+                case 7:
+                  count(seen.updates, u.num);
+                  if (step.update(u.num, uf) && (note?.("completed by Cursor"), stepDone())) {
+                    yield await settled();
+                    return;
+                  }
+                  break;
+                default:
+                  count(seen.updates, u.num);
+              }
+            }
+            break;
+          case 2: {
+            step.exec(m.data);
+            const call = exec(m.data, tools, send, closeExec, seen.refused);
+            if (call) {
+              said += call.args.length;
+              yield { tool: { index: calls++, ...call } };
+            } else if (!fields(m.data).some((e) => e.num === 10)) answered++;
+            if (stepDone()) {
+              yield await settled();
+              return;
+            }
+            break;
+          }
+          case 3:
+            if (listed && step.listedAfter && calls > 0 && pendingCalls(m.data, fields) === calls) {
+              note?.("waited on");
+              yield await settled();
+              return;
+            }
+            count(seen.messages, m.num);
+            break;
+          case 4: {
+            const kv = fields(m.data);
+            const id = pbNum(kv, 1);
+            for (const k of kv) {
+              if (k.num === 2) {
+                const want = field3(fields(k.data), 1)?.data.toString("hex") ?? "";
+                const b = blobs.get(want);
+                const res = b ? pb().bytes(1, b) : pb().bytes(2, pb().str(1, "blob not found"));
+                send(pb().bytes(3, pb().varint(1, id).bytes(2, res)).done());
+              } else if (k.num === 3) {
+                send(pb().bytes(3, pb().varint(1, id).bytes(3, EMPTY)).done());
+              }
+            }
+            break;
+          }
+          default:
+            count(seen.messages, m.num);
+        }
+      }
+    }
+    if (calls > 0) {
+      yield await settled();
+      return;
+    }
+    yield { error: { status: 502, message: "the reply broke off: EOF" } };
+  } catch (e) {
+    if (e?.quiet) {
+      const batch = calls || listed ? `; the step's tool count ${listed || "not sent"}: ${calls} calls came, ${answered} answered here, ${step.completed} completed by Cursor` : "";
+      yield { error: { status: e.status, message: batch ? e.message.replace(/( \(try again\))?$/, batch + "$1") : e.message } };
+      return;
+    }
+    if (calls > 0 && /EOF/.test(e?.message ?? "")) {
+      yield await settled();
+      return;
+    }
+    yield { error: { status: 502, message: "the reply broke off: " + (e?.message ?? e) } };
+  } finally {
+    Promise.resolve(it.return?.()).catch(() => {
+    });
+  }
+}
+function endFrame(data) {
+  const t = Buffer.from(data ?? []).toString("utf8").trim();
+  if (!t || t === "{}") return "the Run's stream ended (an empty end frame)";
+  return `the Run's stream ended (end frame: ${t.length > 300 ? t.slice(0, 300) + "\u2026" : t})`;
+}
+function emptyWhy(how, seen, usage2) {
+  const list = (m) => [...m].map(([k, n]) => n > 1 ? `#${k} \xD7${n}` : `#${k}`).join(", ");
+  const parts = [how];
+  parts.push(seen.thinking ? `after ${seen.thinking} chars of thinking, no text and no tool call` : "with no thinking, no text and no tool call");
+  if (usage2) parts.push(`Cursor counted ${usage2.output} output tokens`);
+  if (seen.refused.size) parts.push(`Cursor's own tools asked for and refused: ${list(seen.refused)}`);
+  if (seen.updates.size) parts.push(`updates not read: ${list(seen.updates)}`);
+  if (seen.messages.size) parts.push(`messages not read: ${list(seen.messages)}`);
+  return ` (${parts.join("; ")}; try again)`;
+}
+function exec(msg, tools, send, closeExec, refused, native = false) {
+  const es = native ? nativeFields(msg) : fields(msg);
+  if (native && es.some((e) => e.num === 1 && (e.wire !== 0 || !Number.isInteger(e.n) || e.n < 0 || e.n > 4294967295)))
+    throw new NativeSessionError(502, "invalid native exec request ID");
+  const id = pbNum(es, 1);
+  const execID = pbStr(es, 15);
+  let nativeCall, nativeUnavailable = false;
+  if (native) {
+    for (const e of es) if (e.num === 11) {
+      if (e.wire !== 2) throw new NativeSessionError(502, "invalid native MCP argument envelope");
+      const { fields: a, args } = nativeMcpArgs(e.data);
+      const name = pbStr(a, 5) || bareName(pbStr(a, 1));
+      const provider2 = pbStr(a, 4);
+      const server = pbStr(a, 9);
+      if (provider2 && !NAMESPACES.includes(provider2) || server && !NAMESPACES.includes(server)) nativeUnavailable = true;
+      if (pbNum(a, 7) || field3(a, 6)) nativeUnavailable = true;
+      if (!tools.some((t) => t.name === name)) nativeUnavailable = true;
+      if (!pbStr(a, 5) && !NAMESPACES.some((ns) => pbStr(a, 1) === ns + "-" + name)) nativeUnavailable = true;
+      const call = { requestID: id, execID, nativeID: pbStr(a, 3), name, args };
+      if (nativeCall && !isDeepStrictEqual(nativeCall, call)) throw new NativeSessionError(502, "ambiguous repeated native MCP argument envelopes");
+      nativeCall ??= call;
+    }
+  }
+  const answer2 = (num2, res) => {
+    send(pb().bytes(2, pb().varint(1, id).str(15, execID).bytes(num2, res)).done());
+    closeExec(id);
+  };
+  const unavailable = () => {
+    const kind = es.find((e) => ![1, 15, 19, 55].includes(e.num))?.num ?? 0;
+    refused?.set(kind, (refused.get(kind) ?? 0) + 1);
+    send(pb().bytes(5, pb().bytes(2, pb().varint(1, id).str(2, "not available"))).done());
+    closeExec(id);
+    return null;
+  };
+  if (nativeUnavailable) return unavailable();
+  for (const e of es) {
+    switch (e.num) {
+      case 11: {
+        if (native) return { ...nativeCall, args: JSON.stringify(nativeCall.args) };
+        const a = fields(e.data);
+        const args = {};
+        for (const kv of a) {
+          if (kv.num !== 2) continue;
+          const ef = fields(kv.data);
+          const v = field3(ef, 2);
+          args[pbStr(ef, 1)] = v ? pbAny(v.data) : null;
+        }
+        const name = pbStr(a, 5) || bareName(pbStr(a, 1));
+        const cid = pbStr(a, 3).replaceAll("\n", "__") || "call_" + randomBytes4(12).toString("hex");
+        return { id: cid, name, args: JSON.stringify(args) };
+      }
+      case 36: {
+        const srv = pb().str(1, NS).str(2, NS).str(7, "connected");
+        for (const t of tools) srv.bytes(5, toolDef(t));
+        answer2(36, pb().bytes(1, pb().bytes(1, srv)));
+        return null;
+      }
+      case 10:
+        answer2(10, pb().bytes(1, pb().bytes(1, pb().bytes(4, env()))));
+        return null;
+    }
+  }
+  return unavailable();
+}
+var errorResponse = ({ status, message: message2 }) => new Response(JSON.stringify({ error: { message: message2, type: "cursor_error", code: status } }), {
+  status,
+  headers: { "Content-Type": "application/json", "X-Magpie-Sign-In": "kept" }
+});
+function kept(res) {
+  if (res.headers.has("X-Magpie-Sign-In")) return res;
+  const headers2 = new Headers(res.headers);
+  headers2.set("X-Magpie-Sign-In", "kept");
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers: headers2 });
+}
+var answer = async (auth, chat, signal, session) => kept(await answerOf(auth, chat, signal, session));
+var maxOnly = /* @__PURE__ */ new Set();
+var maxRequired = (msg) => /max[ _]mode[ _]required|requires max mode/i.test(String(msg ?? ""));
+async function answerOf(auth, chat, signal, session = "") {
+  let tok;
+  try {
+    tok = await tokenOf(auth);
+  } catch (e) {
+    return errorResponse({ status: e.status ?? 401, message: e.message });
+  }
+  if (signal?.aborted) return errorResponse({ status: 410, message: "the request was cancelled" });
+  const tools = toolsOf(chat);
+  const convID = conversationID(chat, session);
+  const prepared = nativeSessions.prepare(tok, chat, convID, tools);
+  let r;
+  if (prepared.owner) r = prepared.owner.resume({ ...prepared, estimate: conversation(chat, tools).estimate }, signal);
+  const model = String(chat.model ?? "");
+  if (!r) {
+    const raw = await listFor(tok);
+    const tier = chat.service_tier;
+    const fast = tier === "priority" || tier === "fast" ? true : tier ? false : void 0;
+    const req = request(raw, model, chat.reasoning_effort ?? "", fast);
+    const id = req.id;
+    const params = req.params;
+    let maxMode = req.maxMode || maxOnly.has(id);
+    const conv = conversation(chat, tools);
+    let base = await agentURL(tok, false);
+    const once = async () => {
+      const native = prepared.fallback ? null : nativeSessions.create(prepared, { id, maxMode, params }, { pb, exec, usageOf, failure: failure2 });
+      const args = { tok, base, id, tools, conv, convID, signal, maxMode, params };
+      let response = native ? await runNative({ ...args, native }) : await runOnce({ ...args, why: prepared.fallback || "retention capacity or reservation unavailable" });
+      const rebuild = async () => {
+        const why = response.error?.continuityReason || "missing-batch-count";
+        const fallback = await runOnce({ ...args, why });
+        fallback.diagnostic = "stateless; bootstrap=imported-history; reason=" + why;
+        return fallback;
+      };
+      if (response.error?.retentionIneligible && !signal?.aborted) response = await rebuild();
+      else if (native) response.rebuild = rebuild;
+      response.diagnostic ??= "stateless; bootstrap=imported-history; reason=" + (prepared.fallback || "retention capacity or reservation unavailable");
+      return response;
+    };
+    r = await once();
+    if (r.error && regional(r.error.message)) {
+      const viaH1 = !!r.h1;
+      h1Until = 0;
+      const fresh = await agentURL(tok, true);
+      if (fresh !== base || viaH1) {
+        base = fresh;
+        r = await once();
+      }
+    }
+    if (r.error && !maxMode && maxRequired(r.error.message)) {
+      maxMode = true;
+      maxOnly.add(id);
+      r = await once();
+    }
+  }
+  if (r.error) return errorResponse(r.error);
+  const it = r.events;
+  let head = await it.next();
+  if (head.value?.error) return errorResponse(head.value.error);
+  let events = {
+    next() {
+      if (head) {
+        const value = head;
+        head = null;
+        return Promise.resolve(value);
+      }
+      return it.next();
+    },
+    return: () => it.return?.(),
+    [Symbol.asyncIterator]() {
+      return this;
+    }
+  };
+  const responseHeaders = { "X-Magpie-Cursor-Continuity": r.diagnostic };
+  const cid = "chatcmpl-" + randomBytes4(12).toString("hex");
+  const created = Math.floor(Date.now() / 1e3);
+  if (!chat.stream) {
+    while (true) {
+      let retry = false;
+      const msg = { role: "assistant", content: "" };
+      let reasoning = "";
+      const calls = [];
+      let stop = "stop";
+      let usage2;
+      for await (const e of events) {
+        if (e.error) {
+          if (!e.error.retentionIneligible || !r.rebuild || signal?.aborted) return errorResponse(e.error);
+          const reason = e.error.continuityReason;
+          r = await r.rebuild();
+          if (r.error) return errorResponse(r.error);
+          if (reason) r.diagnostic = "stateless; bootstrap=imported-history; reason=" + reason;
+          events = r.events;
+          responseHeaders["X-Magpie-Cursor-Continuity"] = r.diagnostic;
+          retry = true;
+          break;
+        }
+        if (e.text) msg.content += e.text;
+        if (e.reasoning) reasoning += e.reasoning;
+        if (e.tool) calls.push({ id: e.tool.id, type: "function", function: { name: e.tool.name, arguments: e.tool.args } });
+        if (e.stop) [stop, usage2] = [e.stop, e.usage];
+      }
+      if (retry) continue;
+      if (reasoning) msg.reasoning_content = reasoning;
+      if (calls.length) msg.tool_calls = calls;
+      r.delivered?.();
+      return Response.json({ id: cid, object: "chat.completion", created, model, choices: [{ index: 0, message: msg, finish_reason: stop }], ...usage2 ? { usage: usage2 } : {} }, { headers: responseHeaders });
+    }
+  }
+  const chunk = (delta, finish_reason = null, extra = {}) => enc.encode(`data: ${JSON.stringify({ id: cid, object: "chat.completion.chunk", created, model, choices: [{ index: 0, delta, finish_reason }], ...extra })}
+
+`);
+  let began = false;
+  const stream = new ReadableStream({
+    async pull(ctl) {
+      const next = await events.next();
+      if (!began) {
+        began = true;
+        ctl.enqueue(chunk({ role: "assistant", content: "" }));
+      }
+      if (next.done) {
+        r.delivered?.();
+        ctl.enqueue(enc.encode("data: [DONE]\n\n"));
+        return ctl.close();
+      }
+      const e = next.value;
+      if (e.text) ctl.enqueue(chunk({ content: e.text }));
+      else if (e.reasoning) ctl.enqueue(chunk({ reasoning_content: e.reasoning }));
+      else if (e.tool) ctl.enqueue(chunk({ tool_calls: [{ index: e.tool.index, id: e.tool.id, type: "function", function: { name: e.tool.name, arguments: e.tool.args } }] }));
+      else if (e.stop) ctl.enqueue(chunk({}, e.stop, e.usage ? { usage: e.usage } : {}));
+      else if (e.error) {
+        ctl.enqueue(enc.encode(`data: ${JSON.stringify({ error: { message: e.error.message, code: e.error.status } })}
+
+`));
+        ctl.close();
+      }
+    },
+    async cancel() {
+      await r.cancel?.();
+      await events.return();
+    }
+  });
+  return new Response(stream, { status: 200, headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", ...responseHeaders } });
+}
+async function CursorAuthPlugin(input) {
+  const includedOnly = () => {
+    try {
+      return input?.magpie?.option?.(ID, INCLUDED_ONLY) === true;
+    } catch {
+      return false;
+    }
+  };
+  setWireTrace(() => {
+    try {
+      return input?.magpie?.option?.(ID, WIRE_TRACE) === true && input.directory ? join2(input.directory, "cursor-traces") : "";
+    } catch {
+      return "";
+    }
+  });
+  return {
+    auth: {
+      provider: ID,
+      async loader(getAuth) {
+        const auth = await getAuth();
+        if (!auth || auth.type !== "oauth" && auth.type !== "api") return {};
+        return {
+          baseURL: AGENT,
+          apiKey: "cursor",
+          // every chat completion run on Cursor's agent API, with the
+          // sign-in as it is now
+          async fetch(input2, init = {}) {
+            const url = typeof input2 === "string" ? input2 : input2 instanceof URL ? input2.href : input2.url;
+            if (!/\/chat\/completions$/.test(new URL(url).pathname))
+              return errorResponse({ status: 404, message: "only chat completions are served" });
+            let chat;
+            try {
+              const b = init.body ?? (input2 instanceof Request ? await input2.clone().text() : void 0);
+              chat = JSON.parse(typeof b === "string" ? b : new TextDecoder().decode(b));
+            } catch {
+              return errorResponse({ status: 400, message: "a request that isn't JSON" });
+            }
+            const session = new Headers(init.headers ?? (input2 instanceof Request ? input2.headers : void 0)).get(SESSION) ?? "";
+            return answer(await getAuth() ?? auth, chat, init.signal ?? (input2 instanceof Request ? input2.signal : void 0), session);
+          }
+        };
+      },
+      methods: [
+        { type: "oauth", label: "Cursor (browser)", authorize: browserSignIn },
+        { type: "oauth", label: "cursor-agent's sign-in", authorize: cliSignIn },
+        { type: "api", label: "Cursor API key (cursor.com/dashboard \u2192 Integrations)" }
+      ],
+      // magpie's own switches (input.magpie.option), read at each usage
+      // reading
+      options: [
+        {
+          key: INCLUDED_ONLY,
+          label: "Included usage only",
+          description: "Keeps an account in routing only while its included usage lasts: once an included pool (Cursor Models, Other Models, a newer plan's Weekly) is used up, magpie moves its models to the next account until it resets, even if on-demand or free credit could pay."
+        },
+        {
+          key: WIRE_TRACE,
+          label: "Wire trace",
+          description: "For a bug report: when a Cursor request fails, saves the shape of what Cursor sent and what was sent back (each frame's kind, field numbers, size and time) to the cursor-traces folder in magpie's folder. No prompt or reply text, tool names or arguments, tokens, headers or account ids are written. The newest 20 are kept."
+        }
+      ],
+      // magpie's: how much of the plan's included usage is gone (the plan
+      // is the one the sign-in read). The built-in's read, clean or not,
+      // neither marked the account nor cleared it.
+      async usage(getAuth, provider2) {
+        let tok;
+        try {
+          tok = await tokenOf(await getAuth());
+        } catch (e) {
+          return { error: e.message, windows: [], signIn: "kept" };
+        }
+        const info = planOf(tok);
+        const [u, { plan }, bot] = await Promise.all([usage(tok, Object.keys(provider2?.models ?? {}), includedOnly(), info), info, botUsage(tok)]);
+        const last = (w) => w.name === "Total" || w.name === "On-demand" && w.aside;
+        const { credits: free = [], ...read } = u;
+        const windows = [...read.windows.filter((w) => !last(w)), ...bot, ...free, ...read.windows.filter(last)];
+        return { ...read, windows, ...plan ? { plan } : {}, signIn: "kept" };
+      },
+      // magpie's: the account's calls from since (ms) on that didn't go
+      // through magpie, for its Usage page (callsOf). A failure is thrown:
+      // magpie reads them again from the same time.
+      async calls(getAuth, provider2, { since = Date.now() - 30 * 864e5, signal } = {}) {
+        const tok = await tokenOf(await getAuth());
+        return { calls: await callsOf(tok, Math.max(0, Number(since) || 0), signal) };
+      }
+    },
+    // the session the request is part of, for the conversation_id
+    // (conversationID): magpie and OpenCode name it here, and the loader's
+    // fetch reads it back. Every plugin's hook sees every provider's
+    // requests, so it is put on Cursor's alone.
+    async "chat.headers"(input2, output) {
+      if (input2?.model?.providerID !== ID && input2?.provider?.info?.id !== ID) return;
+      const s = sessionOf(input2);
+      if (s) output.headers[SESSION] = s;
+    },
+    async config(config) {
+      config.provider ??= {};
+      const was = config.provider[ID] ?? {};
+      config.provider[ID] = {
+        name: "Cursor",
+        npm: CHAT,
+        api: AGENT,
+        ...was,
+        models: {
+          auto: { name: "Auto", limit: { context: DEFAULT_CONTEXT, output: 0 }, attachment: true, tool_call: true },
+          ...was.models ?? {}
+        }
+      };
+    },
+    // the account's list: each picker model once for each context size,
+    // with that window
+    provider: {
+      id: ID,
+      async models(provider2, { auth } = {}) {
+        if (!auth) return provider2.models;
+        const tok = await tokenOf(auth);
+        return Object.fromEntries((await usable(tok)).map((m) => [m.id, runtimeModel(m)]));
+      }
+    }
+  };
+}
+var _internal = { mine, ownConversation, callsOf, slugFor, fromCatalog, credits, kvReply, listFor, lists, keychain, keychainToken, nativeTransport, onDemandOf, resetH1: () => h1Until = 0, onH1: () => Date.now() < h1Until, resetTeam: () => {
+  teamRead.at = 0;
+  teamRead.info = null;
+}, expireTeam: () => teamRead.at = 0, H2, H1, h2Blocked, open, openH1, openH2, STEP_WAIT, stepUsage, usageKey, ledger, owed, flights, misses, unreadable, catalog, usable, request, modelsOf, tokensOf, maxRequired, conversationID, usageOf, sessionOf, SESSION, errorResponse, kept, poolBase, conversation, buildRun, decode, exec, fields, pb, pbValue, pbAny, frame, frames, failure: failure2, toolsOf, expiry };
+
+// src/auth.js
+import { execFile as execFile2 } from "node:child_process";
+import { createHash as createHash11 } from "node:crypto";
+import { readFile as readFile2 } from "node:fs/promises";
+import { homedir as homedir2, platform as platform2 } from "node:os";
+import { join as join3 } from "node:path";
+
 // ../dsh-cursor/lib/oauth.js
-import { createHash as createHash8, randomBytes as randomBytes3, randomUUID as randomUUID5 } from "node:crypto";
+import { createHash as createHash10, randomBytes as randomBytes5, randomUUID as randomUUID6 } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 var LOGIN_URL = "https://cursor.com/loginDeepControl";
 var POLL_URL = "https://api2.cursor.sh/auth/poll";
@@ -8726,10 +12992,10 @@ async function cursorAbortable(operation, signal) {
     checkCursorSignal(signal);
   }
   if (!signal) return await operation;
-  let withdraw;
+  let withdraw2;
   const cancelled = new Promise((resolve, reject) => {
-    withdraw = () => reject(cursorAuthError(signal.reason?.name === "TimeoutError" ? "TIMEOUT" : "CANCELLED"));
-    signal.addEventListener("abort", withdraw, { once: true });
+    withdraw2 = () => reject(cursorAuthError(signal.reason?.name === "TimeoutError" ? "TIMEOUT" : "CANCELLED"));
+    signal.addEventListener("abort", withdraw2, { once: true });
   });
   try {
     return await Promise.race([operation, cancelled]);
@@ -8737,16 +13003,16 @@ async function cursorAbortable(operation, signal) {
     checkCursorSignal(signal);
     throw error;
   } finally {
-    signal.removeEventListener("abort", withdraw);
+    signal.removeEventListener("abort", withdraw2);
   }
 }
-async function withCursorDeadline(signals, timeoutMs, run2) {
+async function withCursorDeadline(signals, timeoutMs, run3) {
   const controller = new AbortController();
   const signal = AbortSignal.any([...signals.filter(Boolean), controller.signal]);
   const timer = setTimeout(() => controller.abort(new DOMException("Cursor deadline", "TimeoutError")), timeoutMs);
   try {
     checkCursorSignal(signal);
-    return await cursorAbortable(Promise.resolve().then(() => run2(signal)), signal);
+    return await cursorAbortable(Promise.resolve().then(() => run3(signal)), signal);
   } finally {
     clearTimeout(timer);
   }
@@ -8771,12 +13037,12 @@ async function fetchAuth(fetchImpl, url, init, signal) {
       ...init,
       headers: { ...init.headers, ...attributionHeaders() },
       signal
-    })).then((response2) => {
+    })).then((response) => {
       if (signal?.aborted) {
-        void discard(response2);
+        void discard(response);
         checkCursorSignal(signal);
       }
-      return response2;
+      return response;
     }), signal);
   } catch (error) {
     checkCursorSignal(signal);
@@ -8784,9 +13050,9 @@ async function fetchAuth(fetchImpl, url, init, signal) {
     throw cursorAuthError("NETWORK");
   }
 }
-async function readAuthJson(response2, signal) {
-  if (!response2.body) throw cursorAuthError("PROVIDER_RESPONSE");
-  const reader = response2.body.getReader();
+async function readAuthJson(response, signal) {
+  if (!response.body) throw cursorAuthError("PROVIDER_RESPONSE");
+  const reader = response.body.getReader();
   const chunks = [];
   let size = 0;
   let completed = false;
@@ -8824,8 +13090,8 @@ function httpError2(status) {
   if (status === 429) return cursorAuthError("RATE_LIMIT");
   return cursorAuthError(status >= 500 ? "PROVIDER_ERROR" : "PROVIDER_RESPONSE");
 }
-async function discard(response2) {
-  if (response2.body) void response2.body.cancel().catch(() => {
+async function discard(response) {
+  if (response.body) void response.body.cancel().catch(() => {
   });
 }
 function nonempty(value) {
@@ -8840,9 +13106,9 @@ async function loginCursorOAuth({
   pollDelayMs = 1e3
 } = {}) {
   return await withCursorDeadline([signal], timeoutMs, async (loginSignal) => {
-    const verifier = randomBytes3(32).toString("base64url");
-    const challenge = createHash8("sha256").update(verifier).digest("base64url");
-    const uuid2 = randomUUID5();
+    const verifier = randomBytes5(32).toString("base64url");
+    const challenge = createHash10("sha256").update(verifier).digest("base64url");
+    const uuid2 = randomUUID6();
     const params = new URLSearchParams({ challenge, uuid: uuid2, mode: "login", redirectTarget: "cli" });
     notify({ message: "\u8BF7\u624B\u52A8\u6253\u5F00\u94FE\u63A5\u767B\u5F55 Cursor\uFF0C\u5B8C\u6210\u540E\u6B64\u5904\u4F1A\u81EA\u52A8\u7EE7\u7EED", url: `${LOGIN_URL}?${params}` });
     const pollUrl = new URL(POLL_URL);
@@ -8856,16 +13122,16 @@ async function loginCursorOAuth({
       }
       try {
         const tokens = await withCursorDeadline([loginSignal], requestTimeoutMs, async (requestSignal) => {
-          const response2 = await fetchAuth(fetchImpl, pollUrl, { method: "GET", headers: { accept: "application/json" } }, requestSignal);
-          if (response2.status === 404) {
-            await discard(response2);
+          const response = await fetchAuth(fetchImpl, pollUrl, { method: "GET", headers: { accept: "application/json" } }, requestSignal);
+          if (response.status === 404) {
+            await discard(response);
             return void 0;
           }
-          if (!response2.ok) {
-            await discard(response2);
-            throw httpError2(response2.status);
+          if (!response.ok) {
+            await discard(response);
+            throw httpError2(response.status);
           }
-          const data = await readAuthJson(response2, requestSignal);
+          const data = await readAuthJson(response, requestSignal);
           if (!nonempty(data.accessToken) || !nonempty(data.refreshToken)) throw cursorAuthError("PROVIDER_RESPONSE");
           return { access: data.accessToken, refresh: data.refreshToken, expires: cursorTokenExpiry(data.accessToken) };
         });
@@ -8884,21 +13150,21 @@ async function loginCursorOAuth({
 }
 async function refreshCursorOAuth(grant, { signal, fetch: fetchImpl = globalThis.fetch } = {}) {
   return await withCursorDeadline([signal], 15e3, async (requestSignal) => {
-    const response2 = await fetchAuth(fetchImpl, REFRESH_URL, {
+    const response = await fetchAuth(fetchImpl, REFRESH_URL, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({ grant_type: "refresh_token", client_id: IDE_CLIENT_ID, refresh_token: grant.refresh })
     }, requestSignal);
-    if (!response2.ok) {
-      if (response2.status === 400) {
-        const data2 = await readAuthJson(response2, requestSignal);
+    if (!response.ok) {
+      if (response.status === 400) {
+        const data2 = await readAuthJson(response, requestSignal);
         if (data2.error === "invalid_grant") throw cursorAuthError("AUTH");
       } else {
-        await discard(response2);
+        await discard(response);
       }
-      throw httpError2(response2.status);
+      throw httpError2(response.status);
     }
-    const data = await readAuthJson(response2, requestSignal);
+    const data = await readAuthJson(response, requestSignal);
     if (data.shouldLogout === true || data.error === "invalid_grant") throw cursorAuthError("AUTH");
     if (!nonempty(data.access_token)) throw cursorAuthError("PROVIDER_RESPONSE");
     return {
@@ -8909,651 +13175,26 @@ async function refreshCursorOAuth(grant, { signal, fetch: fetchImpl = globalThis
   });
 }
 
-// ../dsh-cursor/lib/catalog.js
-var EMPTY = Object.freeze([]);
-var REASONING_PARAMETERS = /* @__PURE__ */ new Set(["effort", "reasoning", "reasoning_effort", "thinking", "thinking_effort"]);
-function freeze(value) {
-  if (value && typeof value === "object") {
-    for (const child of Object.values(value)) freeze(child);
-    Object.freeze(value);
-  }
-  return value;
-}
-function text(value) {
-  return typeof value === "string" ? value.trim() : "";
-}
-function positive(value) {
-  return Number.isSafeInteger(value) && value > 0;
-}
-function selectionKey(selection) {
-  return JSON.stringify([
-    selection.wireModelId,
-    selection.maxMode ?? false,
-    (selection.parameters ?? []).map((p) => [p.key, p.value]).sort((a, b) => a[0].localeCompare(b[0]))
-  ]);
-}
-function parameterValues(definition) {
-  return [
-    ...definition?.parameterType?.booleanParameter?.values ?? [],
-    ...definition?.parameterType?.enumParameter?.values ?? []
-  ];
-}
-function allowedVariant(details, variant2) {
-  if (variant2.confirmationDialogue?.blocksSubmission === true) return false;
-  return !(variant2.parameterValues ?? []).some((parameter) => {
-    const definition = (details.parameterDefinitions ?? []).find((item) => item.id === parameter.id);
-    return parameterValues(definition).find((item) => item.value === parameter.value)?.blockedByAdminAllowlist === true;
-  });
-}
-function variantParameters(variant2) {
-  const parameters = (variant2.parameterValues ?? []).map((p) => ({ key: text(p.id), value: text(p.value) }));
-  if (parameters.some((p) => !p.key) || new Set(parameters.map((p) => p.key)).size !== parameters.length) return void 0;
-  return parameters.sort((a, b) => a.key.localeCompare(b.key));
-}
-function declaredEffort(details, parameters) {
-  const axes = parameters.filter((p) => REASONING_PARAMETERS.has(p.key));
-  if (!axes.length) return void 0;
-  const main = axes.find((p) => p.key !== "thinking") ?? axes[0];
-  const definition = (details.parameterDefinitions ?? []).find((item) => item.id === main.key);
-  const declared = parameterValues(definition).find((item) => item.value === main.value);
-  const id = main.key === "thinking" && ["false", "off", "none"].includes(main.value) ? "off" : main.key === "thinking" && ["true", "on"].includes(main.value) ? "on" : main.value;
-  if (!id) return void 0;
-  return {
-    id,
-    name: text(declared?.displayName) || main.value,
-    signature: JSON.stringify(axes.map((p) => [p.key, p.value]))
-  };
-}
-function contextLimit(details, selection) {
-  const parameter = selection.parameters?.find((p) => p.key === "context")?.value;
-  if (parameter) {
-    const match = /^(\d+(?:\.\d+)?)([km])?$/iu.exec(parameter);
-    if (match) {
-      const amount = Math.round(Number(match[1]) * (match[2]?.toLowerCase() === "m" ? 1e6 : match[2]?.toLowerCase() === "k" ? 1e3 : 1));
-      if (positive(amount)) return amount;
-    }
-  }
-  const limit = selection.maxMode === true ? details.contextTokenLimitForMaxMode : details.contextTokenLimit;
-  return positive(limit) ? limit : void 0;
-}
-function displayName(value) {
-  return text(value).replace(/[\u200B-\u200D\uFEFF]/gu, "").replace(/\bno[\s_-]*zdr\b/giu, "").replace(/\b\d+(?:\.\d+)?[km]\b/giu, "").replace(/\(\s*\)|\[\s*\]/gu, "").replace(/·/gu, " ").replace(/\s+/gu, " ").replace(/\s*[·|/]\s*$/u, "").trim();
-}
-function familyOf(entry) {
-  return entry.presentation?.family ?? entry.defaultSelection.requestedModelId ?? entry.defaultSelection.wireModelId;
-}
-function laneOf(entry) {
-  return (entry.defaultSelection.parameters ?? []).filter((p) => p.key !== "context" && !REASONING_PARAMETERS.has(p.key));
-}
-function laneKey(entry) {
-  return JSON.stringify(laneOf(entry).toSorted((a, b) => a.key.localeCompare(b.key)));
-}
-var FABLE_ROUTE = /^claude-fable-(\d+(?:-\d+)*)(-thinking)?-(low|medium|high|xhigh|max)(-fast)?$/u;
-var FABLE_EFFORTS = [
-  ["low", "Low"],
-  ["medium", "Medium"],
-  ["high", "High"],
-  ["xhigh", "Extra High"],
-  ["max", "Max"]
-];
-function fableRoute(entry) {
-  const match = FABLE_ROUTE.exec(entry.info.id);
-  const selection = entry.defaultSelection;
-  if (!match || selection.wireModelId !== entry.info.id || selection.requestedModelId !== void 0 || selection.parameters?.length || entry.efforts?.length) return void 0;
-  const [, version, thinking = "", effort, fast = ""] = match;
-  return {
-    id: `claude-fable-${version}${thinking}${fast}`,
-    effort,
-    name: ["Claude Fable", version.replaceAll("-", "."), thinking && "Thinking", fast && "Fast"].filter(Boolean).join(" ")
-  };
-}
-function mergeFable(entries) {
-  const families = /* @__PURE__ */ new Map();
-  for (const entry of entries) {
-    const route = fableRoute(entry);
-    if (!route) continue;
-    if (!families.has(route.id)) families.set(route.id, { id: route.id, name: route.name, members: [] });
-    families.get(route.id).members.push({ effort: route.effort, entry });
-  }
-  const merged = /* @__PURE__ */ new Map();
-  for (const family of families.values()) {
-    if (entries.some((entry) => entry.info.id === family.id)) continue;
-    const candidates = FABLE_EFFORTS.flatMap(([id, name]) => {
-      const matches = family.members.filter((member) => member.effort === id);
-      return matches.length === 1 ? [{ id, name, entry: matches[0].entry }] : [];
-    });
-    if (candidates.length < 2 || candidates.length !== family.members.length) continue;
-    const selected = candidates.find((candidate) => candidate.id === "high") ?? candidates[0];
-    const capabilities = (entry) => JSON.stringify([
-      entry.info.context,
-      [...entry.info.inputModalities].sort(),
-      entry.defaultSelection.maxMode === true
-    ]);
-    if (candidates.some((candidate) => capabilities(candidate.entry) !== capabilities(selected.entry))) continue;
-    merged.set(family.members[0].entry, {
-      info: {
-        ...selected.entry.info,
-        id: family.id,
-        name: family.name,
-        reasoning: {
-          efforts: candidates.map(({ id, name }) => ({ id: ReasoningEffortId(id), name })),
-          defaultEffort: ReasoningEffortId(selected.id)
-        }
-      },
-      defaultSelection: selected.entry.defaultSelection,
-      efforts: candidates.map(({ id, name, entry }) => ({ id: ReasoningEffortId(id), name, selection: entry.defaultSelection })),
-      aliases: candidates.map(({ entry }) => entry.info.id),
-      effortAliases: candidates.map(({ id, entry }) => ({ id: entry.info.id, effort: ReasoningEffortId(id) }))
-    });
-  }
-  const consumed = new Set([...merged.values()].flatMap((entry) => entry.aliases));
-  return entries.flatMap((entry) => merged.get(entry) ?? (consumed.has(entry.info.id) ? [] : [entry]));
-}
-function catalogView(entries) {
-  entries = mergeFable(entries);
-  const maxima = /* @__PURE__ */ new Map();
-  for (const entry of entries) {
-    const limit = Math.max(entry.info.context?.contextWindow ?? 0, entry.presentation?.maxContext ?? 0);
-    maxima.set(familyOf(entry), Math.max(maxima.get(familyOf(entry)) ?? 0, limit));
-  }
-  const kept = entries.filter((entry) => !entry.info.context?.contextWindow || entry.info.context.contextWindow >= maxima.get(familyOf(entry))).map((entry) => ({ ...entry, info: { ...entry.info }, ...entry.aliases ? { aliases: [...entry.aliases] } : {} }));
-  for (const entry of kept) {
-    const peers = kept.filter((other) => familyOf(other) === familyOf(entry));
-    const lane = laneOf(entry);
-    let name = displayName(entry.presentation?.name ?? entry.info.name) || familyOf(entry);
-    if (!entry.presentation && lane.some((p) => p.key === "fast" && p.value === "true")) name = name.replace(/\s+(?:·\s*)?fast$/iu, "");
-    const labels = [];
-    for (const parameter of lane) {
-      if (parameter.value === "false") continue;
-      if (parameter.key === "fast" && parameter.value === "true") labels.push("Fast");
-      else if (parameter.value === "true" || peers.some((other) => laneOf(other).find((p) => p.key === parameter.key)?.value !== parameter.value)) {
-        labels.push(displayName(entry.presentation?.labels?.[parameter.key] ?? `${parameter.key}=${parameter.value}`));
-      }
-    }
-    if (entry.defaultSelection.maxMode === true && peers.some((other) => laneKey(other) === laneKey(entry) && other.defaultSelection.maxMode !== true)) labels.push("Max Mode");
-    entry.info.name = [name, ...new Set(labels.filter((label) => !name.toLowerCase().endsWith(label.toLowerCase())))].filter(Boolean).join(" ");
-  }
-  const visible = new Set(kept.map((entry) => entry.info.id));
-  for (const entry of kept) if (entry.aliases) entry.aliases = [...new Set(entry.aliases)].filter((id) => !visible.has(id));
-  for (const removed of entries.filter((entry) => !visible.has(entry.info.id))) {
-    const matches = kept.filter((entry) => familyOf(entry) === familyOf(removed) && laneKey(entry) === laneKey(removed));
-    const target = matches.find((entry) => entry.defaultSelection.maxMode === removed.defaultSelection.maxMode) ?? matches[0];
-    if (!target) continue;
-    target.aliases = [.../* @__PURE__ */ new Set([...target.aliases ?? [], removed.info.id, ...removed.aliases ?? []])].filter((id) => !visible.has(id));
-  }
-  return kept;
-}
-function presentation(details, selection, name) {
-  if (!details) return void 0;
-  const limits = (details.variants ?? []).map((variant2) => {
-    const parameters = variantParameters(variant2);
-    return parameters ? contextLimit(details, { maxMode: variant2.isMaxMode, parameters }) : void 0;
-  }).filter(positive);
-  const maxContext = limits.length ? Math.max(...limits) : void 0;
-  const labels = Object.fromEntries((selection.parameters ?? []).filter((p) => p.key !== "context" && !REASONING_PARAMETERS.has(p.key)).map((parameter) => {
-    const definition = details.parameterDefinitions?.find((item) => item.id === parameter.key);
-    const value = parameterValues(definition).find((item) => item.value === parameter.value);
-    return [parameter.key, text(value?.displayName) || (parameter.value === "true" ? text(definition?.name) : "") || `${parameter.key}=${parameter.value}`];
-  }));
-  return { family: text(details.name), name, ...maxContext ? { maxContext } : {}, labels };
-}
-function modelInfo(id, name, details, selection, legacy) {
-  const modalities = details ? details.supportsImages === true ? ["text", "image"] : ["text"] : legacy.inputModalities?.includes("image") ? ["text", "image"] : ["text"];
-  const limit = details ? contextLimit(details, selection) : legacy.contextWindow;
-  return {
-    provider: "cursor",
-    id,
-    name,
-    inputModalities: modalities,
-    ...positive(limit) ? { context: { contextWindow: limit } } : {}
-  };
-}
-function legacyEntry(row, details) {
-  const selection = {
-    wireModelId: row.modelId,
-    ...typeof row.maxMode === "boolean" ? { maxMode: row.maxMode } : {}
-  };
-  const name = text(details?.clientDisplayName) || text(row.displayName) || row.modelId;
-  return {
-    info: modelInfo(row.modelId, name, details, selection, row),
-    defaultSelection: selection,
-    ...details ? { presentation: presentation(details, selection, name) } : {}
-  };
-}
-function cursorCatalogEntries(usableModels, rich) {
-  if (!Array.isArray(usableModels)) throw cursorAuthError("PROVIDER_RESPONSE");
-  const usable = /* @__PURE__ */ new Map();
-  const usableRows = /* @__PURE__ */ new Map();
-  for (const row of usableModels) {
-    if (!row || !text(row.modelId)) continue;
-    const id = text(row.modelId);
-    const normalized = { ...row, modelId: id };
-    const route = JSON.stringify([id, row.maxMode === true]);
-    if (!usableRows.has(route)) usableRows.set(route, normalized);
-    if (!usable.has(id) || usable.get(id).maxMode === true && row.maxMode !== true) usable.set(id, normalized);
-  }
-  const entries = [];
-  const represented = /* @__PURE__ */ new Set();
-  const claimed = /* @__PURE__ */ new Set();
-  function appendLegacy(id, details) {
-    const rows = [...usableRows.values()].filter((row) => row.modelId === id);
-    for (const row of rows) {
-      const entry = legacyEntry(row, details);
-      const uiId = rows.length > 1 && row.maxMode === true ? `${id}@max=true` : id;
-      if (claimed.has(uiId)) continue;
-      entry.info.id = uiId;
-      entries.push(entry);
-      claimed.add(uiId);
-    }
-    represented.add(id);
-  }
-  for (const details of rich?.models ?? []) {
-    const base = text(details.name);
-    if (!base) continue;
-    const aliases = [base, ...details.legacySlugs ?? [], ...details.idAliases ?? []].map(text).filter(Boolean);
-    const relatedIds = [...aliases, ...(details.variants ?? []).map((v) => text(v.legacySlug)).filter(Boolean)];
-    if (details.supportsAgent === false || details.isChatOnly === true || details.onlySupportsCmdK === true || details.isHidden === true || details.degradationStatus === 2) {
-      for (const id of relatedIds) if (usable.has(id)) represented.add(id);
-      continue;
-    }
-    if (!details.variants?.length) {
-      for (const id of aliases) {
-        const row = usable.get(id);
-        if (!row || represented.has(id) || claimed.has(id)) continue;
-        appendLegacy(id, details);
-      }
-      continue;
-    }
-    const groups = /* @__PURE__ */ new Map();
-    const seen = /* @__PURE__ */ new Set();
-    const baseEntitled = aliases.some((id) => usable.has(id));
-    const defaultRank = (variant2) => variant2.isDefaultNonMaxConfig === true ? 0 : variant2.isDefaultMaxConfig === true ? 1 : 2;
-    for (const variant2 of details.variants.toSorted((left, right) => defaultRank(left) - defaultRank(right))) {
-      const slug = text(variant2.legacySlug);
-      if (slug && usable.has(slug)) represented.add(slug);
-      if (!allowedVariant(details, variant2) || !baseEntitled && !usable.has(slug)) continue;
-      const parameters = variantParameters(variant2);
-      if (!parameters) continue;
-      const usableRoute = usable.has(slug) ? slug : aliases.find((alias) => usable.has(alias));
-      if (!usableRoute) continue;
-      const selection = {
-        wireModelId: usableRoute,
-        requestedModelId: base,
-        ...typeof variant2.isMaxMode === "boolean" ? { maxMode: variant2.isMaxMode } : {},
-        ...parameters.length ? { parameters } : {}
-      };
-      const signature = selectionKey(selection);
-      if (seen.has(signature)) continue;
-      seen.add(signature);
-      const lane = parameters.filter((p) => !REASONING_PARAMETERS.has(p.key));
-      const key = JSON.stringify([lane, variant2.isMaxMode === true]);
-      const candidate = { variant: variant2, selection, effort: declaredEffort(details, parameters), lane };
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(candidate);
-    }
-    const lanes = [...groups.values()];
-    const flagged = (candidate) => candidate.selection.maxMode === true ? candidate.variant.isDefaultMaxConfig === true : candidate.variant.isDefaultNonMaxConfig === true;
-    const primary = lanes.find((group) => group.some((candidate) => candidate.variant.isDefaultNonMaxConfig === true)) ?? lanes[0];
-    for (const candidates of lanes) {
-      const selected = candidates.find(flagged) ?? candidates[0];
-      const variant2 = selected.variant;
-      let id = candidates === primary ? base : text(variant2.legacySlug) || text(variant2.variantStringRepresentation);
-      if (!id || claimed.has(id)) {
-        id = `${base}@${selected.lane.map((p) => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`).join(",")}${selected.selection.maxMode === true ? ",max=true" : ""}`;
-      }
-      if (claimed.has(id)) continue;
-      const row = usable.get(text(variant2.legacySlug)) ?? aliases.map((alias) => usable.get(alias)).find(Boolean);
-      const baseName = text(details.clientDisplayName) || text(row?.displayName) || base;
-      const info = modelInfo(id, baseName, details, selected.selection);
-      const effortCandidates = candidates.filter((candidate) => candidate.effort);
-      const effortRoutes = [];
-      for (const candidate of effortCandidates) {
-        const conflicts = effortCandidates.some((other) => other.effort.id === candidate.effort.id && other.effort.signature !== candidate.effort.signature);
-        const effortId = conflicts ? candidate.effort.signature : candidate.effort.id;
-        const current = effortRoutes.find((route) => route.id === effortId);
-        if (current) continue;
-        effortRoutes.push({ id: ReasoningEffortId(effortId), name: candidate.effort.name, selection: candidate.selection });
-      }
-      if (effortRoutes.length) {
-        const defaultEffort = effortRoutes.find((route) => selectionKey(route.selection) === selectionKey(selected.selection))?.id;
-        info.reasoning = {
-          efforts: effortRoutes.map(({ id: effortId, name: effortName }) => ({ id: effortId, name: effortName })),
-          ...defaultEffort ? { defaultEffort } : {}
-        };
-      }
-      entries.push({
-        info,
-        defaultSelection: selected.selection,
-        presentation: presentation(details, selected.selection, baseName),
-        ...effortRoutes.length ? { efforts: effortRoutes } : {}
-      });
-      claimed.add(id);
-    }
-    for (const id of aliases) if (usable.has(id)) represented.add(id);
-  }
-  for (const id of usable.keys()) {
-    if (represented.has(id) || claimed.has(id)) continue;
-    appendLegacy(id);
-  }
-  return freeze(catalogView(entries));
-}
-function validSelection(selection) {
-  return selection && text(selection.wireModelId) && (selection.requestedModelId === void 0 || text(selection.requestedModelId)) && (selection.maxMode === void 0 || typeof selection.maxMode === "boolean") && (selection.parameters === void 0 || Array.isArray(selection.parameters) && selection.parameters.every((p) => text(p?.key) && typeof p.value === "string") && new Set(selection.parameters.map((p) => p.key)).size === selection.parameters.length);
-}
-function cachedSelection(selection) {
-  return {
-    wireModelId: selection.wireModelId,
-    ...selection.requestedModelId === void 0 ? {} : { requestedModelId: selection.requestedModelId },
-    ...selection.maxMode === void 0 ? {} : { maxMode: selection.maxMode },
-    ...selection.parameters === void 0 ? {} : { parameters: selection.parameters.map(({ key, value }) => ({ key, value })) }
-  };
-}
-function validPresentation(value) {
-  return value && text(value.family) && text(value.name) && (value.maxContext === void 0 || positive(value.maxContext)) && value.labels && typeof value.labels === "object" && !Array.isArray(value.labels) && Object.values(value.labels).every((label) => typeof label === "string");
-}
-function cachedState(cached) {
-  if (!cached || !text(cached.loginId) || !positive(cached.checkedAt) || !Array.isArray(cached.entries)) return void 0;
-  const entries = cached.entries;
-  const ids = /* @__PURE__ */ new Set();
-  for (const entry of entries) {
-    if (!entry?.info || entry.info.provider !== "cursor" || !text(entry.info.id) || !text(entry.info.name) || ids.has(entry.info.id) || !validSelection(entry.defaultSelection) || entry.presentation !== void 0 && !validPresentation(entry.presentation) || entry.aliases !== void 0 && (!Array.isArray(entry.aliases) || entry.aliases.some((id) => !text(id))) || entry.effortAliases !== void 0 && (!Array.isArray(entry.effortAliases) || entry.effortAliases.some((alias) => !text(alias?.id) || !entry.aliases?.includes(alias.id) || !entry.efforts?.some((effort) => effort.id === alias.effort))) || !Array.isArray(entry.info.inputModalities) || !entry.info.inputModalities.includes("text") || entry.info.inputModalities.some((mode) => mode !== "text" && mode !== "image") || entry.info.context && !positive(entry.info.context.contextWindow) || entry.efforts && (!Array.isArray(entry.efforts) || entry.efforts.some((effort) => !text(effort?.id) || !text(effort.name) || !validSelection(effort.selection)))) return void 0;
-    if (entry.info.reasoning && (!Array.isArray(entry.info.reasoning.efforts) || entry.info.reasoning.efforts.some((effort) => !text(effort?.id) || !text(effort.name) || !entry.efforts?.some((route) => route.id === effort.id)) || entry.info.reasoning.defaultEffort !== void 0 && !entry.efforts?.some((route) => route.id === entry.info.reasoning.defaultEffort))) return void 0;
-    ids.add(entry.info.id);
-  }
-  return freeze({
-    loginId: cached.loginId,
-    checkedAt: cached.checkedAt,
-    entries: catalogView(entries.map((entry) => ({
-      info: {
-        provider: "cursor",
-        id: entry.info.id,
-        name: entry.info.name,
-        inputModalities: [...entry.info.inputModalities],
-        ...entry.info.context ? { context: { contextWindow: entry.info.context.contextWindow } } : {},
-        ...entry.info.reasoning ? { reasoning: {
-          efforts: entry.info.reasoning.efforts.map(({ id, name }) => ({ id, name })),
-          ...entry.info.reasoning.defaultEffort === void 0 ? {} : { defaultEffort: entry.info.reasoning.defaultEffort }
-        } } : {}
-      },
-      defaultSelection: cachedSelection(entry.defaultSelection),
-      ...entry.presentation ? { presentation: {
-        family: entry.presentation.family,
-        name: entry.presentation.name,
-        ...entry.presentation.maxContext ? { maxContext: entry.presentation.maxContext } : {},
-        labels: { ...entry.presentation.labels }
-      } } : {},
-      ...entry.aliases ? { aliases: [...entry.aliases] } : {},
-      ...entry.effortAliases ? { effortAliases: entry.effortAliases.map(({ id, effort }) => ({ id, effort })) } : {},
-      ...entry.efforts ? { efforts: entry.efforts.map(({ id, name, selection }) => ({ id, name, selection: cachedSelection(selection) })) } : {}
-    })))
-  });
-}
-function createCursorCatalog(auth, options = {}) {
-  const fetchModels = options.fetchModels ?? fetchCursorUsableModels;
-  const unary = options.requestUnary ?? requestUnary;
-  const save = options.save ?? (() => {
-  });
-  let state = cachedState(options.cached);
-  let generation = 0;
-  let pending;
-  let disposed = false;
-  let persistence = Promise.resolve();
-  function enqueue(action) {
-    const result = persistence.then(action);
-    persistence = result.catch(() => {
-    });
-    return result;
-  }
-  function entries() {
-    return state?.entries ?? EMPTY;
-  }
-  function snapshot(modelId) {
-    const exact = entries().find((entry) => entry.info.id === modelId);
-    if (exact) return exact;
-    const compatible = entries().find((entry) => entry.aliases?.includes(modelId));
-    if (!compatible) return void 0;
-    const effortId = compatible.effortAliases?.find((alias) => alias.id === modelId)?.effort;
-    const route = compatible.efforts?.find((effort) => effort.id === effortId);
-    return freeze({
-      ...compatible,
-      info: {
-        ...compatible.info,
-        id: modelId,
-        ...route ? { reasoning: { ...compatible.info.reasoning, defaultEffort: route.id } } : {}
-      },
-      ...route ? { defaultSelection: route.selection } : {}
-    });
-  }
-  function select(entry, effort) {
-    if (!entry || !validSelection(entry.defaultSelection)) throw new LlmError("Cursor \u6A21\u578B\u4E0D\u5728\u5F53\u524D\u76EE\u5F55\u4E2D\uFF0C\u8BF7\u5237\u65B0\u6A21\u578B\u5217\u8868", "MODEL_NOT_FOUND");
-    if (effort === void 0) return entry.defaultSelection;
-    const advertised = entry.efforts?.find((candidate) => candidate.id === effort);
-    if (!advertised) throw new LlmError("\u6B64 Cursor \u6A21\u578B\u4E0D\u652F\u6301\u6240\u9009\u601D\u8003\u7EA7\u522B", "INVALID_REASONING_EFFORT");
-    return advertised.selection;
-  }
-  function clear() {
-    if (disposed) return Promise.reject(cursorAuthError("CANCELLED"));
-    generation += 1;
-    pending?.abort();
-    state = void 0;
-    return enqueue(() => save(null));
-  }
-  async function refresh(signal) {
-    checkCursorSignal(signal);
-    if (disposed) throw cursorAuthError("CANCELLED");
-    const mine = ++generation;
-    pending?.abort();
-    const controller = new AbortController();
-    pending = controller;
-    const operationSignal = AbortSignal.any([controller.signal, ...signal ? [signal] : []]);
-    const live = () => {
-      checkCursorSignal(operationSignal);
-      if (disposed || generation !== mine) throw cursorAuthError("CANCELLED");
-    };
-    let accountChanged = false;
-    try {
-      const grant = await cursorAbortable(auth.getGrant(operationSignal), operationSignal);
-      live();
-      const verifyAccount = async () => {
-        const current = await cursorAbortable(auth.metadata(), operationSignal);
-        live();
-        if (!current.configured || current.loginId !== grant.loginId || current.needsLogin) {
-          accountChanged = true;
-          throw cursorAuthError("AUTH");
-        }
-      };
-      if (state && state.loginId !== grant.loginId) {
-        state = void 0;
-        await enqueue(async () => {
-          live();
-          await save(null);
-        });
-        live();
-      }
-      const nextEntries = await withCursorDeadline([operationSignal], options.timeoutMs ?? 15e3, async (requestSignal) => {
-        const transport = {
-          accessToken: grant.access,
-          ...options.endpoint ? { endpoint: options.endpoint } : {},
-          ...options.proxyUrl ? { proxyUrl: options.proxyUrl } : {},
-          headers: { ...options.headers, ...attributionHeaders() },
-          signal: requestSignal
-        };
-        const rows = await cursorAbortable(fetchModels(transport), requestSignal);
-        let rich;
-        try {
-          rich = await withCursorDeadline([requestSignal], options.metadataTimeoutMs ?? 2e3, async (metadataSignal) => {
-            const metadataTransport = { ...transport, signal: metadataSignal };
-            return options.fetchMetadata ? await cursorAbortable(options.fetchMetadata(metadataTransport), metadataSignal) : decodeAvailableModelsResponse(await cursorAbortable(unary(
-              CURSOR_AVAILABLE_MODELS_PATH,
-              encodeAvailableModelsRequest(),
-              metadataTransport
-            ), metadataSignal));
-          });
-        } catch {
-          checkCursorSignal(requestSignal);
-        }
-        checkCursorSignal(requestSignal);
-        return cursorCatalogEntries(rows, rich);
-      });
-      live();
-      await verifyAccount();
-      const next = freeze({ loginId: grant.loginId, checkedAt: Date.now(), entries: nextEntries });
-      await enqueue(async () => {
-        live();
-        await verifyAccount();
-        await save(JSON.parse(JSON.stringify(next)));
-        try {
-          live();
-          await verifyAccount();
-        } catch (error) {
-          const current = await auth.metadata();
-          if (state && (!current.configured || current.loginId !== state.loginId)) state = void 0;
-          await save(state ? JSON.parse(JSON.stringify(state)) : null);
-          throw error;
-        }
-        state = next;
-      });
-      live();
-      return state.entries;
-    } catch (error) {
-      if (accountChanged && generation === mine) await clear();
-      throw error;
-    } finally {
-      if (pending === controller) pending = void 0;
-    }
-  }
-  function dispose() {
-    if (!disposed) {
-      disposed = true;
-      generation += 1;
-      pending?.abort();
-    }
-    return persistence;
-  }
-  return Object.freeze({ entries, snapshot, select, refresh, clear, dispose });
-}
-
-// ../dsh-cursor/lib/conversation-cache.js
-var MAX_AGE_MS = 24 * 60 * 60 * 1e3;
-var MAX_RECORDS = 64;
-function createConversationCache(records, logger, blobs) {
-  const warn = () => logger?.warn("cursor: conversation cache unavailable; continuing with in-memory state");
-  let tail = Promise.resolve();
-  const enqueue = (action) => {
-    const result = tail.then(action);
-    tail = result.catch(() => {
-    });
-    return result;
-  };
-  const repository = blobs && {
-    has: (hash) => blobs.get(hash) !== void 0,
-    get: (hash) => blobs.get(hash)?.encoded,
-    put: (hash, encoded) => blobs.put(hash, { encoded })
-  };
-  async function collect() {
-    const ordered = [...records.entries()].sort((a, b) => b[1].savedAt - a[1].savedAt);
-    for (const [index, [id, record]] of ordered.entries()) {
-      if (index >= MAX_RECORDS || Date.now() - record.savedAt > MAX_AGE_MS) await records.delete(id);
-    }
-    if (blobs) {
-      const retained = new Set([...records.entries()].flatMap(([, record]) => record.blobRefs ?? []));
-      for (const hash of blobs.keys()) if (!retained.has(hash)) await blobs.delete(hash);
-    }
-  }
-  return {
-    load(sessionId, binding) {
-      return enqueue(async () => {
-        const record = records.get(sessionId);
-        if (!record || record.binding !== binding || Date.now() - record.savedAt > MAX_AGE_MS) return void 0;
-        try {
-          return await restoreCursorConversation(record.snapshot, repository);
-        } catch {
-          warn();
-          return void 0;
-        }
-      });
-    },
-    save(sessionId, binding, store) {
-      return enqueue(async () => {
-        const references = /* @__PURE__ */ new Set();
-        let storageFailure;
-        const sink = repository && {
-          ...repository,
-          has: (hash) => {
-            references.add(hash);
-            return repository.has(hash);
-          },
-          put: async (hash, encoded) => {
-            try {
-              await repository.put(hash, encoded);
-            } catch (error) {
-              storageFailure = error;
-              throw error;
-            }
-          }
-        };
-        let snapshot;
-        try {
-          snapshot = await snapshotCursorConversation(store, sink);
-        } catch (error) {
-          if (storageFailure !== error) throw error;
-          warn();
-          return;
-        }
-        try {
-          const previous = records.get(sessionId);
-          const blobRefs = references.size > 0 || previous?.binding !== binding ? [...references] : previous?.blobRefs ?? [];
-          await records.put(sessionId, {
-            binding,
-            savedAt: Date.now(),
-            snapshot,
-            ...repository ? { blobRefs } : {}
-          });
-          await collect();
-        } catch {
-          warn();
-        }
-      });
-    },
-    discard(sessionId) {
-      return enqueue(async () => {
-        try {
-          await records.delete(sessionId);
-          await collect();
-        } catch {
-          warn();
-        }
-      });
-    },
-    flush: () => tail
-  };
-}
-
 // src/auth.js
-import { execFile } from "node:child_process";
-import { createHash as createHash9 } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import { homedir, platform } from "node:os";
-import { join } from "node:path";
 var PROVIDER = "cursor";
-var CLI_MARK = "cursor-agent";
-var API = "https://api2.cursor.sh";
+var CLI_MARK2 = "cursor-agent";
+var API2 = "https://api2.cursor.sh";
 var REFRESH_SKEW_MS = 6e4;
 var CLI_RENEW_MS = 5 * 6e4;
 var CLI_READ_TTL_MS = 1e4;
-var run = (file, args) => new Promise((resolve) => execFile(file, args, { timeout: 2e4 }, (error, stdout) => resolve({ ok: !error, out: String(stdout ?? "") })));
+var run2 = (file, args) => new Promise((resolve) => execFile2(file, args, { timeout: 2e4 }, (error, stdout) => resolve({ ok: !error, out: String(stdout ?? "") })));
 var cliRead = { at: 0, token: "" };
-async function cliToken(fresh = false) {
+async function cliToken2(fresh = false) {
   if (!fresh && Date.now() - cliRead.at < CLI_READ_TTL_MS) return cliRead.token;
   let token = "";
-  if (platform() === "darwin") {
-    const result = await run("security", ["find-generic-password", "-s", "cursor-access-token", "-a", "cursor-user", "-w"]);
-    if (result.ok) token = result.out.trim();
+  if (platform2() === "darwin") {
+    const result2 = await run2("security", ["find-generic-password", "-s", "cursor-access-token", "-a", "cursor-user", "-w"]);
+    if (result2.ok) token = result2.out.trim();
   }
   if (!token) {
-    const dir = process.env.XDG_CONFIG_HOME ? join(process.env.XDG_CONFIG_HOME, "cursor") : join(homedir(), ".cursor");
+    const dir = process.env.XDG_CONFIG_HOME ? join3(process.env.XDG_CONFIG_HOME, "cursor") : join3(homedir2(), ".cursor");
     try {
-      token = JSON.parse(await readFile(join(dir, "auth.json"), "utf8"))?.accessToken ?? "";
+      token = JSON.parse(await readFile2(join3(dir, "auth.json"), "utf8"))?.accessToken ?? "";
     } catch {
     }
   }
@@ -9561,20 +13202,37 @@ async function cliToken(fresh = false) {
   return token;
 }
 async function cliGrantToken() {
-  let token = await cliToken();
+  let token = await cliToken2();
   if (token && cursorTokenExpiry(token) - Date.now() < CLI_RENEW_MS) {
-    for (const file of [join(homedir(), ".local", "bin", "cursor-agent"), "cursor-agent"]) {
-      if ((await run(file, ["status"])).ok) break;
+    for (const file of [join3(homedir2(), ".local", "bin", "cursor-agent"), "cursor-agent"]) {
+      if ((await run2(file, ["status"])).ok) break;
     }
-    token = await cliToken(true);
+    token = await cliToken2(true);
   }
   if (!token) throw new LlmError("cursor-agent isn't signed in: run `cursor-agent login`, or sign in to Cursor again in magpie", "CURSOR_AUTH_REQUIRED");
   if (cursorTokenExpiry(token) <= Date.now()) throw new LlmError("cursor-agent's sign-in has run out: run `cursor-agent login` again", "CURSOR_AUTH_REQUIRED");
   return token;
 }
-var loginIdOf = (record) => record.accountId || createHash9("sha256").update(record.refresh ?? "").digest("hex").slice(0, 24);
+var loginIdOf = (record) => record.accountId || createHash11("sha256").update(record.type === "api" ? record.key : record.refresh ?? "").digest("hex").slice(0, 24);
+var exchanged2 = /* @__PURE__ */ new Map();
+async function keyToken2(key) {
+  const id = createHash11("sha256").update(key).digest("hex");
+  const had = exchanged2.get(id);
+  if (had && had.expires - Date.now() > CLI_RENEW_MS) return had.access;
+  const response = await fetch(`${API2}/auth/exchange_user_api_key`, {
+    method: "POST",
+    body: "{}",
+    signal: AbortSignal.timeout(15e3),
+    headers: { "content-type": "application/json", authorization: `Bearer ${key}`, "x-cursor-client-type": "cli", "x-ghost-mode": "true" }
+  });
+  if (response.status >= 500) throw new LlmError(`Cursor's API key exchange answered HTTP ${response.status}`, "PROVIDER_ERROR", { status: 502 });
+  const access = response.ok ? (await response.json().catch(() => null))?.accessToken : void 0;
+  if (!access) throw new LlmError("Cursor didn't take this API key", "CURSOR_AUTH_REQUIRED");
+  exchanged2.set(id, { access, expires: cursorTokenExpiry(access) });
+  return access;
+}
 async function cursorUnary(path, token, body = {}, signal = AbortSignal.timeout(15e3)) {
-  const response2 = await fetch(`${API}/${path}`, {
+  const response = await fetch(`${API2}/${path}`, {
     method: "POST",
     signal,
     body: JSON.stringify(body),
@@ -9586,10 +13244,10 @@ async function cursorUnary(path, token, body = {}, signal = AbortSignal.timeout(
       "x-ghost-mode": "true"
     }
   });
-  if (!response2.ok) throw new LlmError(`Cursor ${path} answered HTTP ${response2.status}`, "PROVIDER_ERROR", { status: response2.status });
-  return await response2.json();
+  if (!response.ok) throw new LlmError(`Cursor ${path} answered HTTP ${response.status}`, "PROVIDER_ERROR", { status: response.status });
+  return await response.json();
 }
-async function whoIs(token) {
+async function whoIs2(token) {
   const [me, plan] = await Promise.allSettled([
     cursorUnary("aiserver.v1.DashboardService/GetMe", token),
     cursorUnary("aiserver.v1.DashboardService/GetPlanInfo", token)
@@ -9604,6 +13262,7 @@ function createCursorAuth(getAuth, client) {
   let refreshing;
   const current = async () => {
     const record = await getAuth();
+    if (record?.type === "api") return record.key ? record : void 0;
     if (record?.type !== "oauth") return void 0;
     return renewed.get(record.refresh) ?? record;
   };
@@ -9611,7 +13270,8 @@ function createCursorAuth(getAuth, client) {
     const record = await current();
     if (!record) throw new LlmError("Cursor is not signed in: sign in to Cursor in magpie", "CURSOR_AUTH_REQUIRED");
     const loginId = loginIdOf(record);
-    if (record.refresh === CLI_MARK) return { type: "oauth", loginId, access: await cliGrantToken(), refresh: CLI_MARK, expires: 0 };
+    if (record.type === "api") return { type: "oauth", loginId, access: await keyToken2(record.key), refresh: "api-key", expires: 0 };
+    if (record.refresh === CLI_MARK2) return { type: "oauth", loginId, access: await cliGrantToken(), refresh: CLI_MARK2, expires: 0 };
     if (record.access && (record.expires || cursorTokenExpiry(record.access)) - Date.now() > REFRESH_SKEW_MS) {
       return { type: "oauth", loginId, access: record.access, refresh: record.refresh, expires: record.expires };
     }
@@ -9653,7 +13313,7 @@ var signInMethods = [
         async callback() {
           try {
             const tokens = await login;
-            const who = await whoIs(tokens.access);
+            const who = await whoIs2(tokens.access);
             return {
               type: "success",
               access: tokens.access,
@@ -9678,20 +13338,21 @@ var signInMethods = [
         instructions: "Uses the account `cursor-agent login` signed in to.",
         method: "auto",
         async callback() {
-          const token = await cliToken(true);
+          const token = await cliToken2(true);
           if (!token) return { type: "failed", error: "cursor-agent isn't signed in: run `cursor-agent login`" };
           if (cursorTokenExpiry(token) <= Date.now()) return { type: "failed", error: "cursor-agent's sign-in has run out: run `cursor-agent login` again" };
-          const who = await whoIs(token);
+          const who = await whoIs2(token);
           if (!who.email) return { type: "failed", error: "Cursor couldn't say which account is signed in" };
-          return { type: "success", access: "", refresh: CLI_MARK, expires: 0, accountId: who.email, ...who.plan ? { plan: who.plan } : {} };
+          return { type: "success", access: "", refresh: CLI_MARK2, expires: 0, accountId: who.email, ...who.plan ? { plan: who.plan } : {} };
         }
       };
     }
-  }
+  },
+  { type: "api", label: "Cursor API key (cursor.com/dashboard \u2192 Integrations)" }
 ];
 
 // src/chat.js
-import { createHash as createHash10, randomUUID as randomUUID6 } from "node:crypto";
+import { createHash as createHash12, randomUUID as randomUUID7 } from "node:crypto";
 var SESSION_HEADER = "x-magpie-cursor-session";
 var PARKED_MS = 30 * 6e4;
 var HEADER_WAIT_MS = 1e4;
@@ -9705,37 +13366,12 @@ var REBUILD = /* @__PURE__ */ new Set([
   "CURSOR_RUN_BUSY",
   "CURSOR_TURN_CLOSED"
 ]);
-var LEVELS = ["none", "minimal", "low", "medium", "high", "xhigh", "max"];
-var LEVEL_OF = { off: "none", on: "high", "extra-high": "xhigh" };
-function effortVariants(entry) {
-  const variants = /* @__PURE__ */ new Map();
-  for (const effort of entry.efforts ?? []) {
-    let level, thinking = false;
-    if (effort.id.startsWith("[")) {
-      const axes = Object.fromEntries(JSON.parse(effort.id));
-      level = axes.effort ?? axes.reasoning_effort ?? axes.reasoning ?? axes.thinking_effort;
-      thinking = axes.thinking === "true";
-    } else level = effort.id;
-    level = LEVEL_OF[level] ?? level;
-    if (!LEVELS.includes(level)) continue;
-    if (!variants.has(level) || thinking) variants.set(level, effort.id);
-  }
-  return new Map([...variants].sort(([a], [b]) => LEVELS.indexOf(a) - LEVELS.indexOf(b)));
-}
-function effortFor(entry, requested) {
-  const variants = effortVariants(entry);
-  if (!requested || !variants.size) return void 0;
-  const want = LEVELS.indexOf(LEVEL_OF[requested] ?? requested);
-  if (want < 0) return void 0;
-  const [, id] = [...variants].sort(([a], [b]) => Math.abs(LEVELS.indexOf(a) - want) - Math.abs(LEVELS.indexOf(b) - want) || LEVELS.indexOf(b) - LEVELS.indexOf(a))[0];
-  return id;
-}
 function conversationKey(chat, session, system) {
   const key = (typeof chat.prompt_cache_key === "string" ? chat.prompt_cache_key.trim() : "") || session || "";
   const first2 = (chat.messages ?? []).find((message2) => message2?.role === "user");
-  return createHash10("sha256").update(JSON.stringify(["cursor conversation", key, key ? "" : system, first2?.content ?? ""])).digest("hex");
+  return createHash12("sha256").update(JSON.stringify(["cursor conversation", key, key ? "" : system, first2?.content ?? ""])).digest("hex");
 }
-function statusOf(error) {
+function statusOf2(error) {
   if (Number.isInteger(error?.status) && error.status >= 400 && error.status < 600) return error.status;
   switch (error?.code) {
     case "CURSOR_AUTH_REQUIRED":
@@ -9760,20 +13396,20 @@ function statusOf(error) {
   }
 }
 var headers = { "x-magpie-sign-in": "kept" };
-function errorResponse(error) {
-  const status = statusOf(error);
+function errorResponse2(error) {
+  const status = statusOf2(error);
   return new Response(
     JSON.stringify({ error: { message: error?.message ?? String(error), code: error?.code ?? status } }),
     { status, headers: { ...headers, "content-type": "application/json" } }
   );
 }
-function counted(usage) {
+function counted(usage2) {
   return {
-    input: usage.inputTokens ?? 0,
-    output: usage.outputTokens ?? 0,
-    cacheRead: usage.cacheReadTokens ?? 0,
-    cacheWrite: usage.cacheWriteTokens ?? 0,
-    reasoning: usage.reasoningTokens ?? 0
+    input: usage2.inputTokens ?? 0,
+    output: usage2.outputTokens ?? 0,
+    cacheRead: usage2.cacheReadTokens ?? 0,
+    cacheWrite: usage2.cacheWriteTokens ?? 0,
+    reasoning: usage2.reasoningTokens ?? 0
   };
 }
 var zero = () => ({ prompt: 0, completion: 0, cacheRead: 0, cacheWrite: 0 });
@@ -9782,7 +13418,7 @@ var add = (sum, part) => {
   return sum;
 };
 var tally = (call) => ({ prompt: call.input + call.cacheRead + call.cacheWrite, completion: call.output, cacheRead: call.cacheRead, cacheWrite: call.cacheWrite });
-function stepUsage(diagnostics, occupancy, reported, final) {
+function stepUsage2(diagnostics, occupancy, reported, final) {
   const calls = (diagnostics?.modelCalls ?? []).map(counted);
   const deferred2 = zero();
   let main;
@@ -9820,7 +13456,8 @@ function stepUsage(diagnostics, occupancy, reported, final) {
   };
 }
 var FINISH = { "tool-calls": "tool_calls", stop: "stop", "max-tokens": "length" };
-function createChat({ runtime, catalog, ready, logger }) {
+function createChat({ runtime, ready, route, maxRequired: maxRequired2, logger }) {
+  const maxOnly2 = /* @__PURE__ */ new Set();
   const parked = /* @__PURE__ */ new Map();
   const reported = /* @__PURE__ */ new Map();
   function unpark(sessionId) {
@@ -9839,7 +13476,7 @@ function createChat({ runtime, catalog, ready, logger }) {
     parked.set(sessionId, timer);
   }
   async function* step(options, captured) {
-    for (let attempt = 0; ; attempt++) {
+    for (let attempt = 0, maxRetried = false; ; attempt++) {
       let emitted = false;
       let occupancy;
       try {
@@ -9857,15 +13494,22 @@ function createChat({ runtime, catalog, ready, logger }) {
           else if (chunk.type === "finish") {
             const final = chunk.reason.kind !== "tool-calls";
             if (!reported.has(options.sessionId)) reported.set(options.sessionId, zero());
-            const usage = stepUsage(chunk.replayState?.response?.diagnostics, occupancy, reported.get(options.sessionId), final);
+            const usage2 = stepUsage2(chunk.replayState?.response?.diagnostics, occupancy, reported.get(options.sessionId), final);
             if (final) reported.delete(options.sessionId);
-            yield { finish: FINISH[chunk.reason.kind] ?? "stop", usage };
+            yield { finish: FINISH[chunk.reason.kind] ?? "stop", usage: usage2 };
             return;
           }
         }
         return;
       } catch (error) {
         reported.delete(options.sessionId);
+        const selection = captured.entry.defaultSelection;
+        if (!emitted && !maxRetried && !selection.maxMode && maxRequired2(error?.message)) {
+          maxRetried = true;
+          maxOnly2.add(selection.wireModelId);
+          captured = { ...captured, entry: { ...captured.entry, defaultSelection: { ...selection, maxMode: true } } };
+          continue;
+        }
         if (emitted || attempt > 0 || !REBUILD.has(error?.code) || options.signal.aborted) throw error;
         logger?.warn(`cursor: ${options.sessionId} rebuilding from history after ${error.code}`);
         if (options.sessionId) await runtime.closeTurn(options.sessionId, error.message).catch(() => {
@@ -9873,12 +13517,13 @@ function createChat({ runtime, catalog, ready, logger }) {
       }
     }
   }
-  return async function answer(chat, signal, session) {
+  return async function answer2(chat, signal, session) {
     try {
       await ready();
       const model = String(chat.model ?? "");
-      const entry = catalog.snapshot(model);
-      if (!entry) return errorResponse(Object.assign(new Error(`Cursor has no model ${model}; refresh magpie's model list`), { code: "MODEL_NOT_FOUND" }));
+      const selection = await route(chat);
+      if (maxOnly2.has(selection.wireModelId)) selection.maxMode = true;
+      const entry = { info: { id: model }, defaultSelection: selection };
       const { system, messages } = await chatMessages(chat, signal);
       const sessionId = conversationKey(chat, session, system);
       unpark(sessionId);
@@ -9893,8 +13538,7 @@ function createChat({ runtime, catalog, ready, logger }) {
         system,
         messages,
         tools: chatTools(chat),
-        signal: lifetime.signal,
-        reasoningEffort: effortFor(entry, chat.reasoning_effort)
+        signal: lifetime.signal
       };
       const events = step(options, { entry, settings: {} });
       const done = (finish) => {
@@ -9908,7 +13552,7 @@ function createChat({ runtime, catalog, ready, logger }) {
         throw error;
       }
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse2(error);
     }
   };
 }
@@ -9918,12 +13562,12 @@ async function first(events) {
     timer = setTimeout(resolve, HEADER_WAIT_MS, "waiting");
   });
   const next = events.next();
-  const result = await Promise.race([next, waited]);
+  const result2 = await Promise.race([next, waited]);
   clearTimeout(timer);
-  return result === "waiting" ? { pending: next } : { result };
+  return result2 === "waiting" ? { pending: next } : { result: result2 };
 }
 async function streamed(events, model, done) {
-  const id = `chatcmpl-${randomUUID6()}`;
+  const id = `chatcmpl-${randomUUID7()}`;
   const created = Math.floor(Date.now() / 1e3);
   const encoder = new TextEncoder();
   const data = (value) => encoder.encode(`data: ${JSON.stringify(value)}
@@ -9971,14 +13615,14 @@ async function streamed(events, model, done) {
           clearInterval(keepalive);
         }
         while (!next.done) {
-          for (const bytes of encode(next.value)) controller.enqueue(bytes);
+          for (const bytes2 of encode(next.value)) controller.enqueue(bytes2);
           next = await events.next();
         }
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       } catch (error) {
         clearInterval(keepalive);
         done();
-        controller.enqueue(data({ error: { message: error?.message ?? String(error), code: statusOf(error) } }));
+        controller.enqueue(data({ error: { message: error?.message ?? String(error), code: statusOf2(error) } }));
       }
       controller.close();
     },
@@ -9989,13 +13633,13 @@ async function streamed(events, model, done) {
   return new Response(stream, { status: 200, headers: { ...headers, "content-type": "text/event-stream", "cache-control": "no-cache" } });
 }
 async function whole(events, model, done) {
-  let content = "", reasoning = "", finish = "stop", usage;
+  let content = "", reasoning = "", finish = "stop", usage2;
   const toolCalls = [];
   for await (const event of events) {
     if (event.delta?.content) content += event.delta.content;
     else if (event.delta?.reasoning_content) reasoning += event.delta.reasoning_content;
     else if (event.call) toolCalls.push({ id: event.call.id, type: "function", function: { name: event.call.name, arguments: event.call.arguments } });
-    else if (event.finish) ({ finish, usage } = event);
+    else if (event.finish) ({ finish, usage: usage2 } = event);
   }
   done(finish);
   const message2 = {
@@ -10006,32 +13650,32 @@ async function whole(events, model, done) {
   };
   return new Response(
     JSON.stringify({
-      id: `chatcmpl-${randomUUID6()}`,
+      id: `chatcmpl-${randomUUID7()}`,
       object: "chat.completion",
       created: Math.floor(Date.now() / 1e3),
       model,
       choices: [{ index: 0, message: message2, finish_reason: finish }],
-      ...usage ? { usage } : {}
+      ...usage2 ? { usage: usage2 } : {}
     }),
     { status: 200, headers: { ...headers, "content-type": "application/json" } }
   );
 }
 
 // src/store.js
-import { createHash as createHash11 } from "node:crypto";
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { join as join2 } from "node:path";
-var fileOf = (key) => createHash11("sha256").update(key).digest("hex") + ".json";
+import { createHash as createHash13 } from "node:crypto";
+import { mkdirSync as mkdirSync2, readFileSync as readFileSync2, readdirSync as readdirSync2, renameSync as renameSync2, rmSync as rmSync2, writeFileSync as writeFileSync2 } from "node:fs";
+import { join as join4 } from "node:path";
+var fileOf = (key) => createHash13("sha256").update(key).digest("hex") + ".json";
 function recordTable(dir) {
-  mkdirSync(dir, { recursive: true });
+  mkdirSync2(dir, { recursive: true });
   const records = /* @__PURE__ */ new Map();
-  for (const name of readdirSync(dir)) {
+  for (const name of readdirSync2(dir)) {
     if (!name.endsWith(".json")) continue;
     try {
-      const { key, value } = JSON.parse(readFileSync(join2(dir, name), "utf8"));
+      const { key, value } = JSON.parse(readFileSync2(join4(dir, name), "utf8"));
       if (typeof key === "string") records.set(key, value);
     } catch {
-      rmSync(join2(dir, name), { force: true });
+      rmSync2(join4(dir, name), { force: true });
     }
   }
   return {
@@ -10039,50 +13683,48 @@ function recordTable(dir) {
     entries: () => records.entries(),
     keys: () => records.keys(),
     async put(key, value) {
-      const file = join2(dir, fileOf(key));
-      writeFileSync(file + ".tmp", JSON.stringify({ key, value }));
-      renameSync(file + ".tmp", file);
+      const file = join4(dir, fileOf(key));
+      writeFileSync2(file + ".tmp", JSON.stringify({ key, value }));
+      renameSync2(file + ".tmp", file);
       records.set(key, value);
     },
     async delete(key) {
-      rmSync(join2(dir, fileOf(key)), { force: true });
+      rmSync2(join4(dir, fileOf(key)), { force: true });
       records.delete(key);
     }
   };
 }
 function blobTable(dir) {
-  mkdirSync(dir, { recursive: true });
-  const path = (hash) => join2(dir, hash);
+  mkdirSync2(dir, { recursive: true });
+  const path = (hash2) => join4(dir, hash2);
   return {
-    get(hash) {
+    get(hash2) {
       try {
-        return { encoded: readFileSync(path(hash), "utf8") };
+        return { encoded: readFileSync2(path(hash2), "utf8") };
       } catch {
         return void 0;
       }
     },
-    keys: () => readdirSync(dir).filter((name) => /^[0-9a-f]{64}$/u.test(name)),
-    async put(hash, { encoded }) {
-      writeFileSync(path(hash) + ".tmp", encoded);
-      renameSync(path(hash) + ".tmp", path(hash));
+    keys: () => readdirSync2(dir).filter((name) => /^[0-9a-f]{64}$/u.test(name)),
+    async put(hash2, { encoded }) {
+      writeFileSync2(path(hash2) + ".tmp", encoded);
+      renameSync2(path(hash2) + ".tmp", path(hash2));
     },
-    async delete(hash) {
-      rmSync(path(hash), { force: true });
+    async delete(hash2) {
+      rmSync2(path(hash2), { force: true });
     }
   };
 }
 
 // src/index.js
-var API2 = "https://api2.cursor.sh";
-var CHAT = "@ai-sdk/openai-compatible";
-var DEFAULT_CONTEXT = 2e5;
-var CATALOG_KEEP_MS = 10 * 6e4;
+var API3 = "https://api2.cursor.sh";
 var LOG_BYTES = 4 << 20;
+var OPTIONS = /* @__PURE__ */ new Set(["included_only"]);
 function fileLogger(file) {
   return {
     warn(message2) {
       try {
-        if (statSync(file, { throwIfNoEntry: false })?.size > LOG_BYTES) renameSync2(file, file + ".1");
+        if (statSync(file, { throwIfNoEntry: false })?.size > LOG_BYTES) renameSync3(file, file + ".1");
         appendFileSync(file, `${(/* @__PURE__ */ new Date()).toISOString()} ${message2}
 `);
       } catch {
@@ -10090,30 +13732,30 @@ function fileLogger(file) {
     }
   };
 }
+async function routeFor(auth, chat) {
+  const grant = await auth.getGrant();
+  const raw = await _internal.listFor(grant.access);
+  const model = String(chat.model ?? "");
+  const tier = chat.service_tier;
+  const fast = tier === "priority" || tier === "fast" ? true : tier ? false : void 0;
+  const { id, params, maxMode } = _internal.request(raw, model, chat.reasoning_effort ?? "", fast);
+  return {
+    wireModelId: id,
+    maxMode: maxMode === true,
+    ...params.length ? { parameters: params.map(({ id: key, value }) => ({ key, value: String(value) })) } : {}
+  };
+}
 var provider;
-function providerFor(input) {
+async function providerFor(input) {
   if (provider) return provider;
-  const dir = process.env.MAGPIE_CURSOR_DATA ?? join3(process.env.XDG_DATA_HOME || join3(homedir2(), ".local", "share"), "magpie-cursor");
-  mkdirSync2(dir, { recursive: true });
-  const logger = fileLogger(join3(dir, "cursor.log"));
+  const dir = process.env.MAGPIE_CURSOR_DATA ?? join5(process.env.XDG_DATA_HOME || join5(homedir3(), ".local", "share"), "magpie-cursor");
+  mkdirSync3(dir, { recursive: true });
+  const logger = fileLogger(join5(dir, "cursor.log"));
   let getAuth = async () => void 0;
   const auth = createCursorAuth(() => getAuth(), input?.client);
-  const catalogs = recordTable(join3(dir, "catalog"));
-  const cached = catalogs.get("default");
-  const catalog = createCursorCatalog(auth, {
-    cached,
-    save: (value) => value === null ? catalogs.delete("default") : catalogs.put("default", value)
-  });
-  let checkedAt = cached?.checkedAt ?? 0;
-  let refreshing;
-  const refresh = () => refreshing ??= catalog.refresh().then((entries) => {
-    checkedAt = Date.now();
-    return entries;
-  }).finally(() => {
-    refreshing = void 0;
-  });
-  const conversationCache = createConversationCache(recordTable(join3(dir, "conversations")), logger, blobTable(join3(dir, "blobs")));
-  const runtime = new CursorRuntime({ logger: () => logger }, auth, catalog, { conversationCache });
+  const conversationCache = createConversationCache(recordTable(join5(dir, "conversations")), logger, blobTable(join5(dir, "blobs")));
+  const selections = { select: (entry) => entry.defaultSelection };
+  const runtime = new CursorRuntime({ logger: () => logger }, auth, selections, { conversationCache });
   let loginId;
   async function ready() {
     const metadata = await auth.metadata();
@@ -10121,110 +13763,56 @@ function providerFor(input) {
       loginId = metadata.loginId;
       await runtime.invalidateAccount(loginId);
     }
-    if (!catalog.entries().length) await refresh();
-    else if (Date.now() - checkedAt > CATALOG_KEEP_MS) refresh().catch(() => {
-    });
   }
   provider = {
-    catalog,
-    refresh,
-    ready,
+    community: await CursorAuthPlugin(input),
     setAuth(next) {
       getAuth = next;
     },
-    answer: createChat({ runtime, catalog, ready, logger })
+    answer: createChat({ runtime, ready, logger, route: (chat) => routeFor(auth, chat), maxRequired: _internal.maxRequired })
   };
   return provider;
 }
-function magpieModel(entry) {
-  const variants = effortVariants(entry);
-  const context = entry.info.context?.contextWindow ?? DEFAULT_CONTEXT;
-  return {
-    id: entry.info.id,
-    providerID: PROVIDER,
-    name: entry.info.name,
-    api: { id: entry.info.id, url: API2, npm: CHAT },
-    status: "active",
-    headers: {},
-    options: {},
-    cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
-    limit: { context, output: 0 },
-    capabilities: {
-      temperature: false,
-      reasoning: variants.size > 0,
-      attachment: true,
-      toolcall: true,
-      input: { text: true, image: entry.info.inputModalities.includes("image"), audio: false, video: false, pdf: false },
-      output: { text: true, image: false, audio: false, video: false, pdf: false },
-      interleaved: false
-    },
-    release_date: "",
-    variants: Object.fromEntries([...variants.keys()].map((level) => [level, { reasoningEffort: level }]))
-  };
-}
 async function MagpieCursorPlugin(input) {
-  const cursor = providerFor(input);
+  const cursor = await providerFor(input);
+  const shown = cursor.community;
   return {
     auth: {
       provider: PROVIDER,
       async loader(getAuth) {
         const record = await getAuth();
-        if (record?.type !== "oauth" || !record.access && record.refresh !== CLI_MARK) return {};
+        const signedIn = record?.type === "api" ? !!record.key : record?.type === "oauth" && (!!record.access || record.refresh === CLI_MARK2);
+        if (!signedIn) return {};
         cursor.setAuth(getAuth);
         return {
-          baseURL: API2,
+          baseURL: API3,
           apiKey: "cursor",
-          async fetch(request, init = {}) {
-            const url = typeof request === "string" ? request : request instanceof URL ? request.href : request.url;
+          async fetch(request2, init = {}) {
+            const url = typeof request2 === "string" ? request2 : request2 instanceof URL ? request2.href : request2.url;
             if (!/\/chat\/completions$/u.test(new URL(url).pathname)) {
-              return errorResponse(Object.assign(new Error("only chat completions are served"), { status: 404 }));
+              return errorResponse2(Object.assign(new Error("only chat completions are served"), { status: 404 }));
             }
             let chat;
             try {
-              const body = init.body ?? (request instanceof Request ? await request.clone().text() : void 0);
+              const body = init.body ?? (request2 instanceof Request ? await request2.clone().text() : void 0);
               chat = JSON.parse(typeof body === "string" ? body : new TextDecoder().decode(body));
             } catch {
-              return errorResponse(Object.assign(new Error("a request that isn't JSON"), { status: 400 }));
+              return errorResponse2(Object.assign(new Error("a request that isn't JSON"), { status: 400 }));
             }
-            const headers2 = new Headers(init.headers ?? (request instanceof Request ? request.headers : void 0));
-            const signal = init.signal ?? (request instanceof Request ? request.signal : void 0);
+            const headers2 = new Headers(init.headers ?? (request2 instanceof Request ? request2.headers : void 0));
+            const signal = init.signal ?? (request2 instanceof Request ? request2.signal : void 0);
             return cursor.answer(chat, signal, headers2.get(SESSION_HEADER) ?? "");
           }
         };
       },
-      methods: signInMethods
+      methods: signInMethods,
+      options: shown.auth.options.filter((option) => OPTIONS.has(option.key)),
+      usage: shown.auth.usage,
+      calls: shown.auth.calls
     },
-    // The session a request is part of, for its conversation; put on Cursor's requests alone.
-    async "chat.headers"(hook, output) {
-      if (hook?.model?.providerID !== PROVIDER && hook?.provider?.info?.id !== PROVIDER) return;
-      const session = String(hook?.sessionID ?? "").trim();
-      if (session && !/^magpie-[0-9a-f]{24}$/u.test(session)) output.headers[SESSION_HEADER] = session.slice(0, 128);
-    },
-    async config(config) {
-      config.provider ??= {};
-      const was = config.provider[PROVIDER] ?? {};
-      config.provider[PROVIDER] = {
-        name: "Cursor",
-        npm: CHAT,
-        api: API2,
-        ...was,
-        models: { ...Object.fromEntries(cursor.catalog.entries().map((entry) => [entry.info.id, {
-          name: entry.info.name,
-          limit: { context: entry.info.context?.contextWindow ?? DEFAULT_CONTEXT, output: 0 },
-          attachment: true,
-          tool_call: true
-        }])), ...was.models }
-      };
-    },
-    provider: {
-      id: PROVIDER,
-      async models(magpieProvider, { auth } = {}) {
-        if (!auth) return magpieProvider.models;
-        cursor.setAuth(async () => auth);
-        await cursor.ready();
-        return Object.fromEntries(cursor.catalog.entries().map((entry) => [entry.info.id, magpieModel(entry)]));
-      }
-    }
+    "chat.headers": shown["chat.headers"],
+    config: shown.config,
+    provider: shown.provider
   };
 }
 export {

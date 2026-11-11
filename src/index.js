@@ -1,23 +1,25 @@
 /**
- * Cursor subscriptions in magpie through dsh-cursor: its wire protocol, Run
- * runtime, model catalog and OAuth, with a Chat Completions front and
- * durable conversation checkpoints in a folder of the plugin's own.
+ * Cursor subscriptions in magpie. Requests run on dsh-cursor: its wire
+ * protocol, Run runtime and OAuth, with a Chat Completions front and durable
+ * conversation checkpoints in a folder of the plugin's own. What magpie shows
+ * is the community Cursor plugin's own, so the two serve the same models
+ * under the same ids: its model list, how a model id, effort and service tier
+ * pick Cursor's variant, its plan usage and its calls outside magpie.
  */
 import { appendFileSync, mkdirSync, renameSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { CursorRuntime } from 'dsh-cursor/lib/runtime.js'
-import { createCursorCatalog } from 'dsh-cursor/lib/catalog.js'
 import { createConversationCache } from 'dsh-cursor/lib/conversation-cache.js'
+import { CursorAuthPlugin, _internal as community } from '@magpie-community/opencode-cursor-auth/index.mjs'
 import { CLI_MARK, PROVIDER, createCursorAuth, signInMethods } from './auth.js'
-import { SESSION_HEADER, createChat, effortVariants, errorResponse } from './chat.js'
+import { SESSION_HEADER, createChat, errorResponse } from './chat.js'
 import { blobTable, recordTable } from './store.js'
 
 const API = 'https://api2.cursor.sh'
-const CHAT = '@ai-sdk/openai-compatible'
-const DEFAULT_CONTEXT = 200_000
-const CATALOG_KEEP_MS = 10 * 60_000
 const LOG_BYTES = 4 << 20
+/** The community plugin's switches this plugin reads too. */
+const OPTIONS = new Set(['included_only'])
 
 function fileLogger(file) {
   return {
@@ -30,9 +32,24 @@ function fileLogger(file) {
   }
 }
 
+/** A request's Cursor selection, as the community plugin picks the variant. */
+async function routeFor(auth, chat) {
+  const grant = await auth.getGrant()
+  const raw = await community.listFor(grant.access)
+  const model = String(chat.model ?? '')
+  // fast only when asked: a service tier of priority or fast is on, any other off
+  const tier = chat.service_tier
+  const fast = tier === 'priority' || tier === 'fast' ? true : tier ? false : undefined
+  const { id, params, maxMode } = community.request(raw, model, chat.reasoning_effort ?? '', fast)
+  return {
+    wireModelId: id, maxMode: maxMode === true,
+    ...(params.length ? { parameters: params.map(({ id: key, value }) => ({ key, value: String(value) })) } : {}),
+  }
+}
+
 /** One provider per process, whatever number of times magpie loads the plugin. */
 let provider
-function providerFor(input) {
+async function providerFor(input) {
   if (provider) return provider
   const dir = process.env.MAGPIE_CURSOR_DATA ?? join(process.env.XDG_DATA_HOME || join(homedir(), '.local', 'share'), 'magpie-cursor')
   mkdirSync(dir, { recursive: true })
@@ -40,65 +57,37 @@ function providerFor(input) {
   // The sign-in magpie last handed over; every request reads it afresh.
   let getAuth = async () => undefined
   const auth = createCursorAuth(() => getAuth(), input?.client)
-  const catalogs = recordTable(join(dir, 'catalog'))
-  const cached = catalogs.get('default')
-  const catalog = createCursorCatalog(auth, {
-    cached, save: value => value === null ? catalogs.delete('default') : catalogs.put('default', value),
-  })
-  let checkedAt = cached?.checkedAt ?? 0
-  let refreshing
-  const refresh = () => refreshing ??= catalog.refresh()
-    .then(entries => { checkedAt = Date.now(); return entries })
-    .finally(() => { refreshing = undefined })
   const conversationCache = createConversationCache(recordTable(join(dir, 'conversations')), logger, blobTable(join(dir, 'blobs')))
-  const runtime = new CursorRuntime({ logger: () => logger }, auth, catalog, { conversationCache })
+  // The selection is made per request; the runtime runs it as it is.
+  const selections = { select: entry => entry.defaultSelection }
+  const runtime = new CursorRuntime({ logger: () => logger }, auth, selections, { conversationCache })
   let loginId
-  /** A catalog for the signed-in account, and a runtime that has forgotten any other one's Runs. */
+  /** A runtime that has forgotten any other account's Runs. */
   async function ready() {
     const metadata = await auth.metadata()
     if (metadata.loginId !== loginId) {
       loginId = metadata.loginId
       await runtime.invalidateAccount(loginId)
     }
-    if (!catalog.entries().length) await refresh()
-    else if (Date.now() - checkedAt > CATALOG_KEEP_MS) refresh().catch(() => {})
   }
   provider = {
-    catalog, refresh, ready,
+    community: await CursorAuthPlugin(input),
     setAuth(next) { getAuth = next },
-    answer: createChat({ runtime, catalog, ready, logger }),
+    answer: createChat({ runtime, ready, logger, route: chat => routeFor(auth, chat), maxRequired: community.maxRequired }),
   }
   return provider
 }
 
-function magpieModel(entry) {
-  const variants = effortVariants(entry)
-  const context = entry.info.context?.contextWindow ?? DEFAULT_CONTEXT
-  return {
-    id: entry.info.id, providerID: PROVIDER, name: entry.info.name,
-    api: { id: entry.info.id, url: API, npm: CHAT },
-    status: 'active', headers: {}, options: {},
-    cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
-    limit: { context, output: 0 },
-    capabilities: {
-      temperature: false, reasoning: variants.size > 0, attachment: true, toolcall: true,
-      input: { text: true, image: entry.info.inputModalities.includes('image'), audio: false, video: false, pdf: false },
-      output: { text: true, image: false, audio: false, video: false, pdf: false },
-      interleaved: false,
-    },
-    release_date: '',
-    variants: Object.fromEntries([...variants.keys()].map(level => [level, { reasoningEffort: level }])),
-  }
-}
-
 export async function MagpieCursorPlugin(input) {
-  const cursor = providerFor(input)
+  const cursor = await providerFor(input)
+  const shown = cursor.community
   return {
     auth: {
       provider: PROVIDER,
       async loader(getAuth) {
         const record = await getAuth()
-        if (record?.type !== 'oauth' || (!record.access && record.refresh !== CLI_MARK)) return {}
+        const signedIn = record?.type === 'api' ? !!record.key : record?.type === 'oauth' && (!!record.access || record.refresh === CLI_MARK)
+        if (!signedIn) return {}
         cursor.setAuth(getAuth)
         return {
           baseURL: API,
@@ -122,31 +111,12 @@ export async function MagpieCursorPlugin(input) {
         }
       },
       methods: signInMethods,
+      options: shown.auth.options.filter(option => OPTIONS.has(option.key)),
+      usage: shown.auth.usage,
+      calls: shown.auth.calls,
     },
-    // The session a request is part of, for its conversation; put on Cursor's requests alone.
-    async 'chat.headers'(hook, output) {
-      if (hook?.model?.providerID !== PROVIDER && hook?.provider?.info?.id !== PROVIDER) return
-      const session = String(hook?.sessionID ?? '').trim()
-      // magpie names a conversation with no session of its own after its first message.
-      if (session && !/^magpie-[0-9a-f]{24}$/u.test(session)) output.headers[SESSION_HEADER] = session.slice(0, 128)
-    },
-    async config(config) {
-      config.provider ??= {}
-      const was = config.provider[PROVIDER] ?? {}
-      config.provider[PROVIDER] = { name: 'Cursor', npm: CHAT, api: API, ...was,
-        models: { ...Object.fromEntries(cursor.catalog.entries().map(entry => [entry.info.id, {
-          name: entry.info.name, limit: { context: entry.info.context?.contextWindow ?? DEFAULT_CONTEXT, output: 0 },
-          attachment: true, tool_call: true,
-        }])), ...was.models } }
-    },
-    provider: {
-      id: PROVIDER,
-      async models(magpieProvider, { auth } = {}) {
-        if (!auth) return magpieProvider.models
-        cursor.setAuth(async () => auth)
-        await cursor.ready()
-        return Object.fromEntries(cursor.catalog.entries().map(entry => [entry.info.id, magpieModel(entry)]))
-      },
-    },
+    'chat.headers': shown['chat.headers'],
+    config: shown.config,
+    provider: shown.provider,
   }
 }

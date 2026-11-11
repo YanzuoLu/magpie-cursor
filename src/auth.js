@@ -1,9 +1,9 @@
 /**
- * Magpie's Cursor sign-in as the grant dsh-cursor's runtime and catalog ask
- * for. An account is either the browser sign-in dsh-cursor does (Cursor's
- * Deep Control PKCE login, its tokens renewed with the refresh token), or
- * the account cursor-agent signed in to, whose token is read from where the
- * CLI keeps it each time and never written.
+ * Magpie's Cursor sign-in as the grant dsh-cursor's runtime asks for. An
+ * account is the browser sign-in dsh-cursor does (Cursor's Deep Control PKCE
+ * login, its tokens renewed with the refresh token), the account
+ * cursor-agent signed in to, whose token is read from where the CLI keeps it
+ * each time and never written, or a Cursor API key.
  */
 import { execFile } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -54,7 +54,29 @@ async function cliGrantToken() {
   return token
 }
 
-const loginIdOf = record => record.accountId || createHash('sha256').update(record.refresh ?? '').digest('hex').slice(0, 24)
+const loginIdOf = record => record.accountId
+  || createHash('sha256').update(record.type === 'api' ? record.key : record.refresh ?? '').digest('hex').slice(0, 24)
+
+/**
+ * An API key's access token: the key exchanged at /auth/exchange_user_api_key,
+ * as cursor-agent does with CURSOR_API_KEY, and exchanged again when the
+ * token is about to run out.
+ */
+const exchanged = new Map()
+async function keyToken(key) {
+  const id = createHash('sha256').update(key).digest('hex')
+  const had = exchanged.get(id)
+  if (had && had.expires - Date.now() > CLI_RENEW_MS) return had.access
+  const response = await fetch(`${API}/auth/exchange_user_api_key`, {
+    method: 'POST', body: '{}', signal: AbortSignal.timeout(15_000),
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${key}`, 'x-cursor-client-type': 'cli', 'x-ghost-mode': 'true' },
+  })
+  if (response.status >= 500) throw new LlmError(`Cursor's API key exchange answered HTTP ${response.status}`, 'PROVIDER_ERROR', { status: 502 })
+  const access = response.ok ? (await response.json().catch(() => null))?.accessToken : undefined
+  if (!access) throw new LlmError("Cursor didn't take this API key", 'CURSOR_AUTH_REQUIRED')
+  exchanged.set(id, { access, expires: cursorTokenExpiry(access) })
+  return access
+}
 
 /** A Connect unary call in JSON on Cursor's API. */
 export async function cursorUnary(path, token, body = {}, signal = AbortSignal.timeout(15_000)) {
@@ -89,6 +111,7 @@ export function createCursorAuth(getAuth, client) {
   let refreshing
   const current = async () => {
     const record = await getAuth()
+    if (record?.type === 'api') return record.key ? record : undefined
     if (record?.type !== 'oauth') return undefined
     return renewed.get(record.refresh) ?? record
   }
@@ -96,6 +119,7 @@ export function createCursorAuth(getAuth, client) {
     const record = await current()
     if (!record) throw new LlmError('Cursor is not signed in: sign in to Cursor in magpie', 'CURSOR_AUTH_REQUIRED')
     const loginId = loginIdOf(record)
+    if (record.type === 'api') return { type: 'oauth', loginId, access: await keyToken(record.key), refresh: 'api-key', expires: 0 }
     if (record.refresh === CLI_MARK) return { type: 'oauth', loginId, access: await cliGrantToken(), refresh: CLI_MARK, expires: 0 }
     if (record.access && (record.expires || cursorTokenExpiry(record.access)) - Date.now() > REFRESH_SKEW_MS) {
       return { type: 'oauth', loginId, access: record.access, refresh: record.refresh, expires: record.expires }
@@ -162,4 +186,5 @@ export const signInMethods = [
       }
     },
   },
+  { type: 'api', label: 'Cursor API key (cursor.com/dashboard → Integrations)' },
 ]

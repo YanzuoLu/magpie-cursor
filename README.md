@@ -4,9 +4,14 @@ Cursor subscriptions in [magpie](https://github.com/yetone/magpie) through
 [dsh-cursor](https://github.com/YanzuoLu/dsh-cursor), the in-process Cursor
 provider of DeepSeek Harness. Provider id: `cursor`.
 
-dsh-cursor's wire protocol, Run runtime, model catalog and OAuth are bundled
-as they are. This package adds a Chat Completions front, magpie's sign-in and
-model hooks, and durable conversation state on disk.
+Requests run on dsh-cursor's wire protocol, Run runtime and OAuth, bundled as
+they are, with a Chat Completions front and durable conversation state on
+disk. What magpie shows is
+[@magpie-community/opencode-cursor-auth](https://github.com/magpie-community/plugins)'s
+own, bundled at 0.2.44, so both plugins serve the same models under the same
+ids: its model list (`claude-opus-5-5@1m`, efforts as variants, Fast through
+`service_tier`), how a model id picks Cursor's variant and Max Mode, its plan
+usage rings and its calls outside magpie.
 
 - A Cursor Run stays alive across tool handoffs. The request that carries the
   tools' results resumes the original execution ids; a Run waits up to 30
@@ -17,8 +22,9 @@ model hooks, and durable conversation state on disk.
   RunSSE/BidiAppend upload.
 - Cursor receives a names-only MCP directory of the caller's tools; their full
   schemas go through Cursor's MCP-state request.
-- Usage is reported on every step: the context Cursor's checkpoint says it
-  occupied, or a model call's own counters when Cursor sends them. At the end
+- Usage is reported on every step from Cursor's own counters for each model
+  call (or, without them, the context its checkpoint says the step occupied).
+  At the end
   of a turn, whatever of Cursor's own count for the whole Run the steps have
   not reported goes as `magpie_deferred`, so a turn adds up to what Cursor
   counted.
@@ -43,6 +49,8 @@ back. Both read the same sign-in.
 - **cursor-agent's sign-in**: the token `cursor-agent login` keeps (macOS
   keychain, else `~/.cursor/auth.json`), read each time and never written. When
   it has less than 5 minutes left, `cursor-agent status` renews it.
+- **Cursor API key**: exchanged for a token at `/auth/exchange_user_api_key`,
+  and again when the token runs out.
 
 ## Data
 
@@ -51,10 +59,4 @@ Conversation checkpoints, blob packs, the model catalog and `cursor.log`
 (`~/.local/share/magpie-cursor`), or `$MAGPIE_CURSOR_DATA`. Checkpoints older
 than a day, beyond the newest 64, are dropped.
 
-## Not included
-
-magpie's plan-usage rings and outside-call history (`usage`, `calls`), API-key
-sign-in and Fast-mode switching through `service_tier`. Fast lanes are
-listed as models of their own.
-
-MIT. Upstream notices are in dsh-cursor's UPSTREAM.md.
+MIT. Upstream notices are in dsh-cursor's UPSTREAM.md and the community plugin's package.

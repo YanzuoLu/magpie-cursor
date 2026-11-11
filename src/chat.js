@@ -16,41 +16,6 @@ const KEEPALIVE_MS = 15_000
 /** Failures before any output after which a fresh Run from the request's own history is right. */
 const REBUILD = new Set(['CURSOR_CONTEXT_CHANGED', 'CURSOR_TOOL_RESULT_MISMATCH', 'CURSOR_TOOL_RESULT_DUPLICATE',
   'CURSOR_TOOL_RESULT_MISSING', 'CURSOR_RUN_LOST', 'CURSOR_RUN_BUSY', 'CURSOR_TURN_CLOSED'])
-const LEVELS = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max']
-const LEVEL_OF = { off: 'none', on: 'high', 'extra-high': 'xhigh' }
-
-/**
- * A model's reasoning choices as magpie variants: each Cursor effort under a
- * standard level, the thinking route where Cursor offers a level with and
- * without it.
- */
-export function effortVariants(entry) {
-  const variants = new Map()
-  for (const effort of entry.efforts ?? []) {
-    let level, thinking = false
-    if (effort.id.startsWith('[')) {
-      const axes = Object.fromEntries(JSON.parse(effort.id))
-      level = axes.effort ?? axes.reasoning_effort ?? axes.reasoning ?? axes.thinking_effort
-      thinking = axes.thinking === 'true'
-    } else level = effort.id
-    level = LEVEL_OF[level] ?? level
-    if (!LEVELS.includes(level)) continue
-    if (!variants.has(level) || thinking) variants.set(level, effort.id)
-  }
-  return new Map([...variants].sort(([a], [b]) => LEVELS.indexOf(a) - LEVELS.indexOf(b)))
-}
-
-/** The entry's effort for a requested level: that one, else the nearest offered. */
-function effortFor(entry, requested) {
-  const variants = effortVariants(entry)
-  if (!requested || !variants.size) return undefined
-  const want = LEVELS.indexOf(LEVEL_OF[requested] ?? requested)
-  if (want < 0) return undefined
-  const [, id] = [...variants].sort(([a], [b]) => Math.abs(LEVELS.indexOf(a) - want) - Math.abs(LEVELS.indexOf(b) - want)
-    || LEVELS.indexOf(b) - LEVELS.indexOf(a))[0]
-  return id
-}
-
 /**
  * The conversation a request belongs to: what names the session (Codex's
  * prompt_cache_key, else magpie's session), with its first user message,
@@ -135,8 +100,15 @@ function stepUsage(diagnostics, occupancy, reported, final) {
 
 const FINISH = { 'tool-calls': 'tool_calls', stop: 'stop', 'max-tokens': 'length' }
 
-/** Chat Completions answers over a dsh-cursor runtime and catalog. */
-export function createChat({ runtime, catalog, ready, logger }) {
+/**
+ * Chat Completions answers over a dsh-cursor runtime. route(chat) is the
+ * Cursor selection a request's model, effort and service tier run as, or
+ * undefined for a model the account hasn't got; maxRequired(error) is
+ * Cursor's refusal of a model run without Max Mode.
+ */
+export function createChat({ runtime, ready, route, maxRequired, logger }) {
+  /** Models Cursor said it serves in Max Mode only. */
+  const maxOnly = new Set()
   const parked = new Map()
   /** Usage each session's live Run has reported so far. */
   const reported = new Map()
@@ -161,7 +133,7 @@ export function createChat({ runtime, catalog, ready, logger }) {
    * failure a fresh Run fixes is retried once, before any output.
    */
   async function* step(options, captured) {
-    for (let attempt = 0; ; attempt++) {
+    for (let attempt = 0, maxRetried = false; ; attempt++) {
       let emitted = false
       let occupancy
       try {
@@ -182,6 +154,13 @@ export function createChat({ runtime, catalog, ready, logger }) {
         return
       } catch (error) {
         reported.delete(options.sessionId)
+        const selection = captured.entry.defaultSelection
+        if (!emitted && !maxRetried && !selection.maxMode && maxRequired(error?.message)) {
+          maxRetried = true
+          maxOnly.add(selection.wireModelId)
+          captured = { ...captured, entry: { ...captured.entry, defaultSelection: { ...selection, maxMode: true } } }
+          continue
+        }
         if (emitted || attempt > 0 || !REBUILD.has(error?.code) || options.signal.aborted) throw error
         logger?.warn(`cursor: ${options.sessionId} rebuilding from history after ${error.code}`)
         if (options.sessionId) await runtime.closeTurn(options.sessionId, error.message).catch(() => {})
@@ -193,8 +172,9 @@ export function createChat({ runtime, catalog, ready, logger }) {
     try {
       await ready()
       const model = String(chat.model ?? '')
-      const entry = catalog.snapshot(model)
-      if (!entry) return errorResponse(Object.assign(new Error(`Cursor has no model ${model}; refresh magpie's model list`), { code: 'MODEL_NOT_FOUND' }))
+      const selection = await route(chat)
+      if (maxOnly.has(selection.wireModelId)) selection.maxMode = true
+      const entry = { info: { id: model }, defaultSelection: selection }
       const { system, messages } = await chatMessages(chat, signal)
       const sessionId = conversationKey(chat, session, system)
       unpark(sessionId)
@@ -206,7 +186,7 @@ export function createChat({ runtime, catalog, ready, logger }) {
       else signal?.addEventListener('abort', cancel, { once: true })
       const options = {
         provider: PROVIDER, model, sessionId, system, messages, tools: chatTools(chat),
-        signal: lifetime.signal, reasoningEffort: effortFor(entry, chat.reasoning_effort),
+        signal: lifetime.signal,
       }
       const events = step(options, { entry, settings: {} })
       const done = finish => {

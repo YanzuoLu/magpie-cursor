@@ -166,6 +166,9 @@ importers:
 
   .:
     devDependencies:
+      '@magpie-community/opencode-cursor-auth':
+        specifier: 0.2.44
+        version: 0.2.44
       dsh-cursor:
         specifier: link:../dsh-cursor
         version: link:../dsh-cursor
@@ -331,6 +334,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@magpie-community/opencode-cursor-auth@0.2.44':
+    resolution: {integrity: sha512-dqEBXrTF8gYy43/xoaiYWe0kP6vQ0WnJ/K+lW5mK1lQs4ljWKh1HxSckb46GBtScntbT/Vo6CwOG83xRrUs9Rw==}
+
   esbuild@0.25.12:
     resolution: {integrity: sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==}
     engines: {node: '>=18'}
@@ -415,6 +421,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.25.12':
     optional: true
+
+  '@magpie-community/opencode-cursor-auth@0.2.44': {}
 
   esbuild@0.25.12:
     optionalDependencies:
