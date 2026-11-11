@@ -1,0 +1,25 @@
+{
+  "name": "magpie-cursor",
+  "version": "0.1.0",
+  "description": "Cursor subscriptions in magpie through dsh-cursor's in-process Cursor provider",
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "main": "./dist/index.mjs",
+  "exports": {
+    ".": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "license": "MIT",
+  "author": "Yanzuo Lu",
+  "repository": { "type": "git", "url": "https://github.com/YanzuoLu/magpie-cursor.git" },
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "dsh-cursor": "link:../dsh-cursor",
+    "esbuild": "0.25.12"
+  }
+}
